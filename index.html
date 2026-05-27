@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0f0f0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Дикция">
+<title>Дикция — тренажёр речи</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0f0f0f;--bg2:#1a1a1a;--bg3:#242424;--border:#2e2e2e;
+  --accent:#e8ff47;--accent2:#47b6ff;--accent3:#ff7eb3;--accent4:#a78bfa;
+  --text:#f0f0f0;--muted:#888;--danger:#ff6b6b;--success:#4ade80;--r:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overflow:hidden}
+#update-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--accent);color:#000;font-size:13px;font-weight:500;padding:10px 16px;text-align:center;cursor:pointer}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--bg2);border-top:0.5px solid var(--border);display:flex;padding:8px 0 max(8px,env(safe-area-inset-bottom))}
+nav button{flex:1;background:none;border:none;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9px;font-family:'Inter',sans-serif;cursor:pointer;padding:4px 0;transition:color 0.15s}
+nav button.active{color:var(--accent)}
+nav button svg{width:20px;height:20px}
+.screen{display:none;height:100dvh;overflow-y:auto;padding:0 0 88px}
+.screen.active{display:block}
+.hdr{padding:52px 20px 16px;position:sticky;top:0;background:var(--bg);z-index:10;border-bottom:0.5px solid var(--border)}
+.hdr-label{font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.hdr-title{font-family:'Unbounded',sans-serif;font-size:20px;font-weight:600;line-height:1.2}
+.hdr-title span{color:var(--accent)}
+.section{padding:16px 16px 0}
+.section-title{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+.card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:14px 16px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:8px;border:0.5px solid var(--border);background:var(--bg3);color:var(--text);font-size:13px;font-family:'Inter',sans-serif;cursor:pointer;transition:all .15s}
+.btn:active{transform:scale(.97)}
+.btn-accent{background:var(--accent);color:#000;border-color:var(--accent);font-weight:500}
+.btn-sm{padding:7px 14px;font-size:12px}
+.tag{font-size:10px;font-weight:500;letter-spacing:.05em;padding:3px 8px;border-radius:20px}
+.tag-warm{background:rgba(255,107,107,.15);color:#ff9f9f}
+.tag-tongue{background:rgba(71,182,255,.15);color:#7ecfff}
+.tag-speed{background:rgba(232,255,71,.15);color:#e8ff47}
+.tag-voice{background:rgba(74,222,128,.15);color:#6ee49a}
+.tag-breath{background:rgba(167,139,250,.15);color:#c4b5fd}
+.tag-sell{background:rgba(255,126,179,.15);color:#ffadd4}
+.tag-mind{background:rgba(251,191,36,.15);color:#fcd34d}
+
+/* HOME */
+.streak-card{margin:16px 16px 0;background:var(--bg2);border:0.5px solid var(--border);border-radius:16px;padding:18px}
+.streak-num{font-family:'Unbounded',sans-serif;font-size:44px;font-weight:600;color:var(--accent);line-height:1}
+.streak-days{display:flex;gap:4px;margin-top:14px;flex-wrap:wrap}
+.streak-dot{width:26px;height:26px;border-radius:7px;background:var(--bg3);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--muted)}
+.streak-dot.done{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600}
+.streak-dot.today{border-color:var(--accent);color:var(--accent)}
+.today-plan{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden}
+.plan-item{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background .1s}
+.plan-item:last-child{border-bottom:none}
+.plan-item:active{background:var(--bg3)}
+.plan-dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0}
+.plan-dot.done{background:var(--success)}
+.plan-dot.now{background:var(--accent)}
+.diag-card{background:linear-gradient(135deg,#1a1a2e,#16213e);border:0.5px solid #2a2a4e;border-radius:var(--r);padding:16px}
+
+/* EXERCISES */
+.ex-list{padding:12px 16px 0;display:flex;flex-direction:column;gap:10px}
+.ex-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:16px;cursor:pointer;transition:border-color .15s}
+.ex-card.open{border-color:var(--accent)}
+.ex-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.ex-name{font-size:15px;font-weight:500;margin:8px 0 4px}
+.ex-desc{font-size:13px;color:var(--muted);line-height:1.6}
+.ex-body{display:none;margin-top:12px}
+.ex-card.open .ex-body{display:block}
+.ex-textbox{background:var(--bg3);border-radius:8px;padding:12px;font-size:14px;line-height:1.8;font-style:italic;margin-bottom:10px}
+.ex-reps{font-size:12px;color:var(--muted);margin-bottom:10px}
+.chevron{transition:transform .2s;flex-shrink:0}
+.ex-card.open .chevron{transform:rotate(90deg)}
+
+/* TONGUE TWISTERS */
+.tt-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:14px 16px;cursor:pointer;transition:all .15s;margin-bottom:8px}
+.tt-card.done{border-color:var(--success)}
+.tt-level{font-size:10px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px}
+.tt-text{font-size:14px;line-height:1.7;font-style:italic;margin-bottom:8px}
+.tt-bottom{display:flex;align-items:center;justify-content:space-between}
+.tt-check{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;transition:all .2s}
+.tt-card.done .tt-check{background:var(--success);border-color:var(--success)}
+
+/* BREATHING */
+.breath-anim{display:flex;align-items:center;justify-content:center;margin:20px 0}
+.breath-circle{width:160px;height:160px;border-radius:50%;border:2px solid var(--accent4);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;transition:transform 4s ease-in-out,opacity 1s;position:relative}
+.breath-circle::before{content:'';position:absolute;inset:-8px;border-radius:50%;border:1px solid rgba(167,139,250,.2);transition:transform 4s ease-in-out}
+.breath-label{font-size:13px;color:var(--accent4);font-weight:500;text-align:center}
+.breath-count{font-family:'Unbounded',sans-serif;font-size:32px;color:var(--text)}
+.breath-phase{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.breath-instruction{font-size:13px;color:var(--muted);text-align:center;min-height:36px;line-height:1.6;padding:0 16px}
+
+/* SELLER */
+.sell-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:10px}
+.sell-title{font-size:14px;font-weight:500;margin-bottom:8px}
+.sell-example{background:var(--bg3);border-left:2px solid var(--accent3);padding:10px 12px;border-radius:0 8px 8px 0;font-size:13px;line-height:1.7;margin:8px 0;font-style:italic}
+.sell-note{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5}
+.sell-bad{color:var(--danger)}
+.sell-good{color:var(--success)}
+
+/* MORNING */
+.ritual-step{display:flex;gap:14px;padding:14px 0;border-bottom:0.5px solid var(--border)}
+.ritual-step:last-child{border-bottom:none}
+.ritual-num{width:28px;height:28px;border-radius:50%;background:var(--bg3);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;color:var(--accent)}
+.ritual-text{flex:1}
+.ritual-name{font-size:14px;font-weight:500;margin-bottom:3px}
+.ritual-desc{font-size:13px;color:var(--muted);line-height:1.6}
+.intention-input{width:100%;background:var(--bg3);border:0.5px solid var(--border);border-radius:8px;padding:12px;font-size:14px;color:var(--text);font-family:'Inter',sans-serif;resize:none;margin-top:8px;min-height:70px}
+.intention-input:focus{outline:none;border-color:var(--accent4)}
+.today-intention{background:var(--bg3);border-left:2px solid var(--accent4);border-radius:0 8px 8px 0;padding:10px 12px;font-size:14px;font-style:italic;color:var(--text);margin-top:8px;display:none}
+
+/* PROGRESS */
+.prog-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:16px}
+.prog-cell{aspect-ratio:1;border-radius:6px;background:var(--bg3);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);cursor:pointer;transition:all .15s}
+.prog-cell.done{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600}
+.prog-cell.today-cell{border-color:var(--accent);color:var(--accent)}
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:14px}
+.stat-val{font-family:'Unbounded',sans-serif;font-size:28px;font-weight:600;color:var(--accent)}
+.stat-lbl{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* TIMER OVERLAY */
+.timer-ov{position:fixed;inset:0;z-index:200;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+.timer-ov.open{display:flex}
+.timer-name{font-size:14px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;text-align:center;padding:0 20px}
+.timer-ring{position:relative;width:190px;height:190px}
+.timer-ring svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--bg3);stroke-width:4}
+.ring-fg{fill:none;stroke:var(--accent);stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset 1s linear}
+.timer-inner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Unbounded',sans-serif;font-size:34px;font-weight:400}
+.timer-btns{display:flex;gap:12px}
+</style>
+</head>
+<body>
+<div id="update-banner" onclick="location.reload()">Доступно обновление — нажми чтобы обновить</div>
+
+<!-- ═══ SCREEN: HOME ═══ -->
+<div class="screen active" id="scr-home">
+  <div class="hdr">
+    <div class="hdr-label">тренажёр речи</div>
+    <div class="hdr-title">Твоя <span>Дикция</span></div>
+  </div>
+
+  <div class="streak-card">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between">
+      <div>
+        <div class="streak-num" id="streak-num">0</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:2px">дней подряд</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:13px;color:var(--muted)" id="total-lbl">0 из 21</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">выполнено</div>
+      </div>
+    </div>
+    <div class="streak-days" id="week-dots"></div>
+  </div>
+
+  <div class="section" style="margin-top:14px">
+    <div class="section-title">утренний ритуал сегодня</div>
+    <div class="card" style="padding:0;overflow:hidden;margin-bottom:10px" id="ritual-home-card">
+      <div style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="goTab('morning')">
+        <div>
+          <div style="font-size:14px;font-weight:500" id="ritual-home-status">Не выполнен</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">3 минуты · дыхание + намеренность</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+    </div>
+
+    <div class="section-title">план на сегодня</div>
+    <div class="today-plan">
+      <div class="plan-item" onclick="goTab('exercises')">
+        <div class="plan-dot now"></div>
+        <div style="flex:1"><div style="font-size:14px">Артикуляционная разминка</div><div style="font-size:12px;color:var(--muted)">5 мин</div></div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="plan-item" onclick="goTab('breathing')">
+        <div class="plan-dot"></div>
+        <div style="flex:1"><div style="font-size:14px">Дыхательная практика</div><div style="font-size:12px;color:var(--muted)">3 мин · 4-7-8</div></div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="plan-item" onclick="goTab('twisters')">
+        <div class="plan-dot"></div>
+        <div style="flex:1"><div style="font-size:14px">Скороговорки</div><div style="font-size:12px;color:var(--muted)">5 мин</div></div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="plan-item" onclick="goTab('exercises')">
+        <div class="plan-dot"></div>
+        <div style="flex:1"><div style="font-size:14px">Чтение вслух</div><div style="font-size:12px;color:var(--muted)">5 мин</div></div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:14px">
+    <div class="section-title">профиль речи (по записям)</div>
+    <div class="diag-card">
+      <div style="font-size:12px;color:var(--accent2);font-weight:500;margin-bottom:12px">Диагностика · 27 мая 2026</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-size:12px;color:var(--muted);width:90px;flex-shrink:0">Темп</div>
+          <div style="flex:1;height:5px;background:var(--bg3);border-radius:3px"><div style="width:78%;height:100%;background:#ff9f9f;border-radius:3px"></div></div>
+          <div style="font-size:11px;color:#ff9f9f;width:40px;text-align:right">быстро</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-size:12px;color:var(--muted);width:90px;flex-shrink:0">Паузы</div>
+          <div style="flex:1;height:5px;background:var(--bg3);border-radius:3px"><div style="width:20%;height:100%;background:#ffb347;border-radius:3px"></div></div>
+          <div style="font-size:11px;color:#ffb347;width:40px;text-align:right">мало</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-size:12px;color:var(--muted);width:90px;flex-shrink:0">Окончания</div>
+          <div style="flex:1;height:5px;background:var(--bg3);border-radius:3px"><div style="width:38%;height:100%;background:#ffb347;border-radius:3px"></div></div>
+          <div style="font-size:11px;color:#ffb347;width:40px;text-align:right">смазаны</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-size:12px;color:var(--muted);width:90px;flex-shrink:0">Осознанность</div>
+          <div style="flex:1;height:5px;background:var(--bg3);border-radius:3px"><div style="width:30%;height:100%;background:var(--accent4);border-radius:3px"></div></div>
+          <div style="font-size:11px;color:var(--accent4);width:40px;text-align:right">растём</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:14px;padding-bottom:8px">
+    <div class="section-title">главный инсайт</div>
+    <div class="card">
+      <div style="font-size:13px;font-weight:500;color:var(--accent2);margin-bottom:6px">Автопилот выключается через 8 сек</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6">По записям: начинаешь осознанно — паузы есть. Через 8 секунд мозг переключается в автомат. Тренируй осознанность, не мышцы.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: EXERCISES ═══ -->
+<div class="screen" id="scr-exercises">
+  <div class="hdr">
+    <div class="hdr-label">ежедневно</div>
+    <div class="hdr-title">Упраж<span>нения</span></div>
+  </div>
+  <div class="ex-list" id="ex-list"></div>
+</div>
+
+<!-- ═══ SCREEN: TWISTERS ═══ -->
+<div class="screen" id="scr-twisters">
+  <div class="hdr">
+    <div class="hdr-label">чёткость · не скорость</div>
+    <div class="hdr-title">Скорого<span>ворки</span></div>
+  </div>
+  <div style="padding:12px 16px 0" id="tt-list"></div>
+</div>
+
+<!-- ═══ SCREEN: BREATHING ═══ -->
+<div class="screen" id="scr-breathing">
+  <div class="hdr">
+    <div class="hdr-label">осознанность · голос</div>
+    <div class="hdr-title">Дыха<span>ние</span></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">выбери практику</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="card" style="cursor:pointer;border-color:var(--accent4)" onclick="startBreath('478')">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="tag tag-breath" style="margin-bottom:8px">перед важным звонком</div>
+            <div style="font-size:15px;font-weight:500">Техника 4-7-8</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:3px">Гасит адреналин за 2 минуты</div>
+          </div>
+          <div style="font-family:'Unbounded',sans-serif;font-size:18px;color:var(--accent4)">4·7·8</div>
+        </div>
+      </div>
+      <div class="card" style="cursor:pointer" onclick="startBreath('diaphragm')">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="tag tag-breath" style="margin-bottom:8px">каждое утро</div>
+            <div style="font-size:15px;font-weight:500">Диафрагмальное</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:3px">Низкий уверенный голос</div>
+          </div>
+          <div style="font-family:'Unbounded',sans-serif;font-size:18px;color:var(--accent4)">4·4</div>
+        </div>
+      </div>
+      <div class="card" style="cursor:pointer" onclick="startBreath('box')">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="tag tag-breath" style="margin-bottom:8px">концентрация</div>
+            <div style="font-size:15px;font-weight:500">Квадратное дыхание</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:3px">Используют спецназ перед операцией</div>
+          </div>
+          <div style="font-family:'Unbounded',sans-serif;font-size:18px;color:var(--accent4)">4·4·4·4</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:16px;padding-bottom:8px">
+    <div class="section-title">почему это работает для речи</div>
+    <div class="card">
+      <div style="font-size:13px;color:var(--muted);line-height:1.7">Когда дышишь грудью — голос зажатый, темп быстрый, слова сливаются. Когда дышишь животом (диафрагмой) — голос становится ниже, спокойнее, появляются естественные паузы. Дыхание управляет речью, не наоборот.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Breathing session overlay -->
+<div class="timer-ov" id="breath-ov" style="background:var(--bg)">
+  <div class="timer-name" id="breath-title">Техника 4-7-8</div>
+  <div class="breath-anim">
+    <div class="breath-circle" id="breath-circle">
+      <div class="breath-phase" id="breath-phase">Готов?</div>
+      <div class="breath-count" id="breath-count">—</div>
+    </div>
+  </div>
+  <div class="breath-instruction" id="breath-instr">Нажми старт и следи за кругом</div>
+  <div style="display:flex;gap:10px">
+    <button class="btn" onclick="stopBreath()">Стоп</button>
+    <button class="btn btn-accent" id="breath-start-btn" onclick="runBreath()">Начать</button>
+  </div>
+  <div style="font-size:12px;color:var(--muted)" id="breath-cycles-lbl"></div>
+</div>
+
+<!-- ═══ SCREEN: SELLER ═══ -->
+<div class="screen" id="scr-seller">
+  <div class="hdr">
+    <div class="hdr-label">речь продавца</div>
+    <div class="hdr-title">Цеп<span>ляет</span></div>
+  </div>
+
+  <div style="padding:12px 16px 0;display:flex;flex-direction:column;gap:0">
+
+    <div class="sell-card">
+      <div class="tag tag-sell" style="margin-bottom:10px">техника #1</div>
+      <div class="sell-title">Пауза перед главным словом</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px">Тишина притягивает внимание сильнее громкости. Сделай паузу 1–2 сек перед ключевым словом — человек сам начинает вслушиваться.</div>
+      <div class="sell-example">
+        <span class="sell-bad">❌ «МыделаемсайтыдляресторановнаСуpabase»</span><br><br>
+        <span class="sell-good">✅ «Мы делаем сайты для ресторанов... <em>(пауза)</em> ...которые увеличивают повторные заказы»</span>
+      </div>
+      <div class="sell-note">Попробуй прямо сейчас: расскажи о своём продукте с намеренной паузой перед главным преимуществом.</div>
+    </div>
+
+    <div class="sell-card">
+      <div class="tag tag-sell" style="margin-bottom:10px">техника #2</div>
+      <div class="sell-title">Быстро-медленно</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px">Общий контекст говори в нормальном темпе. Ключевое слово — медленнее и чуть тише. Мозг собеседника автоматически выделяет его как важное.</div>
+      <div class="sell-example">
+        <span style="color:var(--muted)">«Другие агентства делают сайт за 3 месяца и берут 150 тысяч... <em>(замедляешься)</em> ...мы делаем за две недели.»</span>
+      </div>
+      <div class="sell-note">Правило: один замедленный акцент на предложение — не больше.</div>
+    </div>
+
+    <div class="sell-card">
+      <div class="tag tag-sell" style="margin-bottom:10px">техника #3</div>
+      <div class="sell-title">Интонационная волна</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px">Монотон убивает доверие. Голос должен подниматься на вопросе и опускаться на утверждении. Низкий финал фразы = уверенность. Высокий финал = неуверенность, вопрос.</div>
+      <div class="sell-example">
+        <span class="sell-bad">❌ «Это стоит 4000 рублей?↑» — звучит как сомнение</span><br><br>
+        <span class="sell-good">✅ «Это стоит 4000 рублей↓» — звучит как факт</span>
+      </div>
+      <div class="sell-note">Тренируй: говори цену своего продукта с понижением интонации в конце.</div>
+    </div>
+
+    <div class="sell-card">
+      <div class="tag tag-sell" style="margin-bottom:10px">техника #4</div>
+      <div class="sell-title">Боль → тишина → решение</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px">Структура фразы которая цепляет: назвать боль клиента, сделать паузу чтобы он её почувствовал, потом решение.</div>
+      <div class="sell-example">
+        <span style="color:var(--muted)">«Вы тратите время на учёт вручную... <em>(пауза 2 сек)</em> ...мы автоматизируем это за неделю.»</span>
+      </div>
+      <div class="sell-note">Это твой главный скрипт для Nizamov.tech. Адаптируй под каждый продукт.</div>
+    </div>
+
+    <div class="sell-card" style="border-color:var(--accent3)">
+      <div class="tag tag-sell" style="margin-bottom:10px">тренировка</div>
+      <div class="sell-title">Запиши свой питч</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:10px">Расскажи о любом своём продукте используя все 4 техники. Запишь голос — прослушай — найди где нет паузы или интонация вверх на утверждении.</div>
+      <button class="btn btn-accent btn-sm" onclick="startTimer(120,'Питч продукта · 2 мин')">▶ Таймер 2 мин</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ SCREEN: MORNING ═══ -->
+<div class="screen" id="scr-morning">
+  <div class="hdr">
+    <div class="hdr-label">каждое утро</div>
+    <div class="hdr-title">Утренний <span>ритуал</span></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">3 шага · 3 минуты</div>
+    <div class="card" style="padding:0 16px">
+      <div class="ritual-step">
+        <div class="ritual-num">1</div>
+        <div class="ritual-text">
+          <div class="ritual-name">Диафрагмальное дыхание</div>
+          <div class="ritual-desc">Сядь ровно. Положи руку на живот. 10 вдохов так чтобы рука поднималась — не грудь. Медленно, без спешки.</div>
+          <button class="btn btn-sm" style="margin-top:8px" onclick="startTimer(60,'Дыхание животом · 10 вдохов')">▶ Таймер 1 мин</button>
+        </div>
+      </div>
+      <div class="ritual-step">
+        <div class="ritual-num">2</div>
+        <div class="ritual-text">
+          <div class="ritual-name">«МММ» — включить резонанс</div>
+          <div class="ritual-desc">Произноси «МММ» с закрытым ртом — ощути вибрацию на губах и в переносице. 5 раз по 5 секунд. Это «включает» голос с утра.</div>
+          <button class="btn btn-sm" style="margin-top:8px" onclick="startTimer(40,'МММ · резонанс')">▶ Таймер 40 сек</button>
+        </div>
+      </div>
+      <div class="ritual-step" style="border-bottom:none">
+        <div class="ritual-num">3</div>
+        <div class="ritual-text">
+          <div class="ritual-name">Намеренность дня</div>
+          <div class="ritual-desc">Одна конкретная установка на сегодня. Не цель — а то как ты будешь говорить.</div>
+          <div id="intention-display"></div>
+          <textarea class="intention-input" id="intention-input" placeholder="Например: сегодня делаю паузу перед ответом...&#10;или: говорю медленнее в разговорах...&#10;или: снижаю интонацию в конце фразы..." rows="3"></textarea>
+          <button class="btn btn-accent btn-sm" style="margin-top:8px" onclick="saveIntention()">Сохранить намеренность</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:14px;padding-bottom:8px">
+    <div class="section-title">почему это работает</div>
+    <div class="card">
+      <div style="font-size:13px;color:var(--muted);line-height:1.7">Намеренность — это не аффирмация. Это конкретный параметр на который ты будешь обращать внимание весь день. Мозг начинает замечать то, что ты назвал. Через 21 день это становится автоматическим.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: PROGRESS ═══ -->
+<div class="screen" id="scr-progress">
+  <div class="hdr">
+    <div class="hdr-label">21 день</div>
+    <div class="hdr-title">Про<span>гресс</span></div>
+  </div>
+  <div class="section">
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-val" id="stat-streak">0</div><div class="stat-lbl">дней подряд</div></div>
+      <div class="stat-card"><div class="stat-val" id="stat-total">0</div><div class="stat-lbl">выполнено</div></div>
+    </div>
+    <div class="section-title">21-дневный план</div>
+    <div class="prog-grid" id="prog-grid"></div>
+    <div class="card" style="margin-bottom:10px">
+      <div style="font-size:13px;font-weight:500;color:var(--accent2);margin-bottom:6px">Дни 1–7: фундамент</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6">Разминка + диафрагмальное дыхание + чтение вслух. Утренний ритуал каждый день.</div>
+    </div>
+    <div class="card" style="margin-bottom:10px">
+      <div style="font-size:13px;font-weight:500;color:var(--accent2);margin-bottom:6px">Дни 8–14: скороговорки + продажи</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6">Добавить скороговорки уровень 1–2 и начать тренировать питч. Запись голоса раз в 3 дня.</div>
+    </div>
+    <div class="card" style="margin-bottom:10px">
+      <div style="font-size:13px;font-weight:500;color:var(--accent2);margin-bottom:6px">Дни 15–21: в реальные разговоры</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6">Полный комплекс + техники продавца в живых встречах и звонках. Это самое сложное — делать осознанно в жизни.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TIMER OVERLAY ═══ -->
+<div class="timer-ov" id="timer-ov">
+  <div class="timer-name" id="timer-name">Упражнение</div>
+  <div class="timer-ring">
+    <svg viewBox="0 0 190 190" width="190" height="190">
+      <circle class="ring-bg" cx="95" cy="95" r="84"/>
+      <circle class="ring-fg" id="ring-fg" cx="95" cy="95" r="84" stroke-dasharray="528" stroke-dashoffset="0"/>
+    </svg>
+    <div class="timer-inner" id="timer-time">0:00</div>
+  </div>
+  <div class="timer-btns">
+    <button class="btn" onclick="resetTimer()">Стоп</button>
+    <button class="btn btn-accent" id="timer-toggle" onclick="toggleTimer()">Пауза</button>
+  </div>
+</div>
+
+<!-- ═══ NAVIGATION ═══ -->
+<nav>
+  <button class="active" id="nav-home" onclick="goTab('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+    Главная
+  </button>
+  <button id="nav-exercises" onclick="goTab('exercises')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+    Упражн.
+  </button>
+  <button id="nav-twisters" onclick="goTab('twisters')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+    Фразы
+  </button>
+  <button id="nav-breathing" onclick="goTab('breathing')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 4c-4.418 0-8 3.134-8 7 0 2.5 1.5 4.5 3.5 5.5V19a1 1 0 001 1h7a1 1 0 001-1v-2.5C18.5 15.5 20 13.5 20 11c0-3.866-3.582-7-8-7z"/></svg>
+    Дыхание
+  </button>
+  <button id="nav-seller" onclick="goTab('seller')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+    Продажи
+  </button>
+  <button id="nav-morning" onclick="goTab('morning')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 7a5 5 0 110 10A5 5 0 0112 7z"/></svg>
+    Ритуал
+  </button>
+</nav>
+
+<script>
+// ─── DATA ──────────────────────────────────────────
+const EXERCISES = [
+  {id:'lips',tag:'warm',label:'разминка',name:'Губы — рыбка',desc:'Размять круговую мышцу рта',text:'Хлопай губами как рыба — 20 раз. Потом: вытяни трубочкой → растяни в улыбку → 10 повторений.',reps:'× 20 хлопков + 10 трубочка/улыбка',timer:60},
+  {id:'tongue',tag:'warm',label:'разминка',name:'Язык — чистка зубов',desc:'Активировать кончик языка',text:'Проведи языком по зубам изнутри — верхние потом нижние. 5 кругов в каждую сторону.',reps:'5 кругов × 2 направления',timer:60},
+  {id:'jaw',tag:'warm',label:'разминка',name:'Челюсть — жевание',desc:'Убрать зажатость',text:'Открой рот широко → медленно закрой × 10. Движение вперёд-назад × 5.',reps:'10 + 5 повторений',timer:60},
+  {id:'vowels',tag:'tongue',label:'артикуляция',name:'Гласные с усилием',desc:'Включить весь артикуляционный аппарат',text:'А — Э — И — О — У — Ы\n\nОчень чётко, с преувеличенной артикуляцией — как будто говоришь с глухим. По 3 раза каждую.',reps:'6 звуков × 3 раза',timer:90},
+  {id:'pause',tag:'speed',label:'темп · ⚡ приоритет',name:'Замедлись вдвое',desc:'Твоя главная задача сейчас',text:'Расскажи что-нибудь в два раза медленнее, чем обычно.\n\nПоначалу будет казаться «слишком медленно» — это нормально. Твоё восприятие обманывает. Со стороны звучит нормально.',reps:'2–3 минуты · каждый день',timer:120},
+  {id:'reading',tag:'voice',label:'голос · 🏆 главное',name:'Чтение вслух',desc:'Лучший тренажёр для всего сразу',text:'Любой текст — читай вслух с расстановкой как диктор.\n\nПосле запятой — лёгкая пауза. После точки — 2 секунды. С выражением. Записывай себя раз в 3 дня.',reps:'5–10 минут',timer:300},
+  {id:'mask',tag:'voice',label:'голос',name:'Звук в маску',desc:'Убрать глухость, добавить резонанс',text:'Скажи МММ с закрытым ртом — чувствуешь вибрацию на губах? Вот куда должен идти звук — вперёд, не в горло.\n\nПотом произноси слова с тем же ощущением вибрации спереди.',reps:'30 сек МММ + несколько фраз',timer:60},
+];
+
+const TWISTERS = [
+  {id:'tt1',level:'Уровень 1 — губные',text:'Бобёр добр до бобрят.',tip:'Следи за Б и Р',reps:'× 5 раз'},
+  {id:'tt2',level:'Уровень 1 — губные',text:'Мама мыла Милу мылом.',tip:'Не сливай окончания',reps:'× 5 раз'},
+  {id:'tt3',level:'Уровень 2 — переднеязычные',text:'От топота копыт пыль по полю летит.',tip:'Окончания: "копыт", "летит"',reps:'× 3 медленно + × 3 быстро'},
+  {id:'tt4',level:'Уровень 2 — переднеязычные',text:'Дятел дерево долбил, деда дробью не убил.',tip:'Пауза после каждого слова',reps:'× 3 раза'},
+  {id:'tt5',level:'Уровень 3 — шипящие',text:'Шла Саша по шоссе и сосала сушку.',tip:'Ш и С — не смешивай',reps:'× 3 раза'},
+  {id:'tt6',level:'Уровень 3 — шипящие',text:'Сшит колпак не по-колпаковски.',tip:'Медленно — окончания важнее',reps:'× 3 раза'},
+  {id:'tt7',level:'Уровень 4 — финальный босс',text:'Карл у Клары украл кораллы, а Клара у Карла украла кларнет.',tip:'Только когда 1–3 чисто',reps:'× 2 раза'},
+];
+
+const BREATH_CONFIGS = {
+  '478': {name:'Техника 4-7-8',phases:[{l:'Вдох носом',t:4,instr:'Медленно вдыхай носом...',scale:1.3},{l:'Задержка',t:7,instr:'Задержи дыхание...',scale:1.3},{l:'Выдох ртом',t:8,instr:'Медленно выдыхай ртом...',scale:1}],cycles:4},
+  'diaphragm':{name:'Диафрагмальное',phases:[{l:'Вдох животом',t:4,instr:'Рука на животе — она должна подниматься',scale:1.3},{l:'Выдох',t:4,instr:'Живот опускается, плечи не двигаются',scale:1}],cycles:8},
+  'box':{name:'Квадратное дыхание',phases:[{l:'Вдох',t:4,instr:'Вдох через нос...',scale:1.3},{l:'Задержка',t:4,instr:'Задержи...',scale:1.3},{l:'Выдох',t:4,instr:'Выдох через рот...',scale:1},{l:'Задержка',t:4,instr:'Задержи...',scale:1}],cycles:4},
+};
+
+// ─── STORAGE ──────────────────────────────────────
+const S = {
+  get:(k)=>{ try{return JSON.parse(localStorage.getItem(k))}catch(e){return null} },
+  set:(k,v)=>localStorage.setItem(k,JSON.stringify(v)),
+};
+
+// ─── NAV ──────────────────────────────────────────
+const TABS = ['home','exercises','twisters','breathing','seller','morning','progress'];
+function goTab(name) {
+  TABS.forEach(t => {
+    const s = document.getElementById('scr-'+t);
+    const n = document.getElementById('nav-'+t);
+    if(s) s.classList.toggle('active', t===name);
+    if(n) n.classList.toggle('active', t===name);
+  });
+  if(name==='progress') renderProgress();
+  if(name==='home') renderHome();
+  if(name==='morning') loadIntention();
+}
+
+// ─── EXERCISES ────────────────────────────────────
+function buildExercises() {
+  const list = document.getElementById('ex-list');
+  list.innerHTML = '';
+  EXERCISES.forEach(ex => {
+    const el = document.createElement('div');
+    el.className = 'ex-card'; el.id = 'ex-'+ex.id;
+    el.innerHTML = `
+      <div class="ex-top" onclick="toggleEx('ex-${ex.id}')">
+        <div>
+          <div class="tag tag-${ex.tag}">${ex.label}</div>
+          <div class="ex-name">${ex.name}</div>
+          <div class="ex-desc">${ex.desc}</div>
+        </div>
+        <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="ex-body">
+        <div class="ex-textbox">${ex.text.replace(/\n/g,'<br>')}</div>
+        <div class="ex-reps">${ex.reps}</div>
+        <button class="btn btn-accent btn-sm" onclick="startTimer(${ex.timer},'${ex.name}')">▶ Таймер</button>
+      </div>`;
+    list.appendChild(el);
+  });
+}
+function toggleEx(id) {
+  const el = document.getElementById(id);
+  const wasOpen = el.classList.contains('open');
+  document.querySelectorAll('.ex-card').forEach(c=>c.classList.remove('open'));
+  if(!wasOpen) el.classList.add('open');
+}
+
+// ─── TWISTERS ─────────────────────────────────────
+function buildTwisters() {
+  const done = S.get('tt-done') || {};
+  const list = document.getElementById('tt-list');
+  list.innerHTML = '';
+  TWISTERS.forEach(tt => {
+    const el = document.createElement('div');
+    el.className = 'tt-card' + (done[tt.id]?' done':'');
+    el.innerHTML = `
+      <div class="tt-level">${tt.level}</div>
+      <div class="tt-text">${tt.text}</div>
+      <div class="tt-bottom">
+        <div><div style="font-size:12px;color:var(--muted)">${tt.tip}</div><div style="font-size:12px;color:var(--accent);margin-top:2px">${tt.reps}</div></div>
+        <div class="tt-check">${done[tt.id]?'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>':''}</div>
+      </div>`;
+    el.onclick = () => { done[tt.id]=!done[tt.id]; S.set('tt-done',done); buildTwisters(); };
+    list.appendChild(el);
+  });
+}
+
+// ─── TIMER ────────────────────────────────────────
+let tmrTotal=0,tmrLeft=0,tmrIv=null,tmrRun=false;
+const CIRC=2*Math.PI*84;
+function startTimer(secs,name) {
+  tmrTotal=secs; tmrLeft=secs; tmrRun=true;
+  document.getElementById('timer-name').textContent=name;
+  document.getElementById('timer-ov').classList.add('open');
+  document.getElementById('timer-toggle').textContent='Пауза';
+  updTimer();
+  clearInterval(tmrIv);
+  tmrIv=setInterval(()=>{
+    if(!tmrRun)return;
+    tmrLeft--;updTimer();
+    if(tmrLeft<=0){clearInterval(tmrIv);document.getElementById('timer-toggle').textContent='✓ Готово';}
+  },1000);
+}
+function updTimer(){
+  const m=Math.floor(tmrLeft/60),s=tmrLeft%60;
+  document.getElementById('timer-time').textContent=m+':'+(s<10?'0':'')+s;
+  const p=tmrTotal>0?(tmrTotal-tmrLeft)/tmrTotal:0;
+  document.getElementById('ring-fg').style.strokeDashoffset=CIRC*(1-p);
+}
+function toggleTimer(){tmrRun=!tmrRun;document.getElementById('timer-toggle').textContent=tmrRun?'Пауза':'Продолжить';}
+function resetTimer(){clearInterval(tmrIv);tmrRun=false;document.getElementById('timer-ov').classList.remove('open');}
+
+// ─── BREATHING ────────────────────────────────────
+let breathCfg=null,breathPhaseIdx=0,breathCycleIdx=0,breathCount=0,breathIv=null,breathRunning=false;
+
+function startBreath(type) {
+  breathCfg=BREATH_CONFIGS[type];
+  breathPhaseIdx=0;breathCycleIdx=0;breathCount=0;breathRunning=false;
+  document.getElementById('breath-title').textContent=breathCfg.name;
+  document.getElementById('breath-phase').textContent='Готов?';
+  document.getElementById('breath-count').textContent='—';
+  document.getElementById('breath-instr').textContent='Нажми старт и следи за кругом';
+  document.getElementById('breath-cycles-lbl').textContent='';
+  document.getElementById('breath-start-btn').textContent='Начать';
+  document.getElementById('breath-circle').style.transform='scale(1)';
+  document.getElementById('breath-ov').classList.add('open');
+}
+function runBreath() {
+  if(breathRunning){breathRunning=false;clearInterval(breathIv);document.getElementById('breath-start-btn').textContent='Продолжить';return;}
+  breathRunning=true;
+  document.getElementById('breath-start-btn').textContent='Пауза';
+  nextBreathPhase();
+}
+function nextBreathPhase() {
+  if(!breathRunning||!breathCfg)return;
+  const phase=breathCfg.phases[breathPhaseIdx];
+  breathCount=phase.t;
+  document.getElementById('breath-phase').textContent=phase.l;
+  document.getElementById('breath-instr').textContent=phase.instr;
+  document.getElementById('breath-circle').style.transform='scale('+phase.scale+')';
+  document.getElementById('breath-count').textContent=breathCount;
+  document.getElementById('breath-cycles-lbl').textContent='Цикл '+(breathCycleIdx+1)+' из '+breathCfg.cycles;
+  clearInterval(breathIv);
+  breathIv=setInterval(()=>{
+    breathCount--;
+    document.getElementById('breath-count').textContent=breathCount;
+    if(breathCount<=0){
+      clearInterval(breathIv);
+      breathPhaseIdx++;
+      if(breathPhaseIdx>=breathCfg.phases.length){
+        breathPhaseIdx=0;breathCycleIdx++;
+        if(breathCycleIdx>=breathCfg.cycles){
+          document.getElementById('breath-phase').textContent='Готово';
+          document.getElementById('breath-count').textContent='✓';
+          document.getElementById('breath-instr').textContent='Практика завершена. Ты молодец.';
+          document.getElementById('breath-circle').style.transform='scale(1)';
+          breathRunning=false;
+          document.getElementById('breath-start-btn').textContent='Ещё раз';
+          return;
+        }
+      }
+      setTimeout(nextBreathPhase,300);
+    }
+  },1000);
+}
+function stopBreath(){
+  clearInterval(breathIv);breathRunning=false;breathCfg=null;
+  document.getElementById('breath-ov').classList.remove('open');
+}
+
+// ─── MORNING RITUAL ───────────────────────────────
+function saveIntention() {
+  const val = document.getElementById('intention-input').value.trim();
+  if(!val)return;
+  const today = getToday();
+  S.set('intention-'+today, val);
+  loadIntention();
+  renderHome();
+}
+function loadIntention() {
+  const today = getToday();
+  const saved = S.get('intention-'+today);
+  const disp = document.getElementById('intention-display');
+  const inp = document.getElementById('intention-input');
+  if(saved){
+    disp.style.display='block';
+    disp.innerHTML='<div class="today-intention" style="display:block">'+saved+'</div>';
+    inp.value='';
+    inp.placeholder='Изменить намеренность...';
+  } else {
+    disp.style.display='none';
+  }
+}
+
+// ─── PROGRESS ─────────────────────────────────────
+function getToday(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
+function calcStreak(days){let s=0,i=S.get('day-index')||1;while(i>=1&&days['day'+i]){s++;i--;}return s;}
+function renderProgress(){
+  const days=S.get('days')||{};
+  const idx=S.get('day-index')||1;
+  const grid=document.getElementById('prog-grid');
+  grid.innerHTML='';
+  for(let i=1;i<=21;i++){
+    const key='day'+i;const isToday=idx===i;
+    const el=document.createElement('div');
+    el.className='prog-cell'+(days[key]?' done':'')+(isToday&&!days[key]?' today-cell':'');
+    el.textContent=i;
+    el.onclick=()=>{if(isToday){days[key]=!days[key];S.set('days',days);renderProgress();renderHome();}};
+    grid.appendChild(el);
+  }
+  const total=Object.values(days).filter(Boolean).length;
+  document.getElementById('stat-total').textContent=total;
+  document.getElementById('stat-streak').textContent=calcStreak(days);
+}
+function renderHome(){
+  const days=S.get('days')||{};
+  const total=Object.values(days).filter(Boolean).length;
+  document.getElementById('streak-num').textContent=calcStreak(days);
+  document.getElementById('total-lbl').textContent=total+' из 21';
+  const idx=S.get('day-index')||1;
+  const dotsEl=document.getElementById('week-dots');
+  dotsEl.innerHTML='';
+  for(let i=Math.max(1,idx-6);i<=Math.min(21,idx);i++){
+    const el=document.createElement('div');
+    el.className='streak-dot'+(days['day'+i]?' done':'')+(i===idx&&!days['day'+i]?' today':'');
+    el.textContent=i;dotsEl.appendChild(el);
+  }
+  // ritual status
+  const today=getToday();
+  const intention=S.get('intention-'+today);
+  const ritualEl=document.getElementById('ritual-home-status');
+  if(ritualEl) ritualEl.textContent=intention?'✓ Выполнен — «'+intention.substring(0,30)+(intention.length>30?'...':'')+'»':'Не выполнен';
+}
+
+// ─── INIT ─────────────────────────────────────────
+function init(){
+  const lastDate=S.get('last-date'),today=getToday();
+  if(lastDate!==today){
+    const idx=S.get('day-index')||1;
+    if(lastDate&&idx<21)S.set('day-index',Math.min(idx+1,21));
+    S.set('last-date',today);
+  }
+  buildExercises();
+  buildTwisters();
+  renderHome();
+
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').then(reg=>{
+      reg.update();
+      reg.addEventListener('updatefound',()=>{
+        const nw=reg.installing;
+        nw.addEventListener('statechange',()=>{
+          if(nw.state==='installed'&&navigator.serviceWorker.controller)
+            document.getElementById('update-banner').style.display='block';
+        });
+      });
+    });
+    navigator.serviceWorker.addEventListener('controllerchange',()=>location.reload());
+  }
+
+  history.pushState(null,'',location.href);
+  window.addEventListener('popstate',()=>{
+    if(document.getElementById('timer-ov').classList.contains('open')){resetTimer();}
+    else if(document.getElementById('breath-ov').classList.contains('open')){stopBreath();}
+    else goTab('home');
+    history.pushState(null,'',location.href);
+  });
+}
+init();
+</script>
+</body>
+</html>
