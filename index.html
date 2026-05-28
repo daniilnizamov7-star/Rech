@@ -18,6 +18,7 @@
   --accent:#e8ff47;--accent2:#47b6ff;--accent3:#ff7eb3;--accent4:#a78bfa;
   --text:#f0f0f0;--muted:#888;--danger:#ff6b6b;--success:#4ade80;--r:12px;
 }
+@keyframes spin{to{transform:rotate(360deg)}}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overflow:hidden}
 #update-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--accent);color:#000;font-size:13px;font-weight:500;padding:10px 16px;text-align:center;cursor:pointer}
@@ -103,6 +104,13 @@ nav button svg{width:20px;height:20px}
 .sell-bad{color:var(--danger)}
 .sell-good{color:var(--success)}
 
+/* PROGRAM */
+.c-tab{padding:6px 14px;border-radius:20px;border:0.5px solid var(--border);background:transparent;color:var(--muted);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s}
+.c-tab.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:500}
+.day-detail-ov{position:fixed;inset:0;z-index:200;background:var(--bg);display:none;flex-direction:column;overflow-y:auto;padding-bottom:40px}
+.day-detail-ov.open{display:flex}
+.dd-header{position:sticky;top:0;background:var(--bg);padding:52px 20px 14px;border-bottom:0.5px solid var(--border);z-index:10}
+
 /* MORNING */
 .ritual-step{display:flex;gap:14px;padding:14px 0;border-bottom:0.5px solid var(--border)}
 .ritual-step:last-child{border-bottom:none}
@@ -153,7 +161,7 @@ nav button svg{width:20px;height:20px}
         <div style="font-size:13px;color:var(--muted);margin-top:2px">дней подряд</div>
       </div>
       <div style="text-align:right">
-        <div style="font-size:13px;color:var(--muted)" id="total-lbl">0 из 21</div>
+        <div style="font-size:13px;color:var(--muted)" id="total-lbl">0 из 63</div>
         <div style="font-size:11px;color:var(--muted);margin-top:2px">выполнено</div>
       </div>
     </div>
@@ -224,6 +232,19 @@ nav button svg{width:20px;height:20px}
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="section" style="margin-top:14px;padding-bottom:8px">
+    <div class="section-title">задание дня</div>
+    <div class="card" id="daily-task-card" style="border-color:var(--accent4)">
+      <div id="daily-task-content"></div>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:14px">
+    <div class="section-title">задание дня</div>
+    <div class="card" id="today-focus" style="border-color:var(--accent4);line-height:1.6">Загрузка...</div>
+    <button class="btn btn-sm" style="margin-top:8px;width:100%;justify-content:center" onclick="goTab('program')">Открыть программу →</button>
   </div>
 
   <div class="section" style="margin-top:14px;padding-bottom:8px">
@@ -429,6 +450,45 @@ nav button svg{width:20px;height:20px}
   </div>
 </div>
 
+<!-- ═══ SCREEN: PROGRAM ═══ -->
+<div class="screen" id="scr-program">
+  <div class="hdr">
+    <div class="hdr-label">63 дня</div>
+    <div class="hdr-title">Прог<span>рамма</span></div>
+  </div>
+  <div style="padding:12px 16px 0;display:flex;gap:8px;flex-wrap:wrap" id="circle-tabs"></div>
+  <div style="padding:0 16px" id="program-days"></div>
+</div>
+
+<!-- ═══ DAY DETAIL OVERLAY ═══ -->
+<div class="day-detail-ov" id="day-detail-ov">
+  <div class="dd-header">
+    <div style="font-size:11px;color:var(--muted);margin-bottom:4px" id="dd-circle"></div>
+    <div style="font-size:18px;font-weight:500;line-height:1.3" id="dd-title"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+      <div style="font-size:12px;color:var(--muted)" id="dd-duration"></div>
+      <button class="btn btn-sm" onclick="closeDayDetail()">✕ Закрыть</button>
+    </div>
+  </div>
+  <div style="padding:16px">
+    <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Задание</div>
+    <div class="card" style="font-size:14px;line-height:1.7;margin-bottom:14px" id="dd-task"></div>
+
+    <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Упражнения</div>
+    <div class="card" style="margin-bottom:14px" id="dd-exercises"></div>
+
+    <div id="dd-saliva-block" style="display:none;margin-bottom:14px">
+      <div style="font-size:12px;color:var(--accent3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Совет по слюне</div>
+      <div class="card" style="font-size:13px;color:var(--muted);line-height:1.6;border-left:2px solid var(--accent3)" id="dd-saliva"></div>
+    </div>
+
+    <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Совет дня</div>
+    <div class="card" style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px;border-left:2px solid var(--accent4)" id="dd-tip"></div>
+
+    <button class="btn btn-accent" style="width:100%;justify-content:center;padding:14px" id="dd-done-btn">Отметить выполненным</button>
+  </div>
+</div>
+
 <!-- ═══ SCREEN: PROGRESS ═══ -->
 <div class="screen" id="scr-progress">
   <div class="hdr">
@@ -495,21 +555,114 @@ nav button svg{width:20px;height:20px}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
     Продажи
   </button>
+  <button id="nav-program" onclick="goTab('program')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+    Программа
+  </button>
   <button id="nav-morning" onclick="goTab('morning')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 7a5 5 0 110 10A5 5 0 0112 7z"/></svg>
     Ритуал
   </button>
 </nav>
 
+
 <script>
-// ─── DATA ──────────────────────────────────────────
+// ─── PROGRAM DATA (63 дня + поддержка) ────────────────
+const PROGRAM = {
+  circles: [
+    {
+      id:1, title:'Круг 1 — Фундамент', subtitle:'Дикция, дыхание, каша, слюна',
+      days:[
+        {day:1,focus:'Знакомство с собой',task:'Запиши голос — прочитай вслух: «От топота копыт пыль по полю летит». Это точка отсчёта. Сохрани запись.',exercises:['Губы рыбка × 20','Гласные А-Э-И-О-У-Ы × 3','Диафрагмальное дыхание × 10'],duration:'10 мин',tip:'Не оценивай — просто слушай себя со стороны.',saliva:'Перед записью: сглотни, опусти кончик языка вниз, расслабь челюсть.'},
+        {day:2,focus:'Расслабление челюсти',task:'Весь день замечай — сжата ли челюсть? Каждый раз как замечаешь — расслабь. Зажатая челюсть = каша + слюна.',exercises:['Челюсть жевание × 15','Губы трубочка/улыбка × 10','Дыхание 4-7-8 × 4 цикла'],duration:'10 мин',tip:'Норма — между зубами помещается палец. Если нет — зажат.',saliva:'Расслабленная челюсть снижает слюноотделение. Главная задача недели.'},
+        {day:3,focus:'Язык и кончик',task:'Произноси слова чётко заканчивая каждое. «Топот. Копыт. Летит.» — пауза 1 секунда после каждого.',exercises:['Язык чистка зубов × 5 кругов','Гласные с преувеличением × 5','Квадратное дыхание × 4'],duration:'10 мин',tip:'Кончик языка — главный инструмент для Т, Д, Н, Л.',saliva:'Перед фразой — сглотни + вдох носом. Даёт 15-20 сек комфортной речи.'},
+        {day:4,focus:'Первая скороговорка',task:'Только одна: «Бобёр добр до бобрят» × 10 раз. Медленно. Слышишь каждое окончание?',exercises:['Губы × 20','Бобёр × 10 медленно','МММ-резонанс × 5'],duration:'12 мин',tip:'Не ускоряйся. Скорость — враг первой недели.',saliva:'Сглотни перед каждым повторением. Скоро войдёт в привычку.'},
+        {day:5,focus:'Дыхание и голос',task:'Читай вслух любой текст 5 минут. После запятой — вдох носом. После точки — сглотни и вдох.',exercises:['Диафрагмальное × 10','Чтение вслух 5 мин','Звук в маску × 5'],duration:'12 мин',tip:'Голос идёт вперёд — в губы, не в горло. МММ — твой ориентир.',saliva:'Пауза = время сглотнуть. Строй речь так чтобы паузы были естественными.'},
+        {day:6,focus:'Замедление темпа',task:'Расскажи план на день — в два раза медленнее обычного. Запиши. Послушай.',exercises:['Замедлись вдвое 3 мин','Бобёр × 10','4-7-8 × 4'],duration:'12 мин',tip:'Замедленный темп со стороны звучит нормально. Восприятие обманывает.',saliva:''},
+        {day:7,focus:'Итог недели 1',task:'Запиши голос — та же скороговорка что в день 1. Сравни записи. Слышишь разницу?',exercises:['Разминка полная 5 мин','Запись голоса','Дыхание на выбор'],duration:'15 мин',tip:'Даже маленький прогресс за 7 дней — это уже не ноль.',saliva:'Оцени: стало ли меньше дискомфорта со слюной?'},
+        {day:8,focus:'Скороговорки уровень 2',task:'«От топота копыт пыль по полю летит» — × 3 медленно, × 3 быстро. Контролируй окончания.',exercises:['Разминка 3 мин','Топот × 6','Чтение вслух 5 мин'],duration:'15 мин',tip:'Окончание слова — такой же важный слог как первый.',saliva:''},
+        {day:9,focus:'Намеренность в разговоре',task:'В одном реальном разговоре сегодня — пауза перед ответом 1-2 секунды. Не торопись.',exercises:['Диафрагмальное × 10','Замедлись вдвое 2 мин','Топот × 6'],duration:'12 мин',tip:'Пауза перед ответом = уверенность. Торопливость = тревога.',saliva:'Пауза перед ответом — идеальный момент сглотнуть незаметно.'},
+        {day:10,focus:'Шипящие звуки',task:'«Шла Саша по шоссе» × 5 раз. Ш и С — разные звуки, не мешай их. Медленно.',exercises:['Язык × 5 кругов','Шла Саша × 5','4-7-8 × 4'],duration:'12 мин',tip:'Ш — язык широкий, чашечкой. С — узкий, острый.',saliva:''},
+        {day:11,focus:'Интонация вниз',task:'Произнеси 5 утверждений с понижением интонации в конце. «Я занимаюсь дикцией↓». «Это работает↓».',exercises:['Гласные × 5','Интонационные утверждения × 10','Чтение вслух 5 мин'],duration:'12 мин',tip:'Интонация вверх = неуверенность. Вниз = факт.',saliva:''},
+        {day:12,focus:'Резонанс голоса',task:'МММ 30 секунд → говори фразы с тем же ощущением вибрации на губах.',exercises:['МММ-резонанс 1 мин','Фразы с резонансом 3 мин','Квадратное × 4'],duration:'12 мин',tip:'Палец на губы — должна чувствоваться вибрация когда говоришь.',saliva:''},
+        {day:13,focus:'Первый питч вслух',task:'Расскажи о любом своём продукте — 2 минуты, с паузами, с резонансом, медленно. Запиши.',exercises:['Разминка 5 мин','Питч 2 мин','Прослушай'],duration:'15 мин',tip:'Первый раз соединяешь всё вместе. Не перфекционируй — просто делай.',saliva:'Сглотни перед началом. В паузах — быстрое незаметное сглатывание.'},
+        {day:14,focus:'Итог недели 2',task:'Запись — расскажи о себе 1 минуту. Сравни с записями дня 1 и дня 7.',exercises:['Разминка 5 мин','Запись 1 мин','Дыхание на выбор'],duration:'15 мин',tip:'Слушай не что говоришь — а КАК.',saliva:''},
+        {day:15,focus:'Пауза перед ключевым словом',task:'В разговоре сегодня — пауза ПЕРЕД ключевым словом. «Это стоит... (пауза) ...4000 рублей».',exercises:['Разминка 3 мин','4-7-8 × 4','Чтение с паузами 5 мин'],duration:'12 мин',tip:'Пауза перед главным словом = собеседник сам начинает вслушиваться.',saliva:''},
+        {day:16,focus:'Быстро-медленно',task:'Расскажи о продукте: контекст — нормальный темп, главное преимущество — замедлись и чуть тише.',exercises:['Замедлись вдвое 3 мин','Питч с техникой','Запись'],duration:'15 мин',tip:'Тишина и замедление привлекают больше чем громкость.',saliva:''},
+        {day:17,focus:'Финальный босс скороговорок',task:'«Карл у Клары украл кораллы» × 5 медленно. Только если уровни 1-2 уже звучат чисто.',exercises:['Разминка 5 мин','Карл × 5 медленно','4-7-8 × 4'],duration:'15 мин',tip:'Если не получается — вернись к уровню 2. Нет смысла спешить.',saliva:''},
+        {day:18,focus:'Боль → пауза → решение',task:'Составь 3 фразы: боль клиента → пауза 2 сек → решение. Произнеси каждую × 3 вслух.',exercises:['Разминка 3 мин','3 фразы схемы × 3','Квадратное × 4'],duration:'15 мин',tip:'Пауза после боли — клиент её проживает. Потом решение = спасение.',saliva:''},
+        {day:19,focus:'Живой звонок',task:'Позвони потенциальному клиенту применяя всё: темп, паузы, интонация вниз.',exercises:['4-7-8 перед звонком × 4','МММ 30 сек','Звонок'],duration:'20 мин',tip:'Перед звонком — 4-7-8, потом МММ. Входишь в разговор уже в нужном состоянии.',saliva:'Сглотни прямо перед тем как начать говорить в трубку. Никто не слышит.'},
+        {day:20,focus:'Голосовое для Telegram',task:'Запиши голосовое для канала «Путь с завода в IT» — 60-90 секунд. С паузами, с резонансом.',exercises:['Разминка 5 мин','4-7-8 × 4','Голосовое сообщение'],duration:'20 мин',tip:'Голосовые слушают на скорости 1.5-2x — говори чуть медленнее обычного.',saliva:''},
+        {day:21,focus:'Финал Круга 1',task:'Финальная запись — скороговорка из дня 1 + 1 минута рассказа о себе. Сравни с самого начала.',exercises:['Полный комплекс','Финальная запись','Сравни день 1 и день 21'],duration:'20 мин',tip:'21 день = новый автоматизм. Это теперь твой базовый уровень.',saliva:'Оцени прогресс со слюной — должно быть заметно лучше.'}
+      ]
+    },
+    {
+      id:2, title:'Круг 2 — Речь продавца', subtitle:'Питчи, звонки, Telegram-канал',
+      days:[
+        {day:1,focus:'Разогрев после паузы',task:'Полная разминка + скороговорки уровень 2. Навык сохранился — убедись сам.',exercises:['Разминка 7 мин','Топот + Шла Саша × 5','Чтение вслух 5 мин'],duration:'15 мин',tip:'Неделя отдыха не убивает навык — она его закрепляет.',saliva:''},
+        {day:2,focus:'Голос для видео',task:'Запиши 60-секундное видео для Telegram. Смотри в камеру, говори с резонансом, паузы после ключевых слов.',exercises:['МММ-резонанс 1 мин','4-7-8 × 4','Видео 60 сек × 2 дубля'],duration:'15 мин',tip:'Первый дубль разогрев, второй рабочий.',saliva:''},
+        {day:3,focus:'Структура питча',task:'Запиши питч любого продукта: боль → усиление → решение → результат. 90 секунд максимум.',exercises:['Разминка 3 мин','Питч × 3 дубля','Прослушай — где ускорился?'],duration:'15 мин',tip:'Усиление боли — самая важная часть. Клиент должен почувствовать.',saliva:''},
+        {day:4,focus:'Работа с возражениями',task:'Придумай 3 возражения клиентов. Ответь на каждое вслух — спокойно, с паузой, интонация вниз.',exercises:['Квадратное × 4','Ответы на возражения × 3','Запись'],duration:'15 мин',tip:'Спокойный низкий голос на возражение = уверенность. Ускорение = защита.',saliva:''},
+        {day:5,focus:'Темп 120 слов/мин',task:'Прочитай текст трижды: быстро как обычно, 120 слов/мин, 90 слов/мин. Слышишь разницу?',exercises:['Чтение × 3 темпа','Замедлись вдвое 3 мин','4-7-8 × 4'],duration:'15 мин',tip:'120 слов в минуту — оптимум для продаж. Засеки по таймеру.',saliva:''},
+        {day:6,focus:'Голосовые вместо текста',task:'Отправь 3 голосовых в рабочих чатах вместо текста. Применяй паузы и резонанс.',exercises:['Разминка 3 мин','МММ 30 сек','3 голосовых'],duration:'15 мин',tip:'Голосовые сообщения — лучший ежедневный тренажёр.',saliva:''},
+        {day:7,focus:'Итог недели 1',task:'Запись — расскажи о Nizamov.tech за 90 секунд. Сравни с Кругом 1.',exercises:['Полный комплекс','Запись питча','Прослушай'],duration:'20 мин',tip:'Круг 2 идёт быстрее — фундамент уже есть.',saliva:''},
+        {day:8,focus:'Сторителлинг',task:'Расскажи историю — как ты пришёл с завода в IT. 2 минуты. С паузами, с эмоцией.',exercises:['Разминка 3 мин','История × 2 дубля','Запись'],duration:'15 мин',tip:'История продаёт лучше цифр. Паузы в истории = напряжение.',saliva:''},
+        {day:9,focus:'Цифры с интонацией вниз',task:'Произнеси 5 фраз с цифрами. «За 14 дней↓. За 4000 рублей↓. Три клиента используют↓.»',exercises:['Интонация вниз × 10','Питч с цифрами','Запись'],duration:'15 мин',tip:'Цифра с интонацией вниз = факт. Факт = доверие.',saliva:''},
+        {day:10,focus:'Холодный звонок',task:'Позвони незнакомому потенциальному клиенту. 4-7-8 перед звонком. Схема боль→пауза→решение.',exercises:['4-7-8 × 4','МММ 30 сек','Звонок'],duration:'20 мин',tip:'4-7-8 буквально снижает уровень кортизола. Делай это всерьёз.',saliva:'Перед звонком сглотни. В паузах — быстрое незаметное сглатывание.'},
+        {day:11,focus:'Видео для канала',task:'Запиши видео для «Путь с завода в IT» — инструмент или урок. 90-120 секунд.',exercises:['Разминка 5 мин','4-7-8 × 4','Видео × 2-3 дубля'],duration:'20 мин',tip:'Дубли — норма. Профессионалы пишут по 5-10 дублей.',saliva:''},
+        {day:12,focus:'Тишина как инструмент',task:'В разговоре — после вопроса собеседника выдержи паузу 3 секунды перед ответом. Не заполняй тишину.',exercises:['Квадратное × 4','Практика в разговоре','Замедлись вдвое 2 мин'],duration:'12 мин',tip:'3 секунды тишины кажутся вечностью только тебе. Собеседник воспринимает как вдумчивость.',saliva:''},
+        {day:13,focus:'Своя скороговорка',task:'Карл у Клары × 5 + придумай свою скороговорку из названий своих продуктов.',exercises:['Карл × 5','Своя скороговорка','Чтение 5 мин'],duration:'15 мин',tip:'Своя скороговорка = тренировка конкретных слов которые произносишь каждый день.',saliva:''},
+        {day:14,focus:'Итог недели 2',task:'Запись — холодный питч незнакомому 90 секунд. Применяй всё из Круга 2.',exercises:['Полный комплекс','Запись питча','Прослушай критически'],duration:'20 мин',tip:'Слушай три вещи: темп, паузы, интонация на ключевых словах.',saliva:''},
+        {day:15,focus:'Тихо-уверенно vs громко',task:'Один питч трижды: тихо-уверенно, нормально, громко-энергично. Какой вариант звучит лучше?',exercises:['МММ 1 мин','Питч × 3 варианта','Запись'],duration:'15 мин',tip:'Обычно тихо-уверенно выигрывает. Громкость ≠ убедительность.',saliva:''},
+        {day:16,focus:'Серия голосовых для канала',task:'Запиши 3 голосовых сообщения — каждое 30-40 секунд. Разные темы. Это контент на 3 дня.',exercises:['Разминка 3 мин','4-7-8 × 4','3 голосовых'],duration:'15 мин',tip:'Короткие голосовые слушают полностью. Длинные — ускоряют или пропускают.',saliva:''},
+        {day:17,focus:'Сложный вопрос клиента',task:'Придумай самый сложный вопрос клиента. Ответь вслух — спокойно, с паузой, без ускорения.',exercises:['Квадратное × 4','Ответ × 3','Запись'],duration:'15 мин',tip:'Ускорение на сложном вопросе = выдаёшь неуверенность. Замедлись именно там.',saliva:''},
+        {day:18,focus:'Полный сценарий продажи',task:'Разыграй вслух: приветствие → боль → питч → возражение → закрытие. 3-4 минуты.',exercises:['Разминка 5 мин','4-7-8 × 4','Сценарий продажи'],duration:'20 мин',tip:'Репетиция вслух — единственный способ подготовиться к реальному разговору.',saliva:''},
+        {day:19,focus:'Реальная встреча или звонок',task:'Проведи встречу или звонок с клиентом применяя все техники. После — запиши что получилось.',exercises:['4-7-8 перед встречей','МММ 30 сек','Встреча/звонок'],duration:'30 мин',tip:'Самооценка: темп, паузы, интонация — что хорошо, что нет.',saliva:''},
+        {day:20,focus:'Полноценный выпуск',task:'Запиши видео для канала — 3-5 минут. Структура: история → урок → призыв к действию.',exercises:['Разминка 7 мин','4-7-8 × 4','Видео'],duration:'30 мин',tip:'Три блока = три паузы между ними. Дай зрителю переключиться.',saliva:''},
+        {day:21,focus:'Финал Круга 2',task:'Финальная запись — питч главного продукта 2 минуты. Сравни с Кругом 1 день 21.',exercises:['Полный комплекс','Финальная запись','Сравни с Кругом 1'],duration:'20 мин',tip:'Круг 2 закончен. Неделя отдыха — потом Круг 3.',saliva:''}
+      ]
+    },
+    {
+      id:3, title:'Круг 3 — Публичность', subtitle:'Выступления, видео, Telegram на поток',
+      days:[
+        {day:1,focus:'Другой масштаб',task:'Запись: расскажи о Nizamov.tech как будто выступаешь перед залом из 50 человек. Громче, медленнее, чётче.',exercises:['Разминка 7 мин','4-7-8 × 4','Запись 2 мин'],duration:'20 мин',tip:'Голос для зала — не громче, а проекция вперёд. МММ перед этим обязательно.',saliva:''},
+        {day:2,focus:'Структура выступления',task:'Подготовь 5-минутное выступление о пути завод→IT. Запиши тезисы, произнеси вслух.',exercises:['Разминка 5 мин','Тезисы → вслух','Запись'],duration:'25 мин',tip:'Выступление без бумажки = доверие. Тезисы — опора, не скрипт.',saliva:''},
+        {day:3,focus:'Темп для аудитории',task:'Читай текст в темпе 100 слов/мин. Это темп публичного выступления — медленнее чем в разговоре.',exercises:['Чтение 100 слов/мин × 3 мин','Замедлись вдвое 3 мин','Квадратное × 4'],duration:'15 мин',tip:'В зале звук разлетается — нужно дать ему время дойти до задних рядов.',saliva:''},
+        {day:4,focus:'Акценты и выделение',task:'Возьми абзац. Прочитай 3 раза выделяя разные слова интонацией. Слышишь как меняется смысл?',exercises:['Разминка 3 мин','Акценты × 3 варианта','Интонация вниз × 10'],duration:'12 мин',tip:'Выделение = интонация + замедление + пауза до. Три инструмента вместе.',saliva:''},
+        {day:5,focus:'Видео без дублей',task:'Запиши видео для Telegram — один дубль, без остановок. Пусть будут небольшие ошибки — это живо.',exercises:['4-7-8 × 4','МММ 30 сек','Видео один дубль'],duration:'20 мин',tip:'Идеальный дубль = мёртвый контент. Живая речь с паузами цепляет.',saliva:''},
+        {day:6,focus:'Импровизация 3 минуты',task:'Таймер 3 минуты. Говори без подготовки — «почему малый бизнес в России должен автоматизироваться».',exercises:['Разминка 3 мин','Импровизация 3 мин','Запись и разбор'],duration:'15 мин',tip:'Пауза вместо «эм» и «ну» — высший уровень.',saliva:''},
+        {day:7,focus:'Итог недели 1',task:'Запись — 3 минуты о своём пути без подготовки. Сравни с Кругом 1 день 1. Это разница за 7 недель.',exercises:['Полный комплекс','Запись 3 мин','Сравнение'],duration:'20 мин',tip:'Разница между записью 1 и сейчас — результат твоей работы.',saliva:''},
+        {day:8,focus:'Серийный контент',task:'Запиши 3 видео за одну сессию. 45-60 секунд каждое. Разные темы.',exercises:['Разминка 7 мин','4-7-8 × 4','3 видео × 60 сек'],duration:'25 мин',tip:'Первое видео разогрев, второе-третье лучшие.',saliva:''},
+        {day:9,focus:'Сессия вопросов-ответов',task:'Попроси кого-то задать 5 вопросов о продуктах. Отвечай применяя все техники. Запиши.',exercises:['Квадратное × 4','Сессия Q&A','Разбор записи'],duration:'20 мин',tip:'Вопрос → пауза 2 сек → ответ. Никогда не торопись.',saliva:''},
+        {day:10,focus:'5-минутный питч',task:'Подготовь и запиши питч Nizamov.tech — полный: компания, продукты, результаты, цены. 5 минут.',exercises:['Разминка 5 мин','4-7-8 × 4','Питч 5 мин'],duration:'25 мин',tip:'5 минут = 500-600 слов. Пиши тезисы, не скрипт.',saliva:''},
+        {day:11,focus:'Голос в разных каналах',task:'Сравни как звучишь: звонок, голосовое Telegram, видео, живой разговор. Что корректировать?',exercises:['МММ 1 мин','Запись в 4 форматах','Сравни'],duration:'20 мин',tip:'Телефон срезает низкие частоты — говори чуть выше и чётче.',saliva:''},
+        {day:12,focus:'Стрессовая тренировка',task:'3 холодных звонка подряд. После каждого — 4-7-8 × 4 и следующий.',exercises:['4-7-8 перед каждым','3 звонка подряд','Разбор'],duration:'30 мин',tip:'Третий звонок всегда лучше первого. Голос разогревается.',saliva:'Между звонками — сглотни, 4-7-8, МММ. 2 минуты восстановления.'},
+        {day:13,focus:'Все скороговорки подряд',task:'Все 7 скороговорок без остановки. Медленно, чётко, окончания.',exercises:['Разминка 5 мин','Все 7 скороговорок × 2','Чтение 5 мин'],duration:'20 мин',tip:'Это уже не тренировка мышц — тест осознанности.',saliva:''},
+        {day:14,focus:'Контент-план на 5 дней',task:'Запиши 5 голосовых для Telegram — по 60-90 секунд. Это контент на 5 дней канала.',exercises:['Разминка 7 мин','4-7-8 × 4','5 голосовых'],duration:'30 мин',tip:'Записывай пока голос разогрет — лучшие получаются после 3-4 подряд.',saliva:''},
+        {day:15,focus:'Живое выступление',task:'Выступи вживую — перед коллегами, партнёрами, семьёй. 5 минут на любую тему.',exercises:['4-7-8 перед выступлением','МММ 1 мин','Выступление'],duration:'30 мин',tip:'Живая аудитория — другой уровень. Смотри в глаза людям, делай паузы.',saliva:''},
+        {day:16,focus:'Разбор и коррекция',task:'Послушай 3 записи из разных дней. Что изменилось? Что ещё нужно улучшить?',exercises:['Разминка 5 мин','Разбор записей','Новая запись с фокусом'],duration:'20 мин',tip:'Слушай не что плохо — что стало лучше.',saliva:''},
+        {day:17,focus:'Прогулочный монолог',task:'Прогулка 10 минут — говори вслух всё что видишь и думаешь. Паузы вместо «эм».',exercises:['4-7-8 перед прогулкой','Прогулка-монолог 10 мин'],duration:'15 мин',tip:'Прогулочный монолог — лучший тренажёр спонтанной речи. Никто не слышит.',saliva:''},
+        {day:18,focus:'Видео 5 минут',task:'Запиши полноценное видео — 5 минут. История + продукты + призыв. Один дубль.',exercises:['Разминка 7 мин','4-7-8 × 4','Видео 5 мин'],duration:'30 мин',tip:'5 минут = ~500 слов при темпе 120 слов/мин плюс паузы.',saliva:''},
+        {day:19,focus:'Симуляция важной встречи',task:'Разыграй вслух встречу с директором крупной компании — полный сценарий. 10 минут.',exercises:['4-7-8 × 4','МММ 30 сек','Сценарий встречи 10 мин'],duration:'20 мин',tip:'Чем страшнее симуляция — тем спокойнее реальная встреча.',saliva:''},
+        {day:20,focus:'Передай знание',task:'Объясни кому-то одну технику дикции которую освоил. Лучший способ закрепить — обучить другого.',exercises:['Разминка 3 мин','Обучение кого-то 10 мин'],duration:'15 мин',tip:'Объяснение другому = понимаешь сам на глубоком уровне.',saliva:''},
+        {day:21,focus:'Финал всей программы',task:'Финальная запись — 3 минуты без подготовки о своём пути и планах. Сравни с Кругом 1 день 1. Это 63 дня работы.',exercises:['Полный комплекс','Финальная запись 3 мин','Сравни все записи'],duration:'25 мин',tip:'63 дня осознанной работы = другой человек в разговоре.',saliva:''}
+      ]
+    }
+  ],
+  maintenance: {
+    title:'Режим поддержки',
+    subtitle:'5 минут в день навсегда',
+    routine:['Губы + язык — 1 мин','МММ-резонанс — 30 сек','Диафрагмальное × 5','Одна скороговорка × 3','Намеренность дня']
+  }
+};
+
 const EXERCISES = [
   {id:'lips',tag:'warm',label:'разминка',name:'Губы — рыбка',desc:'Размять круговую мышцу рта',text:'Хлопай губами как рыба — 20 раз. Потом: вытяни трубочкой → растяни в улыбку → 10 повторений.',reps:'× 20 хлопков + 10 трубочка/улыбка',timer:60},
   {id:'tongue',tag:'warm',label:'разминка',name:'Язык — чистка зубов',desc:'Активировать кончик языка',text:'Проведи языком по зубам изнутри — верхние потом нижние. 5 кругов в каждую сторону.',reps:'5 кругов × 2 направления',timer:60},
   {id:'jaw',tag:'warm',label:'разминка',name:'Челюсть — жевание',desc:'Убрать зажатость',text:'Открой рот широко → медленно закрой × 10. Движение вперёд-назад × 5.',reps:'10 + 5 повторений',timer:60},
   {id:'vowels',tag:'tongue',label:'артикуляция',name:'Гласные с усилием',desc:'Включить весь артикуляционный аппарат',text:'А — Э — И — О — У — Ы\n\nОчень чётко, с преувеличенной артикуляцией — как будто говоришь с глухим. По 3 раза каждую.',reps:'6 звуков × 3 раза',timer:90},
-  {id:'pause',tag:'speed',label:'темп · ⚡ приоритет',name:'Замедлись вдвое',desc:'Твоя главная задача сейчас',text:'Расскажи что-нибудь в два раза медленнее, чем обычно.\n\nПоначалу будет казаться «слишком медленно» — это нормально. Твоё восприятие обманывает. Со стороны звучит нормально.',reps:'2–3 минуты · каждый день',timer:120},
-  {id:'reading',tag:'voice',label:'голос · 🏆 главное',name:'Чтение вслух',desc:'Лучший тренажёр для всего сразу',text:'Любой текст — читай вслух с расстановкой как диктор.\n\nПосле запятой — лёгкая пауза. После точки — 2 секунды. С выражением. Записывай себя раз в 3 дня.',reps:'5–10 минут',timer:300},
+  {id:'pause',tag:'speed',label:'темп · ⚡ приоритет',name:'Замедлись вдвое',desc:'Твоя главная задача сейчас',text:'Расскажи что-нибудь в два раза медленнее, чем обычно.\n\nПоначалу будет казаться «слишком медленно» — это нормально. Твоё восприятие обманывает.',reps:'2–3 минуты · каждый день',timer:120},
+  {id:'reading',tag:'voice',label:'голос · 🏆 главное',name:'Чтение вслух',desc:'Лучший тренажёр для всего сразу',text:'Любой текст — читай вслух с расстановкой как диктор.\n\nПосле запятой — лёгкая пауза. После точки — 2 секунды. Записывай себя раз в 3 дня.',reps:'5–10 минут',timer:300},
   {id:'mask',tag:'voice',label:'голос',name:'Звук в маску',desc:'Убрать глухость, добавить резонанс',text:'Скажи МММ с закрытым ртом — чувствуешь вибрацию на губах? Вот куда должен идти звук — вперёд, не в горло.\n\nПотом произноси слова с тем же ощущением вибрации спереди.',reps:'30 сек МММ + несколько фраз',timer:60},
 ];
 
@@ -524,78 +677,57 @@ const TWISTERS = [
 ];
 
 const BREATH_CONFIGS = {
-  '478': {name:'Техника 4-7-8',phases:[{l:'Вдох носом',t:4,instr:'Медленно вдыхай носом...',scale:1.3},{l:'Задержка',t:7,instr:'Задержи дыхание...',scale:1.3},{l:'Выдох ртом',t:8,instr:'Медленно выдыхай ртом...',scale:1}],cycles:4},
-  'diaphragm':{name:'Диафрагмальное',phases:[{l:'Вдох животом',t:4,instr:'Рука на животе — она должна подниматься',scale:1.3},{l:'Выдох',t:4,instr:'Живот опускается, плечи не двигаются',scale:1}],cycles:8},
-  'box':{name:'Квадратное дыхание',phases:[{l:'Вдох',t:4,instr:'Вдох через нос...',scale:1.3},{l:'Задержка',t:4,instr:'Задержи...',scale:1.3},{l:'Выдох',t:4,instr:'Выдох через рот...',scale:1},{l:'Задержка',t:4,instr:'Задержи...',scale:1}],cycles:4},
+  '478':{name:'Техника 4-7-8',phases:[{l:'Вдох носом',t:4,instr:'Медленно вдыхай носом...',scale:1.3},{l:'Задержка',t:7,instr:'Задержи дыхание...',scale:1.3},{l:'Выдох ртом',t:8,instr:'Медленно выдыхай ртом...',scale:1}],cycles:4},
+  'diaphragm':{name:'Диафрагмальное',phases:[{l:'Вдох животом',t:4,instr:'Рука на животе — она поднимается',scale:1.3},{l:'Выдох',t:4,instr:'Живот опускается, плечи не двигаются',scale:1}],cycles:8},
+  'box':{name:'Квадратное',phases:[{l:'Вдох',t:4,instr:'Вдох через нос...',scale:1.3},{l:'Задержка',t:4,instr:'Задержи...',scale:1.3},{l:'Выдох',t:4,instr:'Выдох через рот...',scale:1},{l:'Задержка',t:4,instr:'Задержи...',scale:1}],cycles:4},
 };
 
 // ─── STORAGE ──────────────────────────────────────
-const S = {
-  get:(k)=>{ try{return JSON.parse(localStorage.getItem(k))}catch(e){return null} },
-  set:(k,v)=>localStorage.setItem(k,JSON.stringify(v)),
-};
+const S={get:(k)=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))};
 
 // ─── NAV ──────────────────────────────────────────
-const TABS = ['home','exercises','twisters','breathing','seller','morning','progress'];
-function goTab(name) {
-  TABS.forEach(t => {
-    const s = document.getElementById('scr-'+t);
-    const n = document.getElementById('nav-'+t);
-    if(s) s.classList.toggle('active', t===name);
-    if(n) n.classList.toggle('active', t===name);
+const TABS=['home','exercises','twisters','breathing','seller','morning','program','progress'];
+function goTab(name){
+  TABS.forEach(t=>{
+    const s=document.getElementById('scr-'+t);
+    const n=document.getElementById('nav-'+t);
+    if(s)s.classList.toggle('active',t===name);
+    if(n)n.classList.toggle('active',t===name);
   });
-  if(name==='progress') renderProgress();
-  if(name==='home') renderHome();
-  if(name==='morning') loadIntention();
+  if(name==='progress')renderProgress();
+  if(name==='home'){renderHome();}
+  if(name==='morning')loadIntention();
+  if(name==='program')renderProgramDay();
 }
 
 // ─── EXERCISES ────────────────────────────────────
-function buildExercises() {
-  const list = document.getElementById('ex-list');
-  list.innerHTML = '';
-  EXERCISES.forEach(ex => {
-    const el = document.createElement('div');
-    el.className = 'ex-card'; el.id = 'ex-'+ex.id;
-    el.innerHTML = `
-      <div class="ex-top" onclick="toggleEx('ex-${ex.id}')">
-        <div>
-          <div class="tag tag-${ex.tag}">${ex.label}</div>
-          <div class="ex-name">${ex.name}</div>
-          <div class="ex-desc">${ex.desc}</div>
-        </div>
-        <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
-      </div>
-      <div class="ex-body">
-        <div class="ex-textbox">${ex.text.replace(/\n/g,'<br>')}</div>
-        <div class="ex-reps">${ex.reps}</div>
-        <button class="btn btn-accent btn-sm" onclick="startTimer(${ex.timer},'${ex.name}')">▶ Таймер</button>
-      </div>`;
+function buildExercises(){
+  const list=document.getElementById('ex-list');
+  list.innerHTML='';
+  EXERCISES.forEach(ex=>{
+    const el=document.createElement('div');
+    el.className='ex-card';el.id='ex-'+ex.id;
+    el.innerHTML=`<div class="ex-top" onclick="toggleEx('ex-${ex.id}')"><div><div class="tag tag-${ex.tag}">${ex.label}</div><div class="ex-name">${ex.name}</div><div class="ex-desc">${ex.desc}</div></div><svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg></div><div class="ex-body"><div class="ex-textbox">${ex.text.replace(/\n/g,'<br>')}</div><div class="ex-reps">${ex.reps}</div><button class="btn btn-accent btn-sm" onclick="startTimer(${ex.timer},'${ex.name}')">▶ Таймер</button></div>`;
     list.appendChild(el);
   });
 }
-function toggleEx(id) {
-  const el = document.getElementById(id);
-  const wasOpen = el.classList.contains('open');
+function toggleEx(id){
+  const el=document.getElementById(id);
+  const was=el.classList.contains('open');
   document.querySelectorAll('.ex-card').forEach(c=>c.classList.remove('open'));
-  if(!wasOpen) el.classList.add('open');
+  if(!was)el.classList.add('open');
 }
 
 // ─── TWISTERS ─────────────────────────────────────
-function buildTwisters() {
-  const done = S.get('tt-done') || {};
-  const list = document.getElementById('tt-list');
-  list.innerHTML = '';
-  TWISTERS.forEach(tt => {
-    const el = document.createElement('div');
-    el.className = 'tt-card' + (done[tt.id]?' done':'');
-    el.innerHTML = `
-      <div class="tt-level">${tt.level}</div>
-      <div class="tt-text">${tt.text}</div>
-      <div class="tt-bottom">
-        <div><div style="font-size:12px;color:var(--muted)">${tt.tip}</div><div style="font-size:12px;color:var(--accent);margin-top:2px">${tt.reps}</div></div>
-        <div class="tt-check">${done[tt.id]?'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>':''}</div>
-      </div>`;
-    el.onclick = () => { done[tt.id]=!done[tt.id]; S.set('tt-done',done); buildTwisters(); };
+function buildTwisters(){
+  const done=S.get('tt-done')||{};
+  const list=document.getElementById('tt-list');
+  list.innerHTML='';
+  TWISTERS.forEach(tt=>{
+    const el=document.createElement('div');
+    el.className='tt-card'+(done[tt.id]?' done':'');
+    el.innerHTML=`<div class="tt-level">${tt.level}</div><div class="tt-text">${tt.text}</div><div class="tt-bottom"><div><div style="font-size:12px;color:var(--muted)">${tt.tip}</div><div style="font-size:12px;color:var(--accent);margin-top:2px">${tt.reps}</div></div><div class="tt-check">${done[tt.id]?'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>':''}</div></div>`;
+    el.onclick=()=>{done[tt.id]=!done[tt.id];S.set('tt-done',done);buildTwisters();};
     list.appendChild(el);
   });
 }
@@ -603,18 +735,13 @@ function buildTwisters() {
 // ─── TIMER ────────────────────────────────────────
 let tmrTotal=0,tmrLeft=0,tmrIv=null,tmrRun=false;
 const CIRC=2*Math.PI*84;
-function startTimer(secs,name) {
-  tmrTotal=secs; tmrLeft=secs; tmrRun=true;
+function startTimer(secs,name){
+  tmrTotal=secs;tmrLeft=secs;tmrRun=true;
   document.getElementById('timer-name').textContent=name;
   document.getElementById('timer-ov').classList.add('open');
   document.getElementById('timer-toggle').textContent='Пауза';
-  updTimer();
-  clearInterval(tmrIv);
-  tmrIv=setInterval(()=>{
-    if(!tmrRun)return;
-    tmrLeft--;updTimer();
-    if(tmrLeft<=0){clearInterval(tmrIv);document.getElementById('timer-toggle').textContent='✓ Готово';}
-  },1000);
+  updTimer();clearInterval(tmrIv);
+  tmrIv=setInterval(()=>{if(!tmrRun)return;tmrLeft--;updTimer();if(tmrLeft<=0){clearInterval(tmrIv);document.getElementById('timer-toggle').textContent='✓ Готово';}},1000);
 }
 function updTimer(){
   const m=Math.floor(tmrLeft/60),s=tmrLeft%60;
@@ -627,10 +754,8 @@ function resetTimer(){clearInterval(tmrIv);tmrRun=false;document.getElementById(
 
 // ─── BREATHING ────────────────────────────────────
 let breathCfg=null,breathPhaseIdx=0,breathCycleIdx=0,breathCount=0,breathIv=null,breathRunning=false;
-
-function startBreath(type) {
-  breathCfg=BREATH_CONFIGS[type];
-  breathPhaseIdx=0;breathCycleIdx=0;breathCount=0;breathRunning=false;
+function startBreath(type){
+  breathCfg=BREATH_CONFIGS[type];breathPhaseIdx=0;breathCycleIdx=0;breathCount=0;breathRunning=false;
   document.getElementById('breath-title').textContent=breathCfg.name;
   document.getElementById('breath-phase').textContent='Готов?';
   document.getElementById('breath-count').textContent='—';
@@ -640,16 +765,13 @@ function startBreath(type) {
   document.getElementById('breath-circle').style.transform='scale(1)';
   document.getElementById('breath-ov').classList.add('open');
 }
-function runBreath() {
+function runBreath(){
   if(breathRunning){breathRunning=false;clearInterval(breathIv);document.getElementById('breath-start-btn').textContent='Продолжить';return;}
-  breathRunning=true;
-  document.getElementById('breath-start-btn').textContent='Пауза';
-  nextBreathPhase();
+  breathRunning=true;document.getElementById('breath-start-btn').textContent='Пауза';nextBreathPhase();
 }
-function nextBreathPhase() {
+function nextBreathPhase(){
   if(!breathRunning||!breathCfg)return;
-  const phase=breathCfg.phases[breathPhaseIdx];
-  breathCount=phase.t;
+  const phase=breathCfg.phases[breathPhaseIdx];breathCount=phase.t;
   document.getElementById('breath-phase').textContent=phase.l;
   document.getElementById('breath-instr').textContent=phase.instr;
   document.getElementById('breath-circle').style.transform='scale('+phase.scale+')';
@@ -657,70 +779,178 @@ function nextBreathPhase() {
   document.getElementById('breath-cycles-lbl').textContent='Цикл '+(breathCycleIdx+1)+' из '+breathCfg.cycles;
   clearInterval(breathIv);
   breathIv=setInterval(()=>{
-    breathCount--;
-    document.getElementById('breath-count').textContent=breathCount;
+    breathCount--;document.getElementById('breath-count').textContent=breathCount;
     if(breathCount<=0){
-      clearInterval(breathIv);
-      breathPhaseIdx++;
+      clearInterval(breathIv);breathPhaseIdx++;
       if(breathPhaseIdx>=breathCfg.phases.length){
         breathPhaseIdx=0;breathCycleIdx++;
         if(breathCycleIdx>=breathCfg.cycles){
           document.getElementById('breath-phase').textContent='Готово';
           document.getElementById('breath-count').textContent='✓';
-          document.getElementById('breath-instr').textContent='Практика завершена. Ты молодец.';
+          document.getElementById('breath-instr').textContent='Практика завершена. Молодец.';
           document.getElementById('breath-circle').style.transform='scale(1)';
-          breathRunning=false;
-          document.getElementById('breath-start-btn').textContent='Ещё раз';
-          return;
+          breathRunning=false;document.getElementById('breath-start-btn').textContent='Ещё раз';return;
         }
       }
       setTimeout(nextBreathPhase,300);
     }
   },1000);
 }
-function stopBreath(){
-  clearInterval(breathIv);breathRunning=false;breathCfg=null;
-  document.getElementById('breath-ov').classList.remove('open');
+function stopBreath(){clearInterval(breathIv);breathRunning=false;breathCfg=null;document.getElementById('breath-ov').classList.remove('open');}
+
+// ─── PROGRAM SCREEN ───────────────────────────────
+function renderProgramDay(){
+  const globalDay=S.get('global-day')||1; // 1-63
+  const circleIdx=Math.floor((globalDay-1)/21); // 0,1,2
+  const dayInCircle=((globalDay-1)%21)+1; // 1-21
+  const circle=PROGRAM.circles[Math.min(circleIdx,2)];
+  const dayData=circle?circle.days[dayInCircle-1]:null;
+
+  // Circle tabs
+  const ctabs=document.getElementById('circle-tabs');
+  if(ctabs){
+    ctabs.innerHTML='';
+    PROGRAM.circles.forEach((c,i)=>{
+      const btn=document.createElement('button');
+      btn.className='c-tab'+(i===Math.min(circleIdx,2)?' active':'');
+      btn.textContent='Круг '+c.id;
+      btn.onclick=()=>{
+        document.querySelectorAll('.c-tab').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        renderCircleView(i);
+      };
+      ctabs.appendChild(btn);
+    });
+  }
+  renderCircleView(Math.min(circleIdx,2), dayInCircle);
 }
 
-// ─── MORNING RITUAL ───────────────────────────────
-function saveIntention() {
-  const val = document.getElementById('intention-input').value.trim();
-  if(!val)return;
-  const today = getToday();
-  S.set('intention-'+today, val);
-  loadIntention();
-  renderHome();
-}
-function loadIntention() {
-  const today = getToday();
-  const saved = S.get('intention-'+today);
-  const disp = document.getElementById('intention-display');
-  const inp = document.getElementById('intention-input');
-  if(saved){
-    disp.style.display='block';
-    disp.innerHTML='<div class="today-intention" style="display:block">'+saved+'</div>';
-    inp.value='';
-    inp.placeholder='Изменить намеренность...';
-  } else {
-    disp.style.display='none';
+function renderCircleView(circleIdx, highlightDay){
+  const circle=PROGRAM.circles[circleIdx];
+  const container=document.getElementById('program-days');
+  if(!container)return;
+  const globalDay=S.get('global-day')||1;
+  const currentCircle=Math.floor((globalDay-1)/21);
+  const currentDayInCircle=((globalDay-1)%21)+1;
+  const hl=highlightDay||(circleIdx===currentCircle?currentDayInCircle:1);
+
+  container.innerHTML='';
+
+  // Circle header
+  const hdr=document.createElement('div');
+  hdr.style.cssText='padding:12px 0 16px';
+  hdr.innerHTML=`<div style="font-size:18px;font-weight:500">${circle.title}</div><div style="font-size:13px;color:var(--muted);margin-top:3px">${circle.subtitle}</div>`;
+  container.appendChild(hdr);
+
+  circle.days.forEach((d,i)=>{
+    const gDay=(circleIdx*21)+i+1;
+    const isDone=(S.get('days')||{})['day'+gDay];
+    const isToday=gDay===globalDay;
+    const isPast=gDay<globalDay;
+
+    const card=document.createElement('div');
+    card.style.cssText=`background:var(--bg2);border:0.5px solid ${isToday?'var(--accent)':isDone?'var(--success)':isPast?'var(--border)':'var(--border)'};border-radius:var(--r);padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:all .15s;opacity:${isPast&&!isDone?'0.5':'1'}`;
+
+    card.innerHTML=`
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:32px;height:32px;border-radius:50%;background:${isDone?'var(--success)':isToday?'var(--accent)':'var(--bg3)'};border:0.5px solid ${isDone?'var(--success)':isToday?'var(--accent)':'var(--border)'};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:${isDone||isToday?'#000':'var(--muted)'};flex-shrink:0">${isDone?'✓':d.day}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:500;color:${isToday?'var(--accent)':'var(--text)'}">${d.focus}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">${d.duration}${isToday?' · сегодня':''}</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
+      </div>`;
+
+    card.onclick=()=>showDayDetail(circleIdx,i);
+    container.appendChild(card);
+  });
+
+  // Maintenance block after circle 3
+  if(circleIdx===2){
+    const mCard=document.createElement('div');
+    mCard.style.cssText='background:linear-gradient(135deg,#1a1a2e,#16213e);border:0.5px solid var(--accent4);border-radius:var(--r);padding:16px;margin-top:8px';
+    mCard.innerHTML=`<div style="font-size:13px;font-weight:500;color:var(--accent4);margin-bottom:8px">${PROGRAM.maintenance.title}</div><div style="font-size:12px;color:var(--muted);margin-bottom:10px">${PROGRAM.maintenance.subtitle}</div>${PROGRAM.maintenance.routine.map(r=>`<div style="font-size:13px;color:var(--text);padding:4px 0;border-bottom:0.5px solid var(--border)">• ${r}</div>`).join('')}`;
+    container.appendChild(mCard);
   }
 }
 
-// ─── PROGRESS ─────────────────────────────────────
+function showDayDetail(circleIdx, dayIdx){
+  const circle=PROGRAM.circles[circleIdx];
+  const d=circle.days[dayIdx];
+  const gDay=(circleIdx*21)+dayIdx+1;
+  const days=S.get('days')||{};
+  const isDone=days['day'+gDay];
+
+  const overlay=document.getElementById('day-detail-ov');
+  overlay.classList.add('open');
+  document.getElementById('dd-title').textContent='День '+d.day+' — '+d.focus;
+  document.getElementById('dd-circle').textContent=circle.title;
+  document.getElementById('dd-duration').textContent=d.duration;
+  document.getElementById('dd-task').textContent=d.task;
+  document.getElementById('dd-exercises').innerHTML=d.exercises.map(e=>`<div style="padding:6px 0;border-bottom:0.5px solid var(--border);font-size:13px">• ${e}</div>`).join('');
+  document.getElementById('dd-tip').textContent=d.tip;
+
+  const salivaBlock=document.getElementById('dd-saliva-block');
+  if(d.saliva){
+    salivaBlock.style.display='block';
+    document.getElementById('dd-saliva').textContent=d.saliva;
+  } else {
+    salivaBlock.style.display='none';
+  }
+
+  const doneBtn=document.getElementById('dd-done-btn');
+  doneBtn.textContent=isDone?'✓ Выполнен — отметить как нет':'Отметить выполненным';
+  doneBtn.style.background=isDone?'var(--success)':'var(--accent)';
+  doneBtn.onclick=()=>{
+    days['day'+gDay]=!days['day'+gDay];
+    S.set('days',days);
+    closeDayDetail();
+    renderProgramDay();
+    renderHome();
+  };
+}
+function closeDayDetail(){document.getElementById('day-detail-ov').classList.remove('open');}
+
+// ─── MORNING RITUAL ───────────────────────────────
+function saveIntention(){
+  const val=document.getElementById('intention-input').value.trim();
+  if(!val)return;
+  S.set('intention-'+getToday(),val);
+  loadIntention();renderHome();
+}
+function loadIntention(){
+  const saved=S.get('intention-'+getToday());
+  const disp=document.getElementById('intention-display');
+  const inp=document.getElementById('intention-input');
+  if(saved){
+    disp.style.display='block';
+    disp.innerHTML=`<div style="background:var(--bg3);border-left:2px solid var(--accent4);border-radius:0 8px 8px 0;padding:10px 12px;font-size:14px;font-style:italic;color:var(--text);margin-top:8px">${saved}</div>`;
+    inp.value='';inp.placeholder='Изменить намеренность...';
+  } else {disp.style.display='none';}
+}
+
+// ─── PROGRESS & HOME ──────────────────────────────
 function getToday(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
-function calcStreak(days){let s=0,i=S.get('day-index')||1;while(i>=1&&days['day'+i]){s++;i--;}return s;}
+function calcStreak(days){
+  const idx=S.get('global-day')||1;
+  let s=0,i=idx;
+  while(i>=1&&days['day'+i]){s++;i--;}
+  return s;
+}
 function renderProgress(){
   const days=S.get('days')||{};
-  const idx=S.get('day-index')||1;
+  const gDay=S.get('global-day')||1;
   const grid=document.getElementById('prog-grid');
   grid.innerHTML='';
-  for(let i=1;i<=21;i++){
-    const key='day'+i;const isToday=idx===i;
+  for(let i=1;i<=63;i++){
+    const isDone=days['day'+i];const isToday=i===gDay;
     const el=document.createElement('div');
-    el.className='prog-cell'+(days[key]?' done':'')+(isToday&&!days[key]?' today-cell':'');
+    el.className='prog-cell'+(isDone?' done':'')+(isToday&&!isDone?' today-cell':'');
+    const circle=Math.ceil(i/21);
+    el.title=`Круг ${circle}, день ${((i-1)%21)+1}`;
+    el.style.fontSize='9px';
     el.textContent=i;
-    el.onclick=()=>{if(isToday){days[key]=!days[key];S.set('days',days);renderProgress();renderHome();}};
+    el.onclick=()=>{if(isToday){days['day'+i]=!days['day'+i];S.set('days',days);renderProgress();renderHome();}};
     grid.appendChild(el);
   }
   const total=Object.values(days).filter(Boolean).length;
@@ -731,33 +961,44 @@ function renderHome(){
   const days=S.get('days')||{};
   const total=Object.values(days).filter(Boolean).length;
   document.getElementById('streak-num').textContent=calcStreak(days);
-  document.getElementById('total-lbl').textContent=total+' из 21';
-  const idx=S.get('day-index')||1;
-  const dotsEl=document.getElementById('week-dots');
-  dotsEl.innerHTML='';
-  for(let i=Math.max(1,idx-6);i<=Math.min(21,idx);i++){
-    const el=document.createElement('div');
-    el.className='streak-dot'+(days['day'+i]?' done':'')+(i===idx&&!days['day'+i]?' today':'');
-    el.textContent=i;dotsEl.appendChild(el);
+  document.getElementById('total-lbl').textContent=total+' из 63';
+  const gDay=S.get('global-day')||1;
+  const circleIdx=Math.floor((gDay-1)/21);
+  const dayInCircle=((gDay-1)%21)+1;
+  const circle=PROGRAM.circles[Math.min(circleIdx,2)];
+  const dayData=circle?circle.days[dayInCircle-1]:null;
+
+  // Today's focus on home
+  const focusEl=document.getElementById('today-focus');
+  if(focusEl&&dayData){
+    focusEl.innerHTML=`<div style="font-size:12px;color:var(--accent4);font-weight:500;margin-bottom:4px">${circle.title} · День ${dayInCircle}</div><div style="font-size:14px;font-weight:500">${dayData.focus}</div><div style="font-size:13px;color:var(--muted);margin-top:4px;line-height:1.6">${dayData.task}</div>${dayData.saliva?`<div style="margin-top:8px;font-size:12px;color:var(--accent3);border-left:2px solid var(--accent3);padding-left:8px">${dayData.saliva}</div>`:''}`;
   }
-  // ritual status
-  const today=getToday();
-  const intention=S.get('intention-'+today);
+
+  const intention=S.get('intention-'+getToday());
   const ritualEl=document.getElementById('ritual-home-status');
-  if(ritualEl) ritualEl.textContent=intention?'✓ Выполнен — «'+intention.substring(0,30)+(intention.length>30?'...':'')+'»':'Не выполнен';
+  if(ritualEl)ritualEl.textContent=intention?'✓ «'+intention.substring(0,35)+(intention.length>35?'...':'')+'»':'Не выполнен';
+
+  // Week dots — last 7 global days
+  const dotsEl=document.getElementById('week-dots');
+  if(dotsEl){
+    dotsEl.innerHTML='';
+    for(let i=Math.max(1,gDay-6);i<=Math.min(63,gDay);i++){
+      const el=document.createElement('div');
+      el.className='streak-dot'+(days['day'+i]?' done':'')+(i===gDay&&!days['day'+i]?' today':'');
+      el.textContent=i;dotsEl.appendChild(el);
+    }
+  }
 }
 
 // ─── INIT ─────────────────────────────────────────
 function init(){
   const lastDate=S.get('last-date'),today=getToday();
   if(lastDate!==today){
-    const idx=S.get('day-index')||1;
-    if(lastDate&&idx<21)S.set('day-index',Math.min(idx+1,21));
+    const gDay=S.get('global-day')||1;
+    if(lastDate&&gDay<63)S.set('global-day',Math.min(gDay+1,63));
     S.set('last-date',today);
   }
-  buildExercises();
-  buildTwisters();
-  renderHome();
+  buildExercises();buildTwisters();renderHome();
 
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('sw.js').then(reg=>{
@@ -777,6 +1018,7 @@ function init(){
   window.addEventListener('popstate',()=>{
     if(document.getElementById('timer-ov').classList.contains('open')){resetTimer();}
     else if(document.getElementById('breath-ov').classList.contains('open')){stopBreath();}
+    else if(document.getElementById('day-detail-ov').classList.contains('open')){closeDayDetail();}
     else goTab('home');
     history.pushState(null,'',location.href);
   });
