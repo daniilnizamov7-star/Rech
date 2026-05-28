@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="theme-color" content="#0f0f0f">
+<meta name="theme-color" content="#ffffff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Дикция">
@@ -14,14 +14,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#0f0f0f;--bg2:#1a1a1a;--bg3:#242424;--border:#2e2e2e;
-  --accent:#e8ff47;--accent2:#47b6ff;--accent3:#ff7eb3;--accent4:#a78bfa;
-  --text:#f0f0f0;--muted:#888;--danger:#ff6b6b;--success:#4ade80;--r:12px;
+  --bg:#f8f9fc;--bg2:#ffffff;--bg3:#f0f2f7;--border:#e2e6ef;
+  --accent:#2563eb;--accent2:#0891b2;--accent3:#db2777;--accent4:#7c3aed;
+  --text:#0f172a;--muted:#64748b;--danger:#dc2626;--success:#16a34a;--r:12px;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overflow:hidden}
-#update-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--accent);color:#000;font-size:13px;font-weight:500;padding:10px 16px;text-align:center;cursor:pointer}
+#update-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--accent);color:#fff;font-size:13px;font-weight:500;padding:10px 16px;text-align:center;cursor:pointer}
 nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--bg2);border-top:0.5px solid var(--border);display:flex;padding:8px 0 max(8px,env(safe-area-inset-bottom))}
 nav button{flex:1;background:none;border:none;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9px;font-family:'Inter',sans-serif;cursor:pointer;padding:4px 0;transition:color 0.15s}
 nav button.active{color:var(--accent)}
@@ -37,7 +37,7 @@ nav button svg{width:20px;height:20px}
 .card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:14px 16px}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:8px;border:0.5px solid var(--border);background:var(--bg3);color:var(--text);font-size:13px;font-family:'Inter',sans-serif;cursor:pointer;transition:all .15s}
 .btn:active{transform:scale(.97)}
-.btn-accent{background:var(--accent);color:#000;border-color:var(--accent);font-weight:500}
+.btn-accent{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:500}
 .btn-sm{padding:7px 14px;font-size:12px}
 .tag{font-size:10px;font-weight:500;letter-spacing:.05em;padding:3px 8px;border-radius:20px}
 .tag-warm{background:rgba(255,107,107,.15);color:#ff9f9f}
@@ -53,7 +53,7 @@ nav button svg{width:20px;height:20px}
 .streak-num{font-family:'Unbounded',sans-serif;font-size:44px;font-weight:600;color:var(--accent);line-height:1}
 .streak-days{display:flex;gap:4px;margin-top:14px;flex-wrap:wrap}
 .streak-dot{width:26px;height:26px;border-radius:7px;background:var(--bg3);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--muted)}
-.streak-dot.done{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600}
+.streak-dot.done{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
 .streak-dot.today{border-color:var(--accent);color:var(--accent)}
 .today-plan{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden}
 .plan-item{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background .1s}
@@ -62,7 +62,7 @@ nav button svg{width:20px;height:20px}
 .plan-dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0}
 .plan-dot.done{background:var(--success)}
 .plan-dot.now{background:var(--accent)}
-.diag-card{background:linear-gradient(135deg,#1a1a2e,#16213e);border:0.5px solid #2a2a4e;border-radius:var(--r);padding:16px}
+.diag-card{background:linear-gradient(135deg,#eff6ff,#f0f9ff);border:0.5px solid #bfdbfe;border-radius:var(--r);padding:16px}
 
 /* EXERCISES */
 .ex-list{padding:12px 16px 0;display:flex;flex-direction:column;gap:10px}
@@ -99,14 +99,14 @@ nav button svg{width:20px;height:20px}
 /* SELLER */
 .sell-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:10px}
 .sell-title{font-size:14px;font-weight:500;margin-bottom:8px}
-.sell-example{background:var(--bg3);border-left:2px solid var(--accent3);padding:10px 12px;border-radius:0 8px 8px 0;font-size:13px;line-height:1.7;margin:8px 0;font-style:italic}
+.sell-example{background:var(--bg3);border-left:3px solid var(--accent3);padding:10px 12px;border-radius:0 8px 8px 0;font-size:13px;line-height:1.7;margin:8px 0;font-style:italic}
 .sell-note{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5}
 .sell-bad{color:var(--danger)}
 .sell-good{color:var(--success)}
 
 /* PROGRAM */
 .c-tab{padding:6px 14px;border-radius:20px;border:0.5px solid var(--border);background:transparent;color:var(--muted);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s}
-.c-tab.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:500}
+.c-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:500}
 .day-detail-ov{position:fixed;inset:0;z-index:200;background:var(--bg);display:none;flex-direction:column;overflow-y:auto;padding-bottom:40px}
 .day-detail-ov.open{display:flex}
 .dd-header{position:sticky;top:0;background:var(--bg);padding:52px 20px 14px;border-bottom:0.5px solid var(--border);z-index:10}
@@ -125,7 +125,7 @@ nav button svg{width:20px;height:20px}
 /* PROGRESS */
 .prog-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:16px}
 .prog-cell{aspect-ratio:1;border-radius:6px;background:var(--bg3);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);cursor:pointer;transition:all .15s}
-.prog-cell.done{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600}
+.prog-cell.done{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
 .prog-cell.today-cell{border-color:var(--accent);color:var(--accent)}
 .stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 .stat-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:14px}
@@ -208,27 +208,27 @@ nav button svg{width:20px;height:20px}
   <div class="section" style="margin-top:14px">
     <div class="section-title">профиль речи (по записям)</div>
     <div class="diag-card">
-      <div style="font-size:12px;color:var(--accent2);font-weight:500;margin-bottom:12px">Диагностика · 27 мая 2026</div>
+      <div style="font-size:12px;color:var(--accent2);font-weight:600;margin-bottom:12px">Диагностика · 27 мая 2026</div>
       <div style="display:flex;flex-direction:column;gap:10px">
         <div style="display:flex;align-items:center;gap:8px">
           <div style="font-size:12px;color:var(--muted);width:90px;flex-shrink:0">Темп</div>
           <div style="flex:1;height:5px;background:var(--bg3);border-radius:3px"><div style="width:78%;height:100%;background:#ff9f9f;border-radius:3px"></div></div>
-          <div style="font-size:11px;color:#ff9f9f;width:40px;text-align:right">быстро</div>
+          <div style="font-size:11px;color:#dc2626;width:40px;text-align:right">быстро</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
           <div style="font-size:12px;color:var(--muted);width:90px;flex-shrink:0">Паузы</div>
           <div style="flex:1;height:5px;background:var(--bg3);border-radius:3px"><div style="width:20%;height:100%;background:#ffb347;border-radius:3px"></div></div>
-          <div style="font-size:11px;color:#ffb347;width:40px;text-align:right">мало</div>
+          <div style="font-size:11px;color:#d97706;width:40px;text-align:right">мало</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
           <div style="font-size:12px;color:var(--muted);width:90px;flex-shrink:0">Окончания</div>
           <div style="flex:1;height:5px;background:var(--bg3);border-radius:3px"><div style="width:38%;height:100%;background:#ffb347;border-radius:3px"></div></div>
-          <div style="font-size:11px;color:#ffb347;width:40px;text-align:right">смазаны</div>
+          <div style="font-size:11px;color:#d97706;width:40px;text-align:right">смазаны</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
           <div style="font-size:12px;color:var(--muted);width:90px;flex-shrink:0">Осознанность</div>
           <div style="flex:1;height:5px;background:var(--bg3);border-radius:3px"><div style="width:30%;height:100%;background:var(--accent4);border-radius:3px"></div></div>
-          <div style="font-size:11px;color:var(--accent4);width:40px;text-align:right">растём</div>
+          <div style="font-size:11px;color:#7c3aed;width:40px;text-align:right">растём</div>
         </div>
       </div>
     </div>
@@ -479,7 +479,7 @@ nav button svg{width:20px;height:20px}
 
     <div id="dd-saliva-block" style="display:none;margin-bottom:14px">
       <div style="font-size:12px;color:var(--accent3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Совет по слюне</div>
-      <div class="card" style="font-size:13px;color:var(--muted);line-height:1.6;border-left:2px solid var(--accent3)" id="dd-saliva"></div>
+      <div class="card" style="font-size:13px;color:var(--muted);line-height:1.6;border-left:3px solid var(--accent3)" id="dd-saliva"></div>
     </div>
 
     <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Совет дня</div>
@@ -1039,13 +1039,13 @@ function renderCircleView(cIdx,hlDay){
     const isPast=gD<gDay;
     const card=document.createElement('div');
     card.style.cssText=`background:var(--bg2);border:0.5px solid ${isToday?'var(--accent)':isDone?'var(--success)':'var(--border)'};border-radius:var(--r);padding:14px 16px;margin-bottom:8px;cursor:pointer;opacity:${isPast&&!isDone?'0.5':'1'}`;
-    card.innerHTML=`<div style="display:flex;align-items:center;gap:12px"><div style="width:32px;height:32px;border-radius:50%;background:${isDone?'var(--success)':isToday?'var(--accent)':'var(--bg3)'};border:0.5px solid ${isDone?'var(--success)':isToday?'var(--accent)':'var(--border)'};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:${isDone||isToday?'#000':'var(--muted)'};flex-shrink:0">${isDone?'✓':d.day}</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500;color:${isToday?'var(--accent)':'var(--text)'}">${d.focus}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${d.duration}${isToday?' · сегодня':''}</div></div><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg></div>`;
+    card.innerHTML=`<div style="display:flex;align-items:center;gap:12px"><div style="width:32px;height:32px;border-radius:50%;background:${isDone?'var(--success)':isToday?'var(--accent)':'var(--bg3)'};border:0.5px solid ${isDone?'var(--success)':isToday?'var(--accent)':'var(--border)'};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:${isDone||isToday?'#fff':'var(--muted)'};flex-shrink:0">${isDone?'✓':d.day}</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500;color:${isToday?'var(--accent)':'var(--text)'}">${d.focus}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${d.duration}${isToday?' · сегодня':''}</div></div><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg></div>`;
     card.onclick=()=>showDayDetail(cIdx,i);
     container.appendChild(card);
   });
   if(cIdx===2){
     const m=document.createElement('div');
-    m.style.cssText='background:linear-gradient(135deg,#1a1a2e,#16213e);border:0.5px solid var(--accent4);border-radius:var(--r);padding:16px;margin-top:8px';
+    m.style.cssText='background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:0.5px solid var(--accent4);border-radius:var(--r);padding:16px;margin-top:8px';
     m.innerHTML=`<div style="font-size:13px;font-weight:500;color:var(--accent4);margin-bottom:8px">${PROGRAM.maintenance.title}</div><div style="font-size:12px;color:var(--muted);margin-bottom:10px">${PROGRAM.maintenance.subtitle}</div>${PROGRAM.maintenance.routine.map(r=>`<div style="font-size:13px;color:var(--text);padding:4px 0;border-bottom:0.5px solid var(--border)">• ${r}</div>`).join('')}`;
     container.appendChild(m);
   }
@@ -1161,7 +1161,7 @@ function renderHome(){
   const dayData=circle?circle.days[dIdx]:null;
   const focusEl=document.getElementById('today-focus');
   if(focusEl&&dayData){
-    focusEl.innerHTML=`<div style="font-size:12px;color:var(--accent4);font-weight:500;margin-bottom:4px">${circle.title} · День ${dIdx+1}</div><div style="font-size:14px;font-weight:500">${dayData.focus}</div><div style="font-size:13px;color:var(--muted);margin-top:4px;line-height:1.6">${dayData.task}</div>${dayData.saliva?`<div style="margin-top:8px;font-size:12px;color:var(--accent3);border-left:2px solid var(--accent3);padding-left:8px">${dayData.saliva}</div>`:''}`;
+    focusEl.innerHTML=`<div style="font-size:12px;color:var(--accent4);font-weight:500;margin-bottom:4px">${circle.title} · День ${dIdx+1}</div><div style="font-size:14px;font-weight:500">${dayData.focus}</div><div style="font-size:13px;color:var(--muted);margin-top:4px;line-height:1.6">${dayData.task}</div>${dayData.saliva?`<div style="margin-top:8px;font-size:12px;color:var(--accent3);border-left:3px solid var(--accent3);padding-left:8px">${dayData.saliva}</div>`:''}`;
   }
   const intention=S.get('intention-'+getToday());
   const ritualEl=document.getElementById('ritual-home-status');
