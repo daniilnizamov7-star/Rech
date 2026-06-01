@@ -325,7 +325,7 @@ nav button.on{color:var(--accent)}
   <div class="home-streak" id="streak-card">
     <div class="streak-fire">🔥</div>
     <div class="streak-info">
-      <div class="streak-num"><span id="streak-num">0</span> дней подряд</div>
+      <div class="streak-num" id="streak-num">0 дней подряд</div>
       <div class="streak-sub" id="streak-sub">Начни сегодня</div>
     </div>
     <div class="streak-dots" id="streak-dots"></div>
@@ -678,7 +678,7 @@ function renderHome(){
   // Стрик
   let streak=0,i=gday;
   while(i>=1&&(S.get('days')||{})['d'+i]){streak++;i--;}
-  document.getElementById('streak-num').textContent=declDays(streak);
+  document.getElementById('streak-num').textContent=declDays(streak)+' подряд';
   document.getElementById('streak-sub').textContent=
     streak===0?'Начни сегодня — первый шаг самый важный':
     streak===1?'Первый день — отличное начало!':
@@ -713,9 +713,9 @@ function renderHome(){
   // Кнопка старт
   const btn=document.getElementById('hdc-start');
   if(done){
-    btn.innerHTML='✓ День выполнен — хорошая работа!';
+    btn.innerHTML='✓ Выполнен · Повторить упражнения';
     btn.style.background='var(--success)';
-    btn.onclick=null;
+    btn.onclick=startWorkout;
   } else {
     btn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Начать тренировку';
     btn.style.background='var(--accent)';
@@ -967,11 +967,9 @@ function renderProgress(){
       dot.className=`day-dot${isDone?' done':isToday?' today':isFuture?' locked':''}`;
       dot.textContent=di+1;
       dot.title=`День ${di+1}: ${circle.days[di].f}`;
-      // Нажатие открывает день
-      if(!isFuture){
-        dot.style.cursor='pointer';
-        dot.onclick=()=>openDayDetail(ci,di);
-      }
+      // Все дни кликабельны
+      dot.style.cursor='pointer';
+      dot.onclick=()=>openDayDetail(ci,di);
       dEl.appendChild(dot);
     });
   });
@@ -1033,7 +1031,7 @@ function openDayDetail(ci,di){
   const doneBtn=document.getElementById('dd-done-btn');
   doneBtn.textContent=isDone?'✓ Выполнен — снять отметку':'Отметить выполненным ✓';
   doneBtn.style.background=isDone?'var(--success)':'var(--accent)';
-  doneBtn.style.display=isToday||isDone?'block':'none';
+  doneBtn.style.display=isToday||isDone?'block':'none'; // только сегодня и прошлые
   doneBtn.onclick=()=>{
     days['d'+gd]=!days['d'+gd];
     S.set('days',days);
