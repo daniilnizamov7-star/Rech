@@ -2,1190 +2,976 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="theme-color" content="#ffffff">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#f8f7f4">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Дикция">
-<title>Дикция — тренажёр речи</title>
+<title>Дикция</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#f8f9fc;--bg2:#ffffff;--bg3:#f0f2f7;--border:#e2e6ef;
-  --accent:#2563eb;--accent2:#0891b2;--accent3:#db2777;--accent4:#7c3aed;
-  --text:#0f172a;--muted:#64748b;--danger:#dc2626;--success:#16a34a;--r:12px;
-}
-@keyframes spin{to{transform:rotate(360deg)}}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overflow:hidden}
-#update-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--accent);color:#fff;font-size:13px;font-weight:500;padding:10px 16px;text-align:center;cursor:pointer}
-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--bg2);border-top:0.5px solid var(--border);display:flex;padding:8px 0 max(8px,env(safe-area-inset-bottom))}
-nav button{flex:1;background:none;border:none;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9px;font-family:'Inter',sans-serif;cursor:pointer;padding:4px 0;transition:color 0.15s}
-nav button.active{color:var(--accent)}
-nav button svg{width:20px;height:20px}
-.screen{display:none;height:100dvh;overflow-y:auto;padding:0 0 88px}
-.screen.active{display:block}
-.hdr{padding:52px 20px 16px;position:sticky;top:0;background:var(--bg);z-index:10;border-bottom:0.5px solid var(--border)}
-.hdr-label{font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
-.hdr-title{font-family:'Unbounded',sans-serif;font-size:20px;font-weight:600;line-height:1.2}
-.hdr-title span{color:var(--accent)}
-.section{padding:16px 16px 0}
-.section-title{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
-.card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:14px 16px}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:8px;border:0.5px solid var(--border);background:var(--bg3);color:var(--text);font-size:13px;font-family:'Inter',sans-serif;cursor:pointer;transition:all .15s}
-.btn:active{transform:scale(.97)}
-.btn-accent{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:500}
-.btn-sm{padding:7px 14px;font-size:12px}
-.tag{font-size:10px;font-weight:500;letter-spacing:.05em;padding:3px 8px;border-radius:20px}
-.tag-warm{background:rgba(255,107,107,.15);color:#ff9f9f}
-.tag-tongue{background:rgba(71,182,255,.15);color:#7ecfff}
-.tag-speed{background:rgba(232,255,71,.15);color:#e8ff47}
-.tag-voice{background:rgba(74,222,128,.15);color:#6ee49a}
-.tag-breath{background:rgba(167,139,250,.15);color:#c4b5fd}
-.tag-sell{background:rgba(255,126,179,.15);color:#ffadd4}
-.tag-mind{background:rgba(251,191,36,.15);color:#fcd34d}
+:root{
+  --bg:#f8f7f4;
+  --bg2:#ffffff;
+  --bg3:#f0ede8;
+  --border:#e8e3db;
+  --accent:#1a1a2e;
+  --accent2:#2563eb;
+  --accent3:#dc2626;
+  --success:#16a34a;
+  --warning:#d97706;
+  --text:#1a1a2e;
+  --muted:#7c7268;
+  --light:#a09890;
+  --r:14px;
+  --font:'Manrope',sans-serif;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);overflow:hidden}
 
-/* HOME */
-.streak-card{margin:16px 16px 0;background:var(--bg2);border:0.5px solid var(--border);border-radius:16px;padding:18px}
-.streak-num{font-family:'Unbounded',sans-serif;font-size:44px;font-weight:600;color:var(--accent);line-height:1}
-.streak-days{display:flex;gap:4px;margin-top:14px;flex-wrap:wrap}
-.streak-dot{width:26px;height:26px;border-radius:7px;background:var(--bg3);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--muted)}
-.streak-dot.done{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
-.streak-dot.today{border-color:var(--accent);color:var(--accent)}
-.today-plan{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden}
-.plan-item{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background .1s}
-.plan-item:last-child{border-bottom:none}
-.plan-item:active{background:var(--bg3)}
-.plan-dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0}
-.plan-dot.done{background:var(--success)}
-.plan-dot.now{background:var(--accent)}
-.diag-card{background:linear-gradient(135deg,#eff6ff,#f0f9ff);border:0.5px solid #bfdbfe;border-radius:var(--r);padding:16px}
+/* UPDATE BANNER */
+#upd{display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--accent2);color:#fff;font-size:13px;font-weight:600;padding:10px 16px;text-align:center;cursor:pointer}
 
-/* EXERCISES */
-.ex-list{padding:12px 16px 0;display:flex;flex-direction:column;gap:10px}
-.ex-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:16px;cursor:pointer;transition:border-color .15s}
-.ex-card.open{border-color:var(--accent)}
-.ex-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
-.ex-name{font-size:15px;font-weight:500;margin:8px 0 4px}
-.ex-desc{font-size:13px;color:var(--muted);line-height:1.6}
-.ex-body{display:none;margin-top:12px}
-.ex-card.open .ex-body{display:block}
-.ex-textbox{background:var(--bg3);border-radius:8px;padding:12px;font-size:14px;line-height:1.8;font-style:italic;margin-bottom:10px}
-.ex-reps{font-size:12px;color:var(--muted);margin-bottom:10px}
-.chevron{transition:transform .2s;flex-shrink:0}
-.ex-card.open .chevron{transform:rotate(90deg)}
+/* SCREENS */
+.scr{display:none;height:100dvh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.scr.on{display:flex;flex-direction:column}
 
-/* TONGUE TWISTERS */
-.tt-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:14px 16px;cursor:pointer;transition:all .15s;margin-bottom:8px}
-.tt-card.done{border-color:var(--success)}
-.tt-level{font-size:10px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px}
-.tt-text{font-size:14px;line-height:1.7;font-style:italic;margin-bottom:8px}
-.tt-bottom{display:flex;align-items:center;justify-content:space-between}
-.tt-check{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;transition:all .2s}
-.tt-card.done .tt-check{background:var(--success);border-color:var(--success)}
+/* ─── HOME ─────────────────────────────────── */
+#scr-home{background:var(--bg)}
 
-/* BREATHING */
-.breath-anim{display:flex;align-items:center;justify-content:center;margin:20px 0}
-.breath-circle{width:160px;height:160px;border-radius:50%;border:2px solid var(--accent4);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;transition:transform 4s ease-in-out,opacity 1s;position:relative}
-.breath-circle::before{content:'';position:absolute;inset:-8px;border-radius:50%;border:1px solid rgba(167,139,250,.2);transition:transform 4s ease-in-out}
-.breath-label{font-size:13px;color:var(--accent4);font-weight:500;text-align:center}
-.breath-count{font-family:'Unbounded',sans-serif;font-size:32px;color:var(--text)}
-.breath-phase{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-.breath-instruction{font-size:13px;color:var(--muted);text-align:center;min-height:36px;line-height:1.6;padding:0 16px}
+.home-top{
+  padding:56px 24px 20px;
+  background:var(--bg);
+  flex-shrink:0;
+}
+.home-greeting{font-size:13px;color:var(--muted);font-weight:500;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px}
+.home-title{font-size:28px;font-weight:800;color:var(--text);line-height:1.15}
+.home-title em{font-style:normal;color:var(--accent2)}
 
-/* SELLER */
-.sell-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:10px}
-.sell-title{font-size:14px;font-weight:500;margin-bottom:8px}
-.sell-example{background:var(--bg3);border-left:3px solid var(--accent3);padding:10px 12px;border-radius:0 8px 8px 0;font-size:13px;line-height:1.7;margin:8px 0;font-style:italic}
-.sell-note{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5}
-.sell-bad{color:var(--danger)}
-.sell-good{color:var(--success)}
+.home-streak{
+  display:flex;align-items:center;gap:10px;
+  background:var(--accent);color:#fff;
+  border-radius:var(--r);padding:12px 16px;
+  margin:16px 24px 0;
+}
+.streak-fire{font-size:22px}
+.streak-info{flex:1}
+.streak-num{font-size:20px;font-weight:800;line-height:1}
+.streak-sub{font-size:12px;opacity:.7;margin-top:2px}
+.streak-dots{display:flex;gap:4px}
+.sdot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3)}
+.sdot.on{background:#fff}
 
-/* PROGRAM */
-.c-tab{padding:6px 14px;border-radius:20px;border:0.5px solid var(--border);background:transparent;color:var(--muted);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s}
-.c-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:500}
-.day-detail-ov{position:fixed;inset:0;z-index:200;background:var(--bg);display:none;flex-direction:column;overflow-y:auto;padding-bottom:40px}
-.day-detail-ov.open{display:flex}
-.dd-header{position:sticky;top:0;background:var(--bg);padding:52px 20px 14px;border-bottom:0.5px solid var(--border);z-index:10}
+.home-day-card{
+  margin:14px 24px 0;
+  background:var(--bg2);
+  border:1.5px solid var(--border);
+  border-radius:var(--r);
+  overflow:hidden;
+}
+.hdc-label{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;
+  border-bottom:1px solid var(--border);
+}
+.hdc-badge{
+  font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--accent2);background:#eff6ff;padding:3px 9px;border-radius:20px;
+}
+.hdc-day{font-size:12px;color:var(--muted);font-weight:500}
+.hdc-focus{font-size:18px;font-weight:700;padding:14px 16px 6px;line-height:1.3}
+.hdc-task{font-size:14px;color:var(--muted);padding:0 16px 14px;line-height:1.6}
+.hdc-steps{padding:0 16px;display:flex;flex-direction:column;gap:0}
+.step-pill{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 0;
+  border-top:1px solid var(--border);
+  font-size:13px;
+}
+.step-num{
+  width:22px;height:22px;border-radius:50%;
+  background:var(--bg3);
+  color:var(--muted);font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.step-name{flex:1;font-weight:500;color:var(--text)}
+.step-dur{font-size:11px;color:var(--light)}
 
-/* MORNING */
-.ritual-step{display:flex;gap:14px;padding:14px 0;border-bottom:0.5px solid var(--border)}
-.ritual-step:last-child{border-bottom:none}
-.ritual-num{width:28px;height:28px;border-radius:50%;background:var(--bg3);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;color:var(--accent)}
-.ritual-text{flex:1}
-.ritual-name{font-size:14px;font-weight:500;margin-bottom:3px}
-.ritual-desc{font-size:13px;color:var(--muted);line-height:1.6}
-.intention-input{width:100%;background:var(--bg3);border:0.5px solid var(--border);border-radius:8px;padding:12px;font-size:14px;color:var(--text);font-family:'Inter',sans-serif;resize:none;margin-top:8px;min-height:70px}
-.intention-input:focus{outline:none;border-color:var(--accent4)}
-.today-intention{background:var(--bg3);border-left:2px solid var(--accent4);border-radius:0 8px 8px 0;padding:10px 12px;font-size:14px;font-style:italic;color:var(--text);margin-top:8px;display:none}
+.hdc-start-btn{
+  margin:14px 16px 16px;
+  width:calc(100% - 32px);
+  background:var(--accent);color:#fff;
+  border:none;border-radius:10px;
+  padding:15px;font-size:16px;font-weight:700;
+  font-family:var(--font);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:transform .1s,opacity .1s;
+}
+.hdc-start-btn:active{transform:scale(.97);opacity:.9}
 
-/* PROGRESS */
-.prog-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:16px}
-.prog-cell{aspect-ratio:1;border-radius:6px;background:var(--bg3);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);cursor:pointer;transition:all .15s}
-.prog-cell.done{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
-.prog-cell.today-cell{border-color:var(--accent);color:var(--accent)}
-.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.stat-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:14px}
-.stat-val{font-family:'Unbounded',sans-serif;font-size:28px;font-weight:600;color:var(--accent)}
-.stat-lbl{font-size:12px;color:var(--muted);margin-top:4px}
+.home-sections{padding:20px 24px 100px;display:flex;flex-direction:column;gap:10px}
+.hs-row{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.hs-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px;cursor:pointer;
+  transition:transform .1s;
+}
+.hs-card:active{transform:scale(.97)}
+.hs-icon{font-size:22px;margin-bottom:6px}
+.hs-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px}
+.hs-sub{font-size:11px;color:var(--muted)}
+.hs-card-wide{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px 16px;cursor:pointer;
+  display:flex;align-items:center;gap:12px;
+  transition:transform .1s;
+}
+.hs-card-wide:active{transform:scale(.97)}
 
-/* TIMER OVERLAY */
-.timer-ov{position:fixed;inset:0;z-index:200;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px}
-.timer-ov.open{display:flex}
-.timer-name{font-size:14px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;text-align:center;padding:0 20px}
-.timer-ring{position:relative;width:190px;height:190px}
-.timer-ring svg{transform:rotate(-90deg)}
-.ring-bg{fill:none;stroke:var(--bg3);stroke-width:4}
-.ring-fg{fill:none;stroke:var(--accent);stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset 1s linear}
-.timer-inner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Unbounded',sans-serif;font-size:34px;font-weight:400}
-.timer-btns{display:flex;gap:12px}
+/* ─── WORKOUT SCREEN ────────────────────────── */
+#scr-workout{background:var(--bg);position:fixed;inset:0;z-index:100;display:none;flex-direction:column}
+#scr-workout.on{display:flex}
+
+.wo-header{
+  padding:52px 20px 16px;
+  display:flex;align-items:center;gap:12px;
+  flex-shrink:0;
+  background:var(--bg);
+  border-bottom:1px solid var(--border);
+}
+.wo-back{
+  width:36px;height:36px;border-radius:50%;background:var(--bg3);
+  border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.wo-header-info{flex:1}
+.wo-title{font-size:16px;font-weight:700}
+.wo-progress-bar{
+  height:4px;background:var(--border);border-radius:2px;margin-top:6px;overflow:hidden;
+}
+.wo-progress-fill{height:100%;background:var(--accent2);border-radius:2px;transition:width .4s ease}
+
+.wo-body{flex:1;overflow-y:auto;padding:20px 20px 0}
+.wo-step-card{
+  background:var(--bg2);border:1.5px solid var(--border);
+  border-radius:16px;padding:20px;margin-bottom:12px;
+}
+.wo-step-num{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+.wo-step-name{font-size:20px;font-weight:800;margin-bottom:4px;line-height:1.2}
+.wo-step-tag{display:inline-block;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;margin-bottom:12px}
+.tag-warm{background:#fff7ed;color:#c2410c}
+.tag-artic{background:#eff6ff;color:#1d4ed8}
+.tag-breath{background:#f5f3ff;color:#6d28d9}
+.tag-tempo{background:#fef3c7;color:#92400e}
+.tag-voice{background:#f0fdf4;color:#166534}
+.tag-practice{background:#fdf2f8;color:#9d174d}
+
+.wo-how{
+  font-size:14px;line-height:1.75;color:var(--text);
+  background:var(--bg3);border-radius:10px;
+  padding:14px;margin-bottom:10px;
+}
+.wo-focus{
+  display:flex;gap:8px;align-items:flex-start;
+  font-size:13px;line-height:1.6;color:var(--muted);
+  padding:8px 0;border-top:1px solid var(--border);
+  margin-top:2px;
+}
+.wo-focus-icon{flex-shrink:0;margin-top:1px}
+.wo-mistake{
+  display:flex;gap:8px;align-items:flex-start;
+  font-size:13px;line-height:1.6;color:var(--muted);
+  padding:8px 0;border-top:1px solid var(--border);
+}
+.wo-saliva{
+  margin-top:10px;
+  background:#fdf2f8;border-left:3px solid #db2777;
+  border-radius:0 8px 8px 0;padding:10px 12px;
+  font-size:13px;color:#831843;line-height:1.6;
+}
+
+.wo-timer{
+  background:var(--bg2);border:1.5px solid var(--border);
+  border-radius:16px;padding:20px;text-align:center;
+  margin-bottom:12px;
+}
+.wo-timer-ring{position:relative;width:130px;height:130px;margin:0 auto 14px}
+.wo-timer-ring svg{transform:rotate(-90deg)}
+.wtr-bg{fill:none;stroke:var(--border);stroke-width:5}
+.wtr-fg{fill:none;stroke:var(--accent2);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .9s linear}
+.wo-timer-time{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:28px;font-weight:800;color:var(--text);
+}
+.wo-timer-label{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:12px}
+.wo-timer-btns{display:flex;gap:8px;justify-content:center}
+.wo-btn{
+  padding:10px 20px;border-radius:8px;border:1.5px solid var(--border);
+  background:var(--bg3);color:var(--text);font-size:13px;font-weight:600;
+  font-family:var(--font);cursor:pointer;transition:transform .1s;
+}
+.wo-btn:active{transform:scale(.96)}
+.wo-btn-prime{background:var(--accent2);color:#fff;border-color:var(--accent2)}
+
+.wo-footer{
+  padding:14px 20px max(14px,env(safe-area-inset-bottom));
+  background:var(--bg);border-top:1px solid var(--border);
+  flex-shrink:0;
+  display:flex;gap:10px;
+}
+.wo-done-btn{
+  flex:1;background:var(--accent);color:#fff;
+  border:none;border-radius:10px;padding:14px;
+  font-size:15px;font-weight:700;font-family:var(--font);
+  cursor:pointer;transition:transform .1s,opacity .1s;
+}
+.wo-done-btn:active{transform:scale(.97)}
+.wo-skip{
+  background:var(--bg3);color:var(--muted);
+  border:none;border-radius:10px;padding:14px 16px;
+  font-size:13px;font-weight:600;font-family:var(--font);
+  cursor:pointer;
+}
+
+/* ─── BREATH SCREEN ─────────────────────────── */
+#scr-breath{background:var(--bg);position:fixed;inset:0;z-index:150;display:none;flex-direction:column;align-items:center;justify-content:center;gap:0}
+#scr-breath.on{display:flex}
+.br-close{position:absolute;top:52px;right:20px;width:36px;height:36px;border-radius:50%;background:var(--bg3);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.br-title{font-size:14px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:32px}
+.br-ring-wrap{position:relative;margin-bottom:24px}
+.br-ring{transition:transform 3s ease-in-out}
+.br-ring-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.br-phase{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
+.br-count{font-size:52px;font-weight:800;color:var(--text);line-height:1}
+.br-instr{font-size:14px;color:var(--muted);text-align:center;max-width:240px;line-height:1.6;margin-bottom:20px}
+.br-cycles{font-size:12px;color:var(--light);margin-bottom:28px}
+.br-btn{padding:13px 36px;border-radius:10px;background:var(--accent);color:#fff;border:none;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer}
+
+/* ─── PROGRESS SCREEN ───────────────────────── */
+#scr-progress{background:var(--bg)}
+.prog-header{padding:52px 24px 20px;flex-shrink:0}
+.prog-h1{font-size:26px;font-weight:800;margin-bottom:2px}
+.prog-sub{font-size:13px;color:var(--muted)}
+
+.prog-circles{padding:0 24px;display:flex;flex-direction:column;gap:12px;padding-bottom:100px}
+.circle-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.cc-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.cc-title{font-size:15px;font-weight:700}
+.cc-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.cc-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:#eff6ff;color:var(--accent2)}
+.cc-days{display:flex;flex-wrap:wrap;gap:5px;padding:14px 16px}
+.day-dot{
+  width:32px;height:32px;border-radius:8px;
+  background:var(--bg3);border:1.5px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:600;color:var(--muted);
+  cursor:pointer;transition:all .15s;
+}
+.day-dot.done{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.day-dot.today{border-color:var(--accent);color:var(--accent);background:#fff}
+.day-dot.locked{opacity:.35}
+
+.maint-card{
+  background:linear-gradient(135deg,#eff6ff,#f5f3ff);
+  border:1px solid #c7d2fe;border-radius:var(--r);
+  padding:16px;
+}
+.maint-title{font-size:14px;font-weight:700;color:var(--accent2);margin-bottom:4px}
+.maint-sub{font-size:12px;color:var(--muted);margin-bottom:10px}
+.maint-items{display:flex;flex-direction:column;gap:4px}
+.maint-item{font-size:13px;color:var(--text);padding:4px 0;border-bottom:1px solid var(--border)}
+.maint-item:last-child{border-bottom:none}
+
+/* ─── BOTTOM NAV ────────────────────────────── */
+nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:90;
+  background:var(--bg2);border-top:1px solid var(--border);
+  display:flex;padding:6px 0 max(6px,env(safe-area-inset-bottom));
+}
+nav button{
+  flex:1;background:none;border:none;color:var(--muted);
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  font-size:10px;font-weight:600;font-family:var(--font);
+  cursor:pointer;padding:4px 0;transition:color .15s;
+}
+nav button svg{width:22px;height:22px}
+nav button.on{color:var(--accent)}
+
+/* ─── UTILITIES ─────────────────────────────── */
+.hidden{display:none!important}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .3s ease forwards}
 </style>
 </head>
 <body>
-<div id="update-banner" onclick="location.reload()">Доступно обновление — нажми чтобы обновить</div>
 
-<!-- ═══ SCREEN: HOME ═══ -->
-<div class="screen active" id="scr-home">
-  <div class="hdr">
-    <div class="hdr-label">тренажёр речи</div>
-    <div class="hdr-title">Твоя <span>Дикция</span></div>
+<div id="upd" onclick="location.reload()">Доступно обновление — нажми чтобы обновить</div>
+
+<!-- ═══════════════════════════════════════
+     HOME
+════════════════════════════════════════ -->
+<div class="scr on" id="scr-home">
+  <div class="home-top">
+    <div class="home-greeting" id="greeting">Доброе утро</div>
+    <div class="home-title">Готов <em>говорить</em><br>чётче?</div>
   </div>
 
-  <div class="streak-card">
-    <div style="display:flex;align-items:flex-end;justify-content:space-between">
+  <div class="home-streak" id="streak-card">
+    <div class="streak-fire">🔥</div>
+    <div class="streak-info">
+      <div class="streak-num"><span id="streak-num">0</span> дней подряд</div>
+      <div class="streak-sub" id="streak-sub">Начни сегодня</div>
+    </div>
+    <div class="streak-dots" id="streak-dots"></div>
+  </div>
+
+  <div class="home-day-card" id="home-day-card">
+    <div class="hdc-label">
+      <div class="hdc-badge" id="hdc-circle">Круг 1</div>
+      <div class="hdc-day" id="hdc-day">День 1 из 21</div>
+    </div>
+    <div class="hdc-focus" id="hdc-focus">Загрузка...</div>
+    <div class="hdc-task" id="hdc-task"></div>
+    <div class="hdc-steps" id="hdc-steps"></div>
+    <button class="hdc-start-btn" id="hdc-start" onclick="startWorkout()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      Начать тренировку
+    </button>
+  </div>
+
+  <div class="home-sections">
+    <div class="hs-row">
+      <div class="hs-card" onclick="openBreath('478')">
+        <div class="hs-icon">🫁</div>
+        <div class="hs-title">4-7-8</div>
+        <div class="hs-sub">Перед звонком</div>
+      </div>
+      <div class="hs-card" onclick="openBreath('box')">
+        <div class="hs-icon">⬜</div>
+        <div class="hs-title">Квадратное</div>
+        <div class="hs-sub">Концентрация</div>
+      </div>
+    </div>
+    <div class="hs-card-wide" onclick="goNav('progress')">
+      <div style="font-size:22px">📋</div>
       <div>
-        <div class="streak-num" id="streak-num">0</div>
-        <div style="font-size:13px;color:var(--muted);margin-top:2px">дней подряд</div>
+        <div class="hs-title">Вся программа — 63 дня</div>
+        <div class="hs-sub" id="prog-summary">Круг 1 · 0 дней выполнено</div>
       </div>
-      <div style="text-align:right">
-        <div style="font-size:13px;color:var(--muted)" id="total-lbl">0 из 63</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:2px">выполнено</div>
-      </div>
-    </div>
-    <div class="streak-days" id="week-dots"></div>
-  </div>
-
-  <div class="section" style="margin-top:14px">
-    <div class="section-title">утренний ритуал сегодня</div>
-    <div class="card" style="padding:0;overflow:hidden;margin-bottom:10px" id="ritual-home-card">
-      <div style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="goTab('morning')">
-        <div>
-          <div style="font-size:14px;font-weight:500" id="ritual-home-status">Не выполнен</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px">3 минуты · дыхание + намеренность</div>
-        </div>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
-      </div>
-    </div>
-
-    <div class="section-title">план на сегодня</div>
-    <div class="today-plan">
-      <div class="plan-item" onclick="goTab('exercises')">
-        <div class="plan-dot now"></div>
-        <div style="flex:1"><div style="font-size:14px">Артикуляционная разминка</div><div style="font-size:12px;color:var(--muted)">5 мин</div></div>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
-      </div>
-      <div class="plan-item" onclick="goTab('breathing')">
-        <div class="plan-dot"></div>
-        <div style="flex:1"><div style="font-size:14px">Дыхательная практика</div><div style="font-size:12px;color:var(--muted)">3 мин · 4-7-8</div></div>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
-      </div>
-      <div class="plan-item" onclick="goTab('twisters')">
-        <div class="plan-dot"></div>
-        <div style="flex:1"><div style="font-size:14px">Скороговорки</div><div style="font-size:12px;color:var(--muted)">5 мин</div></div>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
-      </div>
-      <div class="plan-item" onclick="goTab('exercises')">
-        <div class="plan-dot"></div>
-        <div style="flex:1"><div style="font-size:14px">Чтение вслух</div><div style="font-size:12px;color:var(--muted)">5 мин</div></div>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
-      </div>
-    </div>
-  </div>
-
-  <div class="section" style="margin-top:14px">
-    <div class="section-title">профиль речи (по записям)</div>
-    <div class="diag-card">
-      <div style="font-size:12px;color:var(--accent2);font-weight:600;margin-bottom:12px">Диагностика · 27 мая 2026</div>
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <div style="display:flex;align-items:center;gap:8px">
-          <div style="font-size:12px;color:var(--muted);width:90px;flex-shrink:0">Темп</div>
-          <div style="flex:1;height:5px;background:var(--bg3);border-radius:3px"><div style="width:78%;height:100%;background:#ff9f9f;border-radius:3px"></div></div>
-          <div style="font-size:11px;color:#dc2626;width:40px;text-align:right">быстро</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <div style="font-size:12px;color:var(--muted);width:90px;flex-shrink:0">Паузы</div>
-          <div style="flex:1;height:5px;background:var(--bg3);border-radius:3px"><div style="width:20%;height:100%;background:#ffb347;border-radius:3px"></div></div>
-          <div style="font-size:11px;color:#d97706;width:40px;text-align:right">мало</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <div style="font-size:12px;color:var(--muted);width:90px;flex-shrink:0">Окончания</div>
-          <div style="flex:1;height:5px;background:var(--bg3);border-radius:3px"><div style="width:38%;height:100%;background:#ffb347;border-radius:3px"></div></div>
-          <div style="font-size:11px;color:#d97706;width:40px;text-align:right">смазаны</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <div style="font-size:12px;color:var(--muted);width:90px;flex-shrink:0">Осознанность</div>
-          <div style="flex:1;height:5px;background:var(--bg3);border-radius:3px"><div style="width:30%;height:100%;background:var(--accent4);border-radius:3px"></div></div>
-          <div style="font-size:11px;color:#7c3aed;width:40px;text-align:right">растём</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="section" style="margin-top:14px;padding-bottom:8px">
-    <div class="section-title">задание дня</div>
-    <div class="card" id="daily-task-card" style="border-color:var(--accent4)">
-      <div id="daily-task-content"></div>
-    </div>
-  </div>
-
-  <div class="section" style="margin-top:14px">
-    <div class="section-title">задание дня</div>
-    <div class="card" id="today-focus" style="border-color:var(--accent4);line-height:1.6">Загрузка...</div>
-    <button class="btn btn-sm" style="margin-top:8px;width:100%;justify-content:center" onclick="goTab('program')">Открыть программу →</button>
-  </div>
-
-  <div class="section" style="margin-top:14px;padding-bottom:8px">
-    <div class="section-title">главный инсайт</div>
-    <div class="card">
-      <div style="font-size:13px;font-weight:500;color:var(--accent2);margin-bottom:6px">Автопилот выключается через 8 сек</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.6">По записям: начинаешь осознанно — паузы есть. Через 8 секунд мозг переключается в автомат. Тренируй осознанность, не мышцы.</div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
     </div>
   </div>
 </div>
 
-<!-- ═══ SCREEN: EXERCISES ═══ -->
-<div class="screen" id="scr-exercises">
-  <div class="hdr">
-    <div class="hdr-label">ежедневно</div>
-    <div class="hdr-title">Упраж<span>нения</span></div>
-  </div>
-  <div class="ex-list" id="ex-list"></div>
-</div>
-
-<!-- ═══ SCREEN: TWISTERS ═══ -->
-<div class="screen" id="scr-twisters">
-  <div class="hdr">
-    <div class="hdr-label">чёткость · не скорость</div>
-    <div class="hdr-title">Скорого<span>ворки</span></div>
-  </div>
-  <div style="padding:12px 16px 0" id="tt-list"></div>
-</div>
-
-<!-- ═══ SCREEN: BREATHING ═══ -->
-<div class="screen" id="scr-breathing">
-  <div class="hdr">
-    <div class="hdr-label">осознанность · голос</div>
-    <div class="hdr-title">Дыха<span>ние</span></div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">выбери практику</div>
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <div class="card" style="cursor:pointer;border-color:var(--accent4)" onclick="startBreath('478')">
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div>
-            <div class="tag tag-breath" style="margin-bottom:8px">перед важным звонком</div>
-            <div style="font-size:15px;font-weight:500">Техника 4-7-8</div>
-            <div style="font-size:13px;color:var(--muted);margin-top:3px">Гасит адреналин за 2 минуты</div>
-          </div>
-          <div style="font-family:'Unbounded',sans-serif;font-size:18px;color:var(--accent4)">4·7·8</div>
-        </div>
-      </div>
-      <div class="card" style="cursor:pointer" onclick="startBreath('diaphragm')">
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div>
-            <div class="tag tag-breath" style="margin-bottom:8px">каждое утро</div>
-            <div style="font-size:15px;font-weight:500">Диафрагмальное</div>
-            <div style="font-size:13px;color:var(--muted);margin-top:3px">Низкий уверенный голос</div>
-          </div>
-          <div style="font-family:'Unbounded',sans-serif;font-size:18px;color:var(--accent4)">4·4</div>
-        </div>
-      </div>
-      <div class="card" style="cursor:pointer" onclick="startBreath('box')">
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div>
-            <div class="tag tag-breath" style="margin-bottom:8px">концентрация</div>
-            <div style="font-size:15px;font-weight:500">Квадратное дыхание</div>
-            <div style="font-size:13px;color:var(--muted);margin-top:3px">Используют спецназ перед операцией</div>
-          </div>
-          <div style="font-family:'Unbounded',sans-serif;font-size:18px;color:var(--accent4)">4·4·4·4</div>
-        </div>
-      </div>
+<!-- ═══════════════════════════════════════
+     WORKOUT
+════════════════════════════════════════ -->
+<div class="scr" id="scr-workout">
+  <div class="wo-header">
+    <button class="wo-back" onclick="closeWorkout()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    </button>
+    <div class="wo-header-info">
+      <div class="wo-title" id="wo-title">Тренировка</div>
+      <div class="wo-progress-bar"><div class="wo-progress-fill" id="wo-prog" style="width:0%"></div></div>
     </div>
+    <div style="font-size:13px;color:var(--muted);font-weight:600" id="wo-counter">1/1</div>
   </div>
-
-  <div class="section" style="margin-top:16px;padding-bottom:8px">
-    <div class="section-title">почему это работает для речи</div>
-    <div class="card">
-      <div style="font-size:13px;color:var(--muted);line-height:1.7">Когда дышишь грудью — голос зажатый, темп быстрый, слова сливаются. Когда дышишь животом (диафрагмой) — голос становится ниже, спокойнее, появляются естественные паузы. Дыхание управляет речью, не наоборот.</div>
-    </div>
+  <div class="wo-body" id="wo-body"></div>
+  <div class="wo-footer">
+    <button class="wo-skip" onclick="woNext()" id="wo-skip-btn">Пропустить</button>
+    <button class="wo-done-btn" onclick="woDone()" id="wo-done-btn">Выполнено ✓</button>
   </div>
 </div>
 
-<!-- Breathing session overlay -->
-<div class="timer-ov" id="breath-ov" style="background:var(--bg)">
-  <div class="timer-name" id="breath-title">Техника 4-7-8</div>
-  <div class="breath-anim">
-    <div class="breath-circle" id="breath-circle">
-      <div class="breath-phase" id="breath-phase">Готов?</div>
-      <div class="breath-count" id="breath-count">—</div>
+<!-- ═══════════════════════════════════════
+     BREATH
+════════════════════════════════════════ -->
+<div class="scr" id="scr-breath">
+  <button class="br-close" onclick="closeBreath()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg>
+  </button>
+  <div class="br-title" id="br-title">4-7-8</div>
+  <div class="br-ring-wrap">
+    <div class="br-ring" id="br-ring">
+      <svg width="200" height="200" viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="85" fill="none" stroke="var(--border)" stroke-width="6"/>
+        <circle cx="100" cy="100" r="85" fill="none" stroke="var(--accent2)" stroke-width="6"
+          stroke-linecap="round" stroke-dasharray="534" id="br-arc"
+          style="transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset .9s linear;stroke-dashoffset:534"/>
+      </svg>
+    </div>
+    <div class="br-ring-inner">
+      <div class="br-phase" id="br-phase">—</div>
+      <div class="br-count" id="br-count">—</div>
     </div>
   </div>
-  <div class="breath-instruction" id="breath-instr">Нажми старт и следи за кругом</div>
-  <div style="display:flex;gap:10px">
-    <button class="btn" onclick="stopBreath()">Стоп</button>
-    <button class="btn btn-accent" id="breath-start-btn" onclick="runBreath()">Начать</button>
-  </div>
-  <div style="font-size:12px;color:var(--muted)" id="breath-cycles-lbl"></div>
+  <div class="br-instr" id="br-instr">Нажми «Начать» и следи за кругом</div>
+  <div class="br-cycles" id="br-cycles"></div>
+  <button class="br-btn" id="br-btn" onclick="brRun()">Начать</button>
 </div>
 
-<!-- ═══ SCREEN: SELLER ═══ -->
-<div class="screen" id="scr-seller">
-  <div class="hdr">
-    <div class="hdr-label">речь продавца</div>
-    <div class="hdr-title">Цеп<span>ляет</span></div>
+<!-- ═══════════════════════════════════════
+     PROGRESS
+════════════════════════════════════════ -->
+<div class="scr" id="scr-progress">
+  <div class="prog-header">
+    <div class="prog-h1">Программа</div>
+    <div class="prog-sub" id="prog-header-sub">63 дня · 3 круга</div>
   </div>
-
-  <div style="padding:12px 16px 0;display:flex;flex-direction:column;gap:0">
-
-    <div class="sell-card">
-      <div class="tag tag-sell" style="margin-bottom:10px">техника #1</div>
-      <div class="sell-title">Пауза перед главным словом</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px">Тишина притягивает внимание сильнее громкости. Сделай паузу 1–2 сек перед ключевым словом — человек сам начинает вслушиваться.</div>
-      <div class="sell-example">
-        <span class="sell-bad">❌ «МыделаемсайтыдляресторановнаСуpabase»</span><br><br>
-        <span class="sell-good">✅ «Мы делаем сайты для ресторанов... <em>(пауза)</em> ...которые увеличивают повторные заказы»</span>
-      </div>
-      <div class="sell-note">Попробуй прямо сейчас: расскажи о своём продукте с намеренной паузой перед главным преимуществом.</div>
-    </div>
-
-    <div class="sell-card">
-      <div class="tag tag-sell" style="margin-bottom:10px">техника #2</div>
-      <div class="sell-title">Быстро-медленно</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px">Общий контекст говори в нормальном темпе. Ключевое слово — медленнее и чуть тише. Мозг собеседника автоматически выделяет его как важное.</div>
-      <div class="sell-example">
-        <span style="color:var(--muted)">«Другие агентства делают сайт за 3 месяца и берут 150 тысяч... <em>(замедляешься)</em> ...мы делаем за две недели.»</span>
-      </div>
-      <div class="sell-note">Правило: один замедленный акцент на предложение — не больше.</div>
-    </div>
-
-    <div class="sell-card">
-      <div class="tag tag-sell" style="margin-bottom:10px">техника #3</div>
-      <div class="sell-title">Интонационная волна</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px">Монотон убивает доверие. Голос должен подниматься на вопросе и опускаться на утверждении. Низкий финал фразы = уверенность. Высокий финал = неуверенность, вопрос.</div>
-      <div class="sell-example">
-        <span class="sell-bad">❌ «Это стоит 4000 рублей?↑» — звучит как сомнение</span><br><br>
-        <span class="sell-good">✅ «Это стоит 4000 рублей↓» — звучит как факт</span>
-      </div>
-      <div class="sell-note">Тренируй: говори цену своего продукта с понижением интонации в конце.</div>
-    </div>
-
-    <div class="sell-card">
-      <div class="tag tag-sell" style="margin-bottom:10px">техника #4</div>
-      <div class="sell-title">Боль → тишина → решение</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px">Структура фразы которая цепляет: назвать боль клиента, сделать паузу чтобы он её почувствовал, потом решение.</div>
-      <div class="sell-example">
-        <span style="color:var(--muted)">«Вы тратите время на учёт вручную... <em>(пауза 2 сек)</em> ...мы автоматизируем это за неделю.»</span>
-      </div>
-      <div class="sell-note">Это твой главный скрипт для Nizamov.tech. Адаптируй под каждый продукт.</div>
-    </div>
-
-    <div class="sell-card" style="border-color:var(--accent3)">
-      <div class="tag tag-sell" style="margin-bottom:10px">тренировка</div>
-      <div class="sell-title">Запиши свой питч</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:10px">Расскажи о любом своём продукте используя все 4 техники. Запишь голос — прослушай — найди где нет паузы или интонация вверх на утверждении.</div>
-      <button class="btn btn-accent btn-sm" onclick="startTimer(120,'Питч продукта · 2 мин')">▶ Таймер 2 мин</button>
-    </div>
-
-  </div>
+  <div class="prog-circles" id="prog-circles"></div>
 </div>
 
-<!-- ═══ SCREEN: MORNING ═══ -->
-<div class="screen" id="scr-morning">
-  <div class="hdr">
-    <div class="hdr-label">каждое утро</div>
-    <div class="hdr-title">Утренний <span>ритуал</span></div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">3 шага · 3 минуты</div>
-    <div class="card" style="padding:0 16px">
-      <div class="ritual-step">
-        <div class="ritual-num">1</div>
-        <div class="ritual-text">
-          <div class="ritual-name">Диафрагмальное дыхание</div>
-          <div class="ritual-desc">Сядь ровно. Положи руку на живот. 10 вдохов так чтобы рука поднималась — не грудь. Медленно, без спешки.</div>
-          <button class="btn btn-sm" style="margin-top:8px" onclick="startTimer(60,'Дыхание животом · 10 вдохов')">▶ Таймер 1 мин</button>
-        </div>
-      </div>
-      <div class="ritual-step">
-        <div class="ritual-num">2</div>
-        <div class="ritual-text">
-          <div class="ritual-name">«МММ» — включить резонанс</div>
-          <div class="ritual-desc">Произноси «МММ» с закрытым ртом — ощути вибрацию на губах и в переносице. 5 раз по 5 секунд. Это «включает» голос с утра.</div>
-          <button class="btn btn-sm" style="margin-top:8px" onclick="startTimer(40,'МММ · резонанс')">▶ Таймер 40 сек</button>
-        </div>
-      </div>
-      <div class="ritual-step" style="border-bottom:none">
-        <div class="ritual-num">3</div>
-        <div class="ritual-text">
-          <div class="ritual-name">Намеренность дня</div>
-          <div class="ritual-desc">Одна конкретная установка на сегодня. Не цель — а то как ты будешь говорить.</div>
-          <div id="intention-display"></div>
-          <textarea class="intention-input" id="intention-input" placeholder="Например: сегодня делаю паузу перед ответом...&#10;или: говорю медленнее в разговорах...&#10;или: снижаю интонацию в конце фразы..." rows="3"></textarea>
-          <button class="btn btn-accent btn-sm" style="margin-top:8px" onclick="saveIntention()">Сохранить намеренность</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="section" style="margin-top:14px;padding-bottom:8px">
-    <div class="section-title">почему это работает</div>
-    <div class="card">
-      <div style="font-size:13px;color:var(--muted);line-height:1.7">Намеренность — это не аффирмация. Это конкретный параметр на который ты будешь обращать внимание весь день. Мозг начинает замечать то, что ты назвал. Через 21 день это становится автоматическим.</div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ SCREEN: PROGRAM ═══ -->
-<div class="screen" id="scr-program">
-  <div class="hdr">
-    <div class="hdr-label">63 дня</div>
-    <div class="hdr-title">Прог<span>рамма</span></div>
-  </div>
-  <div style="padding:12px 16px 0;display:flex;gap:8px;flex-wrap:wrap" id="circle-tabs"></div>
-  <div style="padding:0 16px" id="program-days"></div>
-</div>
-
-<!-- ═══ DAY DETAIL OVERLAY ═══ -->
-<div class="day-detail-ov" id="day-detail-ov">
-  <div class="dd-header">
-    <div style="font-size:11px;color:var(--muted);margin-bottom:4px" id="dd-circle"></div>
-    <div style="font-size:18px;font-weight:500;line-height:1.3" id="dd-title"></div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
-      <div style="font-size:12px;color:var(--muted)" id="dd-duration"></div>
-      <button class="btn btn-sm" onclick="closeDayDetail()">✕ Закрыть</button>
-    </div>
-  </div>
-  <div style="padding:16px">
-    <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Задание</div>
-    <div class="card" style="font-size:14px;line-height:1.7;margin-bottom:14px" id="dd-task"></div>
-
-    <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Упражнения</div>
-    <div class="card" style="margin-bottom:14px" id="dd-exercises"></div>
-
-    <div id="dd-saliva-block" style="display:none;margin-bottom:14px">
-      <div style="font-size:12px;color:var(--accent3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Совет по слюне</div>
-      <div class="card" style="font-size:13px;color:var(--muted);line-height:1.6;border-left:3px solid var(--accent3)" id="dd-saliva"></div>
-    </div>
-
-    <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Совет дня</div>
-    <div class="card" style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px;border-left:2px solid var(--accent4)" id="dd-tip"></div>
-
-    <button class="btn btn-accent" style="width:100%;justify-content:center;padding:14px" id="dd-done-btn">Отметить выполненным</button>
-  </div>
-</div>
-
-<!-- ═══ SCREEN: PROGRESS ═══ -->
-<div class="screen" id="scr-progress">
-  <div class="hdr">
-    <div class="hdr-label">21 день</div>
-    <div class="hdr-title">Про<span>гресс</span></div>
-  </div>
-  <div class="section">
-    <div class="stat-row">
-      <div class="stat-card"><div class="stat-val" id="stat-streak">0</div><div class="stat-lbl">дней подряд</div></div>
-      <div class="stat-card"><div class="stat-val" id="stat-total">0</div><div class="stat-lbl">выполнено</div></div>
-    </div>
-    <div class="section-title">21-дневный план</div>
-    <div class="prog-grid" id="prog-grid"></div>
-    <div class="card" style="margin-bottom:10px">
-      <div style="font-size:13px;font-weight:500;color:var(--accent2);margin-bottom:6px">Дни 1–7: фундамент</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.6">Разминка + диафрагмальное дыхание + чтение вслух. Утренний ритуал каждый день.</div>
-    </div>
-    <div class="card" style="margin-bottom:10px">
-      <div style="font-size:13px;font-weight:500;color:var(--accent2);margin-bottom:6px">Дни 8–14: скороговорки + продажи</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.6">Добавить скороговорки уровень 1–2 и начать тренировать питч. Запись голоса раз в 3 дня.</div>
-    </div>
-    <div class="card" style="margin-bottom:10px">
-      <div style="font-size:13px;font-weight:500;color:var(--accent2);margin-bottom:6px">Дни 15–21: в реальные разговоры</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.6">Полный комплекс + техники продавца в живых встречах и звонках. Это самое сложное — делать осознанно в жизни.</div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ TIMER OVERLAY ═══ -->
-<div class="timer-ov" id="timer-ov">
-  <div class="timer-name" id="timer-name">Упражнение</div>
-  <div class="timer-ring">
-    <svg viewBox="0 0 190 190" width="190" height="190">
-      <circle class="ring-bg" cx="95" cy="95" r="84"/>
-      <circle class="ring-fg" id="ring-fg" cx="95" cy="95" r="84" stroke-dasharray="528" stroke-dashoffset="0"/>
-    </svg>
-    <div class="timer-inner" id="timer-time">0:00</div>
-  </div>
-  <div class="timer-btns">
-    <button class="btn" onclick="resetTimer()">Стоп</button>
-    <button class="btn btn-accent" id="timer-toggle" onclick="toggleTimer()">Пауза</button>
-  </div>
-</div>
-
-<!-- ═══ NAVIGATION ═══ -->
+<!-- ═══════════════════════════════════════
+     NAV
+════════════════════════════════════════ -->
 <nav>
-  <button class="active" id="nav-home" onclick="goTab('home')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-    Главная
+  <button class="on" id="nav-home" onclick="goNav('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+    Сегодня
   </button>
-  <button id="nav-exercises" onclick="goTab('exercises')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-    Упражн.
-  </button>
-  <button id="nav-twisters" onclick="goTab('twisters')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-    Фразы
-  </button>
-  <button id="nav-breathing" onclick="goTab('breathing')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 4c-4.418 0-8 3.134-8 7 0 2.5 1.5 4.5 3.5 5.5V19a1 1 0 001 1h7a1 1 0 001-1v-2.5C18.5 15.5 20 13.5 20 11c0-3.866-3.582-7-8-7z"/></svg>
-    Дыхание
-  </button>
-  <button id="nav-seller" onclick="goTab('seller')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-    Продажи
-  </button>
-  <button id="nav-program" onclick="goTab('program')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+  <button id="nav-progress" onclick="goNav('progress')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
     Программа
-  </button>
-  <button id="nav-morning" onclick="goTab('morning')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 7a5 5 0 110 10A5 5 0 0112 7z"/></svg>
-    Ритуал
   </button>
 </nav>
 
-
-
 <script>
-// ─── СПРАВОЧНИК УПРАЖНЕНИЙ ────────────────────────
-const EX_DICT = {
-  'губы рыбка': {
-    name: 'Губы — рыбка',
-    how: 'Расслабь губы и хлопай ими как рыба — верхняя бьёт о нижнюю, звук «поп-поп». Потом: вытяни трубочкой вперёд на 2 сек → растяни в широкую улыбку → это один повтор.',
-    focus: 'Чувствуй как напрягается круговая мышца рта. Если губы немеют — значит работают.',
-    mistake: 'Не сжимай зубы. Рот слегка приоткрыт, работают только губы.',
-  },
-  'губы': {
-    name: 'Губы — рыбка',
-    how: 'Хлопай губами как рыба × 20. Потом трубочка → улыбка × 10.',
-    focus: 'Губы должны работать — чувствуй напряжение.',
-    mistake: 'Не сжимай челюсть.',
-  },
-  'губы трубочка/улыбка': {
-    name: 'Губы трубочка/улыбка',
-    how: 'Вытяни губы вперёд трубочкой на 2 секунды. Потом растяни в максимально широкую улыбку на 2 секунды. Это один повтор.',
-    focus: 'Максимальная амплитуда — чем шире улыбка и чем дальше трубочка, тем лучше.',
-    mistake: 'Не торопись. Каждая позиция — 2 секунды.',
-  },
-  'гласные а-э-и-о-у-ы': {
-    name: 'Гласные А-Э-И-О-У-Ы',
-    how: 'Произноси каждую гласную с преувеличенной артикуляцией — как будто объясняешь глухому. А — рот максимально открыт. И — губы растянуты. У — губы трубочкой. Ы — нижняя челюсть вперёд.',
-    focus: 'Чувствуй разную позицию губ и языка на каждом звуке. Это и есть артикуляция.',
-    mistake: 'Не бубни. Каждый звук — отчётливо, с усилием, не торопясь.',
-  },
-  'гласные с преувеличением': {
-    name: 'Гласные с преувеличением',
-    how: 'То же что и гласные А-Э-И-О-У-Ы, но ещё активнее. Рот открывается на максимум.',
-    focus: 'Преувеличение — это инструмент. В реальной речи артикуляция будет меньше, но точнее.',
-    mistake: 'Не стесняйся — чем абсурднее движения, тем лучше тренировка.',
-  },
-  'диафрагмальное': {
-    name: 'Диафрагмальное дыхание',
-    how: 'Положи руку на живот (не на грудь). Вдыхай носом — живот идёт вперёд, рука поднимается, плечи не двигаются. Выдыхай медленно ртом — живот опускается. Это один вдох.',
-    focus: 'Если поднимается грудь — неправильно. Всё движение должно быть в животе.',
-    mistake: 'Не форсируй. Дыхание спокойное, глубокое, без напряжения в плечах.',
-  },
-  'диафрагмальное дыхание': {
-    name: 'Диафрагмальное дыхание',
-    how: 'Рука на живот. Вдох носом → живот вперёд. Выдох ртом → живот назад. Плечи не двигаются.',
-    focus: 'Всё движение в животе. Грудь неподвижна.',
-    mistake: 'Не поднимай плечи — это признак грудного дыхания.',
-  },
-  'челюсть жевание': {
-    name: 'Челюсть — жевание',
-    how: 'Открой рот широко → медленно закрой × 10. Потом двигай нижней челюстью вперёд-назад × 5. Потом круговые движения челюстью × 5 в каждую сторону.',
-    focus: 'Должно чувствоваться лёгкое растяжение в суставе около уха. Это нормально.',
-    mistake: 'Не форсируй. Если чувствуешь боль — уменьши амплитуду.',
-  },
-  'язык чистка зубов': {
-    name: 'Язык — чистка зубов',
-    how: 'Проведи кончиком языка по внутренней поверхности зубов — как будто чистишь зубы. Сначала по верхним слева направо, потом по нижним справа налево. Это один круг.',
-    focus: 'Кончик языка должен касаться каждого зуба. Не торопись.',
-    mistake: 'Не двигай челюстью — работает только язык.',
-  },
-  'квадратное дыхание': {
-    name: 'Квадратное дыхание',
-    how: 'Вдох носом — 4 секунды. Задержка — 4 секунды. Выдох ртом — 4 секунды. Задержка — 4 секунды. Это один цикл. × 4 цикла.',
-    focus: 'Считай про себя. Равные отрезки — это ключ к технике.',
-    mistake: 'Если голова кружится — уменьши до 3 секунд. Это нормально в начале.',
-  },
-  'ммм-резонанс': {
-    name: 'МММ — резонанс',
-    how: 'Закрой рот, расслабь челюсть. Произнеси протяжное «Мммм» — как будто пробуешь вкусную еду. Должна ощущаться вибрация на губах и в переносице. × 5 раз по 5 секунд.',
-    focus: 'Положи палец на губы — должна чувствоваться вибрация. Если нет — звук идёт в горло.',
-    mistake: 'Не напрягай горло. МММ должен идти вперёд — в губы, не внутрь.',
-  },
-  'ммм': {
-    name: 'МММ — резонанс',
-    how: 'Протяжное «Мммм» с закрытым ртом. Вибрация на губах = правильно.',
-    focus: 'Звук вперёд, не в горло.',
-    mistake: 'Не напрягай шею.',
-  },
-  'дыхание 4-7-8': {
-    name: 'Дыхание 4-7-8',
-    how: 'Вдох носом — 4 секунды. Задержка — 7 секунд. Выдох ртом — 8 секунд. Это один цикл. × 4 цикла. Выдох на счёт 8 — медленный, через слегка сжатые губы.',
-    focus: '7 секунд задержки — это ключ. Именно она снижает уровень кортизола.',
-    mistake: 'Не торопи выдох. 8 секунд — медленно и равномерно.',
-  },
-  'звук в маску': {
-    name: 'Звук в маску',
-    how: 'МММ 30 секунд → запомни ощущение вибрации на губах → теперь говори фразы с тем же ощущением. Представь что звук летит вперёд — в зубы, в губы, в «маску» лица.',
-    focus: 'Лицо от носа до подбородка — это «маска». Звук должен резонировать там.',
-    mistake: 'Не повышай громкость. Резонанс — не громкость.',
-  },
-  'замедлись вдвое': {
-    name: 'Замедлись вдвое',
-    how: 'Расскажи что-нибудь — план на день, любую мысль — в два раза медленнее чем обычно. Каждое слово произноси полностью. Паузы между словами — осознанные.',
-    focus: 'Поначалу будет казаться «слишком медленно». Это нормально — запись покажет что со стороны звучит нормально.',
-    mistake: 'Не тараторь в конце предложения. Темп равномерный до последнего слова.',
-  },
-  'чтение вслух': {
-    name: 'Чтение вслух',
-    how: 'Любой текст — новость, статья. Читай как диктор: после запятой — лёгкая пауза (вдох носом), после точки — 2 секунды тишины. С выражением, не монотонно.',
-    focus: 'Следи за окончаниями слов — не глотай последний слог.',
-    mistake: 'Не читай «про себя вслух» — читай для воображаемой аудитории.',
-  },
-  'бобёр': {
-    name: 'Скороговорка: Бобёр добр до бобрят',
-    how: '«Бобёр добр до бобрят» — произноси медленно, слышишь каждое окончание? «бобЁР», «добР», «бобРЯТ» — Р должен звучать чётко. После каждого слова — короткая пауза.',
-    focus: 'Не скорость — чёткость. Слышишь каждый звук Б и Р?',
-    mistake: 'Не торопись. Скорость — враг первой недели.',
-  },
-  'топот': {
-    name: 'Скороговорка: От топота копыт',
-    how: '«От топота копыт пыль по полю летит» — сначала × 3 очень медленно, каждое слово отдельно. Потом × 3 в нормальном темпе. Следи за окончаниями: «копыТ», «летиТ».',
-    focus: 'Окончание слова — такой же важный слог как первый.',
-    mistake: 'Не сливай «пыль по полю» в одно слово.',
-  },
-  'шла саша': {
-    name: 'Скороговорка: Шла Саша по шоссе',
-    how: '«Шла Саша по шоссе и сосала сушку» — Ш и С разные звуки. Ш — язык широкий, чашечкой, поднят к нёбу. С — язык узкий, острый, за нижними зубами. Чувствуй разницу.',
-    focus: 'Произнеси отдельно: «Шшш» → «Ссс». Разные ощущения? Вот так и в скороговорке.',
-    mistake: 'Не смешивай Ш и С — это разные звуки, не варианты одного.',
-  },
-  'карл': {
-    name: 'Скороговорка: Карл у Клары',
-    how: '«Карл у Клары украл кораллы, а Клара у Карла украла кларнет» — только если уровни 1-3 уже звучат чисто. × 2-3 раза медленно, следи за каждым словом.',
-    focus: 'Это тест осознанности, не упражнение. Если путаешься — вернись к уровню 2.',
-    mistake: 'Не ускоряйся ради «прохождения». Медленно и чисто = правильно.',
-  },
-  'интонационные утверждения': {
-    name: 'Интонационные утверждения',
-    how: 'Произнеси 5-10 любых утверждений с понижением интонации в конце. «Меня зовут Даниил↓». «Я занимаюсь бизнесом↓». «Это работает↓». Голос в конце идёт вниз.',
-    focus: 'Последний слог фразы — голос опускается. Не обрывается, а плавно снижается.',
-    mistake: 'Не заглатывай последнее слово. Оно должно звучать так же чётко как первое.',
-  },
-  'фразы с резонансом': {
-    name: 'Фразы с резонансом',
-    how: 'После МММ — говори любые фразы удерживая ощущение вибрации на губах. Представляй что говоришь «через» губы, не «в» горло.',
-    focus: 'Ощущение вибрации = правильный резонанс. Голос становится полнее.',
-    mistake: 'Если вибрация пропала — вернись к МММ на 10 секунд, потом снова фразы.',
-  },
-  'питч': {
-    name: 'Питч продукта',
-    how: 'Расскажи о любом своём продукте 60-90 секунд. Используй схему: боль клиента → пауза → решение → результат. Говори с паузами, резонансом, интонацией вниз на ключевых словах.',
-    focus: 'Не читай по скрипту — говори своими словами. Запись поможет услышать где ускорился.',
-    mistake: 'Не торопись в конце. Финальная фраза — самая важная.',
-  },
-  'ответы на возражения': {
-    name: 'Ответы на возражения',
-    how: 'Придумай типичное возражение клиента («дорого», «уже есть», «подумаю»). Произнеси ответ вслух — спокойно, с паузой 1-2 сек перед ответом, интонация вниз.',
-    focus: 'Спокойный голос на возражение = уверенность. Пауза перед ответом = ты думаешь, а не защищаешься.',
-    mistake: 'Не ускоряйся на возражении. Именно там большинство ускоряется — выдавая тревогу.',
-  },
-  'акценты': {
-    name: 'Акценты в тексте',
-    how: 'Возьми любой абзац. Прочитай 3 раза выделяя каждый раз разные слова голосом — замедлись и усиль именно это слово. Слышишь как меняется смысл?',
-    focus: 'Выделение = пауза до + замедление + понижение интонации после.',
-    mistake: 'Не выделяй больше одного слова в предложении.',
-  },
-  'импровизация': {
-    name: 'Импровизация',
-    how: 'Поставь таймер на 3 минуты. Говори вслух без подготовки на любую тему. Вместо «эм» и «ну» — пауза. Тишина лучше паразитов.',
-    focus: 'Паузы — это нормально. Они звучат как обдуманность, не как незнание.',
-    mistake: 'Не останавливайся полностью. Если потерял мысль — сделай паузу и продолжай.',
-  },
+// ═══════════════════════════════════════════════════
+// ДАННЫЕ
+// ═══════════════════════════════════════════════════
+
+// Упражнения — полная база
+const EX = {
+  lips:{name:'Губы — рыбка',tag:'warm',tagName:'Разминка',
+    how:'Расслабь губы и хлопай ими как рыба — верхняя бьёт о нижнюю, звук «поп-поп». 20 раз.\n\nПотом: вытяни губы трубочкой вперёд на 2 сек → растяни в широкую улыбку на 2 сек. Это один повтор × 10.',
+    focus:'Чувствуй как напрягается круговая мышца рта. Если губы немеют — работают правильно.',
+    mistake:'Не сжимай зубы. Рот слегка приоткрыт, работают только губы.',
+    timer:60},
+  tongue:{name:'Язык — чистка зубов',tag:'warm',tagName:'Разминка',
+    how:'Проведи кончиком языка по внутренней поверхности зубов — как чистишь зубы.\n\nВерхние слева направо → нижние справа налево. Это один круг. × 5 кругов в каждую сторону.',
+    focus:'Кончик языка касается каждого зуба. Не торопись. Это главной инструмент для Т, Д, Н, Л.',
+    mistake:'Не двигай челюстью — работает только язык.',
+    timer:60},
+  jaw:{name:'Челюсть — жевание',tag:'warm',tagName:'Разминка',
+    how:'Открой рот широко → медленно закрой × 10.\n\nПотом двигай нижней челюстью вперёд-назад × 5.\n\nПотом круговые движения × 5 в каждую сторону.',
+    focus:'Лёгкое растяжение у уха — нормально. Челюсть должна двигаться свободно.',
+    mistake:'Не форсируй. Если чувствуешь боль — уменьши амплитуду.',
+    timer:60},
+  vowels:{name:'Гласные А-Э-И-О-У-Ы',tag:'artic',tagName:'Артикуляция',
+    how:'Произноси каждую гласную с преувеличенной артикуляцией — как будто объясняешь глухому.\n\nА — рот максимально открыт\nЭ — губы слегка растянуты\nИ — губы в широкой улыбке\nО — губы округлены\nУ — губы трубочкой\nЫ — нижняя челюсть чуть вперёд\n\nПо 3 раза каждую.',
+    focus:'Чувствуй разную позицию губ на каждом звуке. Это и есть артикуляция.',
+    mistake:'Не бубни. Каждый звук — чётко, с усилием, не торопясь.',
+    timer:90},
+  mmm:{name:'МММ — резонанс',tag:'voice',tagName:'Голос',
+    how:'Закрой рот, расслабь челюсть. Произнеси протяжное «Мммм» — как будто пробуешь вкусную еду.\n\nДолжна ощущаться вибрация на губах и в переносице. × 5 раз по 5 секунд.',
+    focus:'Положи палец на губы — должна чувствоваться вибрация. Звук идёт вперёд, не в горло.',
+    mistake:'Не напрягай горло. МММ должен идти вперёд — в губы, не внутрь.',
+    timer:40},
+  slow:{name:'Замедлись вдвое',tag:'tempo',tagName:'Темп',
+    how:'Расскажи что-нибудь — план на день, любую мысль — в два раза медленнее чем обычно.\n\nКаждое слово произноси полностью. Паузы между словами — осознанные.',
+    focus:'Поначалу кажется «слишком медленно» — это нормально. Со стороны звучит нормально.',
+    mistake:'Не тараторь в конце предложения. Темп равномерный до последнего слова.',
+    timer:120},
+  reading:{name:'Чтение вслух',tag:'tempo',tagName:'Темп',
+    how:'Любой текст — читай как диктор на радио:\n\nПосле запятой — лёгкая пауза + вдох носом.\nПосле точки — 2 секунды тишины.\n\nС выражением, не монотонно.',
+    focus:'Следи за окончаниями слов — не глотай последний слог.',
+    mistake:'Не читай «про себя вслух» — читай для воображаемой аудитории.',
+    timer:300},
+  mask:{name:'Звук в маску',tag:'voice',tagName:'Голос',
+    how:'МММ 30 секунд → запомни ощущение вибрации на губах.\n\nТеперь говори фразы с тем же ощущением. Звук летит вперёд — в зубы, в губы, в «маску» лица.',
+    focus:'Лицо от носа до подбородка — «маска». Звук должен резонировать там.',
+    mistake:'Не повышай громкость. Резонанс — это не громкость.',
+    timer:60},
+  tt_bobbr:{name:'Скороговорка: Бобёр',tag:'artic',tagName:'Скороговорка',
+    how:'«Бобёр добр до бобрят»\n\nМедленно × 5. Слышишь каждое окончание? «бобЁР», «добР», «бобРЯТ» — Р звучит чётко. Пауза после каждого слова.',
+    focus:'Не скорость — чёткость. Слышишь каждый звук Б и Р?',
+    mistake:'Не торопись. Скорость — враг первой недели.',
+    timer:60},
+  tt_topot:{name:'Скороговорка: Топот',tag:'artic',tagName:'Скороговорка',
+    how:'«От топота копыт пыль по полю летит»\n\n× 3 очень медленно, каждое слово отдельно.\n× 3 в нормальном темпе.\n\nСледи за окончаниями: «копыТ», «летиТ».',
+    focus:'Окончание слова — такой же важный слог как первый.',
+    mistake:'Не сливай «пыль по полю» в одно слово.',
+    timer:90},
+  tt_sasha:{name:'Скороговорка: Шла Саша',tag:'artic',tagName:'Скороговорка',
+    how:'«Шла Саша по шоссе и сосала сушку»\n\nШ — язык широкий, чашечкой, поднят к нёбу.\nС — язык узкий, острый, за нижними зубами.\n\nЧувствуй разницу. × 5 раз.',
+    focus:'Произнеси отдельно «Шшш» → «Ссс». Разные ощущения? Вот так и в скороговорке.',
+    mistake:'Не смешивай Ш и С — это разные звуки.',
+    timer:60},
+  tt_karl:{name:'Скороговорка: Карл и Клара',tag:'artic',tagName:'Финальный босс',
+    how:'«Карл у Клары украл кораллы, а Клара у Карла украла кларнет»\n\n× 3 медленно. Только когда уровни 1-3 звучат чисто.',
+    focus:'Это тест осознанности, не скорость.',
+    mistake:'Не ускоряйся ради «прохождения». Медленно и чисто = правильно.',
+    timer:60},
+  intonation:{name:'Интонация вниз',tag:'voice',tagName:'Голос',
+    how:'Произнеси 10 любых утверждений с понижением интонации в конце.\n\n«Меня зовут Даниил↓»\n«Это стоит 4000 рублей↓»\n«Я занимаюсь IT↓»\n\nГолос в конце идёт вниз, не обрывается.',
+    focus:'Последний слог фразы — голос плавно снижается. Это звучит уверенно.',
+    mistake:'Не заглатывай последнее слово. Оно должно звучать так же чётко как первое.',
+    timer:90},
+  pitch:{name:'Питч продукта',tag:'practice',tagName:'Практика',
+    how:'Расскажи о любом своём продукте 60-90 секунд.\n\nСхема: боль клиента → пауза → решение → результат.\n\nС паузами, с резонансом, интонация вниз на ключевых словах.',
+    focus:'Не читай по скрипту — говори своими словами.',
+    mistake:'Не торопись в конце. Финальная фраза — самая важная.',
+    timer:90},
+  objections:{name:'Работа с возражениями',tag:'practice',tagName:'Практика',
+    how:'Придумай типичное возражение клиента — «дорого», «уже есть», «подумаю».\n\nОтветь вслух — спокойно, с паузой 1-2 сек перед ответом, интонация вниз. × 3 разных возражения.',
+    focus:'Спокойный голос на возражение = уверенность.',
+    mistake:'Не ускоряйся на возражении — именно там выдаёшь тревогу.',
+    timer:120},
+  improv:{name:'Импровизация',tag:'practice',tagName:'Практика',
+    how:'Поставь таймер на 3 минуты. Говори вслух без подготовки на тему «почему малый бизнес должен автоматизироваться».\n\nВместо «эм» и «ну» — пауза.',
+    focus:'Паузы — это нормально. Они звучат как обдуманность.',
+    mistake:'Не останавливайся полностью. Потерял мысль — пауза, и продолжай.',
+    timer:180},
+  breath_diaphragm:{name:'Диафрагмальное дыхание',tag:'breath',tagName:'Дыхание',
+    how:'Положи руку на живот (не на грудь). Вдыхай носом — живот идёт вперёд, рука поднимается, плечи не двигаются.\n\nВыдыхай медленно ртом — живот опускается. × 10 вдохов.',
+    focus:'Если поднимается грудь — неправильно. Всё движение в животе.',
+    mistake:'Не поднимай плечи — это признак грудного дыхания.',
+    timer:60},
 };
 
-function getExDetails(exStr) {
-  const key = exStr.toLowerCase()
-    .replace(/[×\d\s]+$/,'')
-    .replace(/\s+×\s+\d+.*$/,'')
-    .replace(/\s*×.*$/,'')
-    .trim()
-    .replace(/\s+/g,' ');
-
-  // Прямое совпадение
-  if (EX_DICT[key]) return EX_DICT[key];
-
-  // Частичное совпадение
-  for (const k of Object.keys(EX_DICT)) {
-    if (key.includes(k) || k.includes(key)) return EX_DICT[k];
-  }
-
-  // Ключевые слова
-  if (key.includes('губ')) return EX_DICT['губы'];
-  if (key.includes('язык')) return EX_DICT['язык чистка зубов'];
-  if (key.includes('диафрагм')) return EX_DICT['диафрагмальное'];
-  if (key.includes('челюст')) return EX_DICT['челюсть жевание'];
-  if (key.includes('гласн')) return EX_DICT['гласные а-э-и-о-у-ы'];
-  if (key.includes('квадрат')) return EX_DICT['квадратное дыхание'];
-  if (key.includes('4-7-8')) return EX_DICT['дыхание 4-7-8'];
-  if (key.includes('ммм')) return EX_DICT['ммм-резонанс'];
-  if (key.includes('маску') || key.includes('маска')) return EX_DICT['звук в маску'];
-  if (key.includes('замедл')) return EX_DICT['замедлись вдвое'];
-  if (key.includes('чтен')) return EX_DICT['чтение вслух'];
-  if (key.includes('бобёр') || key.includes('бобер')) return EX_DICT['бобёр'];
-  if (key.includes('топот')) return EX_DICT['топот'];
-  if (key.includes('саша') || key.includes('шоссе')) return EX_DICT['шла саша'];
-  if (key.includes('карл')) return EX_DICT['карл'];
-  if (key.includes('интонац')) return EX_DICT['интонационные утверждения'];
-  if (key.includes('резонанс') || key.includes('фраз')) return EX_DICT['фразы с резонансом'];
-  if (key.includes('питч')) return EX_DICT['питч'];
-  if (key.includes('возражен')) return EX_DICT['ответы на возражения'];
-  if (key.includes('акцент')) return EX_DICT['акценты'];
-  if (key.includes('импровиз')) return EX_DICT['импровизация'];
-
-  return null;
-}
-
-
-// ─── PROGRAM DATA (63 дня) ────────────────────────
-const PROGRAM = {
-  circles: [
-    {
-      id:1, title:'Круг 1 — Фундамент', subtitle:'Дикция, дыхание, каша, слюна',
-      days:[
-        {day:1,focus:'Знакомство с собой',task:'Запиши голос — прочитай вслух: «От топота копыт пыль по полю летит». Это точка отсчёта. Сохрани запись.',exercises:['Губы рыбка × 20','Гласные А-Э-И-О-У-Ы × 3','Диафрагмальное дыхание × 10'],duration:'10 мин',tip:'Не оценивай — просто слушай себя со стороны.',saliva:'Перед записью: сглотни, опусти кончик языка вниз, расслабь челюсть.'},
-        {day:2,focus:'Расслабление челюсти',task:'Весь день замечай — сжата ли челюсть? Каждый раз как замечаешь — расслабь. Зажатая челюсть = каша + слюна.',exercises:['Челюсть жевание × 15','Губы трубочка/улыбка × 10','Дыхание 4-7-8 × 4 цикла'],duration:'10 мин',tip:'Норма — между зубами помещается палец. Если нет — зажат.',saliva:'Расслабленная челюсть снижает слюноотделение. Главная задача недели.'},
-        {day:3,focus:'Язык и кончик',task:'Произноси слова чётко заканчивая каждое. «Топот. Копыт. Летит.» — пауза 1 секунда после каждого.',exercises:['Язык чистка зубов × 5 кругов','Гласные с преувеличением × 5','Квадратное дыхание × 4'],duration:'10 мин',tip:'Кончик языка — главный инструмент для Т, Д, Н, Л.',saliva:'Перед фразой — сглотни + вдох носом. Даёт 15-20 сек комфортной речи.'},
-        {day:4,focus:'Первая скороговорка',task:'Только одна: «Бобёр добр до бобрят» × 10 раз. Медленно. Слышишь каждое окончание?',exercises:['Губы × 20','Бобёр × 10 медленно','МММ-резонанс × 5'],duration:'12 мин',tip:'Не ускоряйся. Скорость — враг первой недели.',saliva:'Сглотни перед каждым повторением. Скоро войдёт в привычку.'},
-        {day:5,focus:'Дыхание и голос',task:'Читай вслух любой текст 5 минут. После запятой — вдох носом. После точки — сглотни и вдох.',exercises:['Диафрагмальное × 10','Чтение вслух 5 мин','Звук в маску × 5'],duration:'12 мин',tip:'Голос идёт вперёд — в губы, не в горло. МММ — твой ориентир.',saliva:'Пауза = время сглотнуть. Строй речь так чтобы паузы были естественными.'},
-        {day:6,focus:'Замедление темпа',task:'Расскажи план на день — в два раза медленнее обычного. Запиши. Послушай.',exercises:['Замедлись вдвое 3 мин','Бобёр × 10','Дыхание 4-7-8 × 4'],duration:'12 мин',tip:'Замедленный темп со стороны звучит нормально. Восприятие обманывает.',saliva:''},
-        {day:7,focus:'Итог недели 1',task:'Запиши голос — та же скороговорка что в день 1. Сравни записи. Слышишь разницу?',exercises:['Губы × 20','Гласные А-Э-И-О-У-Ы × 3','МММ-резонанс × 5'],duration:'15 мин',tip:'Даже маленький прогресс за 7 дней — это уже не ноль.',saliva:'Оцени: стало ли меньше дискомфорта со слюной?'},
-        {day:8,focus:'Скороговорки уровень 2',task:'«От топота копыт пыль по полю летит» — × 3 медленно, × 3 быстро. Контролируй окончания.',exercises:['Губы × 20','Топот × 6','Чтение вслух 5 мин'],duration:'15 мин',tip:'Окончание слова — такой же важный слог как первый.',saliva:''},
-        {day:9,focus:'Намеренность в разговоре',task:'В одном реальном разговоре сегодня — пауза перед ответом 1-2 секунды. Не торопись.',exercises:['Диафрагмальное × 10','Замедлись вдвое 2 мин','Топот × 6'],duration:'12 мин',tip:'Пауза перед ответом = уверенность. Торопливость = тревога.',saliva:'Пауза перед ответом — идеальный момент сглотнуть незаметно.'},
-        {day:10,focus:'Шипящие звуки',task:'«Шла Саша по шоссе» × 5 раз. Ш и С — разные звуки, не мешай их. Медленно.',exercises:['Язык чистка зубов × 5 кругов','Шла Саша × 5','Дыхание 4-7-8 × 4'],duration:'12 мин',tip:'Ш — язык широкий, чашечкой. С — узкий, острый.',saliva:''},
-        {day:11,focus:'Интонация вниз',task:'Произнеси 5 утверждений с понижением интонации в конце. «Я занимаюсь дикцией↓». «Это работает↓».',exercises:['Гласные А-Э-И-О-У-Ы × 3','Интонационные утверждения × 10','Чтение вслух 5 мин'],duration:'12 мин',tip:'Интонация вверх = неуверенность. Вниз = факт.',saliva:''},
-        {day:12,focus:'Резонанс голоса',task:'МММ 30 секунд → говори фразы с тем же ощущением вибрации на губах.',exercises:['МММ-резонанс 1 мин','Фразы с резонансом 3 мин','Квадратное дыхание × 4'],duration:'12 мин',tip:'Палец на губы — должна чувствоваться вибрация когда говоришь.',saliva:''},
-        {day:13,focus:'Первый питч вслух',task:'Расскажи о любом своём продукте — 2 минуты, с паузами, с резонансом, медленно. Запиши.',exercises:['Губы × 20','Гласные А-Э-И-О-У-Ы × 3','Питч 2 мин'],duration:'15 мин',tip:'Первый раз соединяешь всё вместе. Не перфекционируй — просто делай.',saliva:'Сглотни перед началом. В паузах — быстрое незаметное сглатывание.'},
-        {day:14,focus:'Итог недели 2',task:'Запись — расскажи о себе 1 минуту. Сравни с записями дня 1 и дня 7.',exercises:['Губы × 20','МММ-резонанс × 5','Чтение вслух 5 мин'],duration:'15 мин',tip:'Слушай не что говоришь — а КАК.',saliva:''},
-        {day:15,focus:'Пауза перед ключевым словом',task:'В разговоре сегодня — пауза ПЕРЕД ключевым словом. «Это стоит... (пауза) ...4000 рублей».',exercises:['Диафрагмальное × 10','Дыхание 4-7-8 × 4','Чтение вслух с паузами 5 мин'],duration:'12 мин',tip:'Пауза перед главным словом = собеседник сам начинает вслушиваться.',saliva:''},
-        {day:16,focus:'Быстро-медленно',task:'Расскажи о продукте: контекст — нормальный темп, главное преимущество — замедлись и чуть тише.',exercises:['Замедлись вдвое 3 мин','Питч с техникой быстро-медленно','МММ-резонанс × 5'],duration:'15 мин',tip:'Тишина и замедление привлекают больше чем громкость.',saliva:''},
-        {day:17,focus:'Финальный босс скороговорок',task:'«Карл у Клары украл кораллы» × 5 медленно. Только если уровни 1-2 уже звучат чисто.',exercises:['Губы × 20','Карл × 5 медленно','Дыхание 4-7-8 × 4'],duration:'15 мин',tip:'Если не получается — вернись к уровню 2. Нет смысла спешить.',saliva:''},
-        {day:18,focus:'Боль → пауза → решение',task:'Составь 3 фразы: боль клиента → пауза 2 сек → решение. Произнеси каждую × 3 вслух.',exercises:['Диафрагмальное × 10','Ответы на возражения × 3','Квадратное дыхание × 4'],duration:'15 мин',tip:'Пауза после боли — клиент её проживает. Потом решение = спасение.',saliva:''},
-        {day:19,focus:'Живой звонок',task:'Позвони потенциальному клиенту применяя всё: темп, паузы, интонация вниз.',exercises:['Дыхание 4-7-8 × 4','МММ-резонанс × 5','Звонок клиенту'],duration:'20 мин',tip:'Перед звонком — 4-7-8, потом МММ. Входишь в разговор уже в нужном состоянии.',saliva:'Сглотни прямо перед тем как начать говорить в трубку. Никто не слышит.'},
-        {day:20,focus:'Голосовое для Telegram',task:'Запиши голосовое для канала «Путь с завода в IT» — 60-90 секунд. С паузами, с резонансом.',exercises:['Губы × 20','Дыхание 4-7-8 × 4','МММ-резонанс × 5'],duration:'20 мин',tip:'Голосовые слушают на скорости 1.5-2x — говори чуть медленнее обычного.',saliva:''},
-        {day:21,focus:'Финал Круга 1',task:'Финальная запись — скороговорка из дня 1 + 1 минута рассказа о себе. Сравни с самого начала.',exercises:['Губы × 20','Гласные А-Э-И-О-У-Ы × 3','МММ-резонанс × 5'],duration:'20 мин',tip:'21 день = новый автоматизм. Это теперь твой базовый уровень.',saliva:'Оцени прогресс со слюной — должно быть заметно лучше.'}
-      ]
-    },
-    {
-      id:2, title:'Круг 2 — Речь продавца', subtitle:'Питчи, звонки, Telegram-канал',
-      days:[
-        {day:1,focus:'Разогрев после паузы',task:'Полная разминка + скороговорки уровень 2. Навык сохранился — убедись сам.',exercises:['Губы × 20','Гласные А-Э-И-О-У-Ы × 3','Топот × 6','Чтение вслух 5 мин'],duration:'15 мин',tip:'Неделя отдыха не убивает навык — она его закрепляет.',saliva:''},
-        {day:2,focus:'Голос для видео',task:'Запиши 60-секундное видео для Telegram. Смотри в камеру, говори с резонансом, паузы после ключевых слов.',exercises:['МММ-резонанс 1 мин','Дыхание 4-7-8 × 4','Фразы с резонансом 3 мин'],duration:'15 мин',tip:'Первый дубль разогрев, второй рабочий.',saliva:''},
-        {day:3,focus:'Структура питча',task:'Запиши питч любого продукта: боль → усиление → решение → результат. 90 секунд максимум.',exercises:['Губы × 20','Питч × 3 дубля','МММ-резонанс × 5'],duration:'15 мин',tip:'Усиление боли — самая важная часть. Клиент должен почувствовать.',saliva:''},
-        {day:4,focus:'Работа с возражениями',task:'Придумай 3 возражения клиентов. Ответь на каждое вслух — спокойно, с паузой, интонация вниз.',exercises:['Квадратное дыхание × 4','Ответы на возражения × 3','Интонационные утверждения × 5'],duration:'15 мин',tip:'Спокойный низкий голос на возражение = уверенность.',saliva:''},
-        {day:5,focus:'Темп 120 слов/мин',task:'Прочитай текст трижды: быстро как обычно, 120 слов/мин, 90 слов/мин. Слышишь разницу?',exercises:['Чтение вслух × 3 темпа','Замедлись вдвое 3 мин','Дыхание 4-7-8 × 4'],duration:'15 мин',tip:'120 слов в минуту — оптимум для продаж.',saliva:''},
-        {day:6,focus:'Голосовые вместо текста',task:'Отправь 3 голосовых в рабочих чатах вместо текста. Применяй паузы и резонанс.',exercises:['МММ-резонанс 1 мин','Дыхание 4-7-8 × 4','Фразы с резонансом 3 мин'],duration:'15 мин',tip:'Голосовые сообщения — лучший ежедневный тренажёр.',saliva:''},
-        {day:7,focus:'Итог недели 1',task:'Запись — расскажи о Nizamov.tech за 90 секунд. Сравни с Кругом 1.',exercises:['Губы × 20','МММ-резонанс × 5','Питч 90 сек'],duration:'20 мин',tip:'Круг 2 идёт быстрее — фундамент уже есть.',saliva:''},
-        {day:8,focus:'Сторителлинг',task:'Расскажи историю — как ты пришёл с завода в IT. 2 минуты. С паузами, с эмоцией.',exercises:['Диафрагмальное × 10','МММ-резонанс × 5','Питч — история 2 мин'],duration:'15 мин',tip:'История продаёт лучше цифр. Паузы в истории = напряжение.',saliva:''},
-        {day:9,focus:'Цифры с интонацией вниз',task:'Произнеси 5 фраз с цифрами. «За 14 дней↓. За 4000 рублей↓. Три клиента используют↓.»',exercises:['Интонационные утверждения × 10','Питч с цифрами','МММ-резонанс × 5'],duration:'15 мин',tip:'Цифра с интонацией вниз = факт. Факт = доверие.',saliva:''},
-        {day:10,focus:'Холодный звонок',task:'Позвони незнакомому потенциальному клиенту. 4-7-8 перед звонком. Схема боль→пауза→решение.',exercises:['Дыхание 4-7-8 × 4','МММ-резонанс × 5','Звонок клиенту'],duration:'20 мин',tip:'4-7-8 снижает уровень кортизола. Делай это всерьёз.',saliva:'Перед звонком сглотни. В паузах — быстрое незаметное сглатывание.'},
-        {day:11,focus:'Видео для канала',task:'Запиши видео для «Путь с завода в IT» — инструмент или урок. 90-120 секунд.',exercises:['Губы × 20','Дыхание 4-7-8 × 4','МММ-резонанс 1 мин'],duration:'20 мин',tip:'Дубли — норма. Профессионалы пишут по 5-10 дублей.',saliva:''},
-        {day:12,focus:'Тишина как инструмент',task:'В разговоре — после вопроса собеседника выдержи паузу 3 секунды перед ответом.',exercises:['Квадратное дыхание × 4','Замедлись вдвое 2 мин','Интонационные утверждения × 5'],duration:'12 мин',tip:'3 секунды тишины кажутся вечностью только тебе.',saliva:''},
-        {day:13,focus:'Своя скороговорка',task:'Карл у Клары × 5 + придумай свою скороговорку из названий своих продуктов.',exercises:['Карл × 5','МММ-резонанс × 5','Чтение вслух 5 мин'],duration:'15 мин',tip:'Своя скороговорка = тренировка конкретных слов которые произносишь каждый день.',saliva:''},
-        {day:14,focus:'Итог недели 2',task:'Запись — холодный питч незнакомому 90 секунд. Применяй всё из Круга 2.',exercises:['Губы × 20','МММ-резонанс 1 мин','Питч × 2 дубля'],duration:'20 мин',tip:'Слушай три вещи: темп, паузы, интонация на ключевых словах.',saliva:''},
-        {day:15,focus:'Тихо-уверенно vs громко',task:'Один питч трижды: тихо-уверенно, нормально, громко-энергично. Какой вариант звучит лучше?',exercises:['МММ-резонанс 1 мин','Питч × 3 варианта','Дыхание 4-7-8 × 4'],duration:'15 мин',tip:'Обычно тихо-уверенно выигрывает. Громкость ≠ убедительность.',saliva:''},
-        {day:16,focus:'Серия голосовых для канала',task:'Запиши 3 голосовых сообщения — каждое 30-40 секунд. Разные темы.',exercises:['Диафрагмальное × 10','Дыхание 4-7-8 × 4','МММ-резонанс × 5'],duration:'15 мин',tip:'Короткие голосовые слушают полностью.',saliva:''},
-        {day:17,focus:'Сложный вопрос клиента',task:'Придумай самый сложный вопрос клиента. Ответь вслух — спокойно, с паузой.',exercises:['Квадратное дыхание × 4','Ответы на возражения × 3','Интонационные утверждения × 5'],duration:'15 мин',tip:'Ускорение на сложном вопросе = выдаёшь неуверенность.',saliva:''},
-        {day:18,focus:'Полный сценарий продажи',task:'Разыграй вслух: приветствие → боль → питч → возражение → закрытие. 3-4 минуты.',exercises:['Губы × 20','Дыхание 4-7-8 × 4','Питч — полный сценарий'],duration:'20 мин',tip:'Репетиция вслух — единственный способ подготовиться к реальному разговору.',saliva:''},
-        {day:19,focus:'Реальная встреча или звонок',task:'Проведи встречу или звонок применяя все техники. После — запиши что получилось.',exercises:['Дыхание 4-7-8 × 4','МММ-резонанс × 5','Встреча/звонок'],duration:'30 мин',tip:'Темп, паузы, интонация — что хорошо, что нет.',saliva:''},
-        {day:20,focus:'Полноценный выпуск',task:'Запиши видео для канала — 3-5 минут. История → урок → призыв к действию.',exercises:['Губы × 20','Дыхание 4-7-8 × 4','МММ-резонанс 1 мин'],duration:'30 мин',tip:'Три блока = три паузы между ними.',saliva:''},
-        {day:21,focus:'Финал Круга 2',task:'Финальная запись — питч главного продукта 2 минуты. Сравни с Кругом 1 день 21.',exercises:['Губы × 20','МММ-резонанс 1 мин','Питч 2 мин'],duration:'20 мин',tip:'Круг 2 закончен. Неделя отдыха — потом Круг 3.',saliva:''}
-      ]
-    },
-    {
-      id:3, title:'Круг 3 — Публичность', subtitle:'Выступления, видео, Telegram на поток',
-      days:[
-        {day:1,focus:'Другой масштаб',task:'Запись: расскажи о Nizamov.tech как будто выступаешь перед залом из 50 человек.',exercises:['Губы × 20','Дыхание 4-7-8 × 4','МММ-резонанс 1 мин'],duration:'20 мин',tip:'Голос для зала — не громче, а проекция вперёд.',saliva:''},
-        {day:2,focus:'Структура выступления',task:'Подготовь 5-минутное выступление о пути завод→IT. Тезисы, произнеси вслух.',exercises:['Диафрагмальное × 10','МММ-резонанс 1 мин','Питч — выступление 5 мин'],duration:'25 мин',tip:'Выступление без бумажки = доверие.',saliva:''},
-        {day:3,focus:'Темп для аудитории',task:'Читай текст в темпе 100 слов/мин — темп публичного выступления.',exercises:['Чтение вслух 100 слов/мин','Замедлись вдвое 3 мин','Квадратное дыхание × 4'],duration:'15 мин',tip:'В зале нужно дать звуку время дойти до задних рядов.',saliva:''},
-        {day:4,focus:'Акценты и выделение',task:'Возьми абзац. Прочитай 3 раза выделяя разные слова интонацией.',exercises:['Гласные А-Э-И-О-У-Ы × 3','Акценты в тексте × 3 варианта','Интонационные утверждения × 10'],duration:'12 мин',tip:'Выделение = пауза до + замедление + понижение после.',saliva:''},
-        {day:5,focus:'Видео без дублей',task:'Запиши видео для Telegram — один дубль без остановок.',exercises:['Дыхание 4-7-8 × 4','МММ-резонанс × 5','Видео один дубль'],duration:'20 мин',tip:'Живая речь с паузами цепляет больше идеального дубля.',saliva:''},
-        {day:6,focus:'Импровизация 3 минуты',task:'Таймер 3 минуты. Говори без подготовки — «почему малый бизнес должен автоматизироваться».',exercises:['Диафрагмальное × 10','Импровизация 3 мин','МММ-резонанс × 5'],duration:'15 мин',tip:'Пауза вместо «эм» и «ну» — высший уровень.',saliva:''},
-        {day:7,focus:'Итог недели 1',task:'Запись — 3 минуты о пути без подготовки. Сравни с Кругом 1 день 1.',exercises:['Губы × 20','Дыхание 4-7-8 × 4','МММ-резонанс 1 мин'],duration:'20 мин',tip:'Разница между записью 1 и сейчас — результат твоей работы.',saliva:''},
-        {day:8,focus:'Серийный контент',task:'Запиши 3 видео за одну сессию. 45-60 секунд каждое. Разные темы.',exercises:['Губы × 20','Дыхание 4-7-8 × 4','МММ-резонанс 1 мин'],duration:'25 мин',tip:'Первое видео разогрев, второе-третье лучшие.',saliva:''},
-        {day:9,focus:'Сессия вопросов-ответов',task:'Попроси кого-то задать 5 вопросов о продуктах. Отвечай применяя все техники.',exercises:['Квадратное дыхание × 4','Ответы на возражения × 5','Интонационные утверждения × 5'],duration:'20 мин',tip:'Вопрос → пауза 2 сек → ответ.',saliva:''},
-        {day:10,focus:'5-минутный питч',task:'Подготовь и запиши питч Nizamov.tech — полный: компания, продукты, результаты, цены.',exercises:['Губы × 20','Дыхание 4-7-8 × 4','Питч 5 мин'],duration:'25 мин',tip:'5 минут = 500-600 слов. Пиши тезисы, не скрипт.',saliva:''},
-        {day:11,focus:'Голос в разных каналах',task:'Сравни: звонок, голосовое Telegram, видео, живой разговор. Что корректировать?',exercises:['МММ-резонанс 1 мин','Фразы с резонансом 3 мин','Дыхание 4-7-8 × 4'],duration:'20 мин',tip:'Телефон срезает низкие частоты — говори чуть чётче.',saliva:''},
-        {day:12,focus:'Стрессовая тренировка',task:'3 холодных звонка подряд. После каждого — 4-7-8 × 4 и следующий.',exercises:['Дыхание 4-7-8 × 4','МММ-резонанс × 5','Звонок клиенту × 3'],duration:'30 мин',tip:'Третий звонок всегда лучше первого.',saliva:'Между звонками — сглотни, 4-7-8, МММ. 2 минуты восстановления.'},
-        {day:13,focus:'Все скороговорки подряд',task:'Все 7 скороговорок без остановки. Медленно, чётко, окончания.',exercises:['Губы × 20','Бобёр × 5','Топот × 5','Шла Саша × 5','Карл × 3'],duration:'20 мин',tip:'Это тест осознанности, не скорости.',saliva:''},
-        {day:14,focus:'Контент-план на 5 дней',task:'Запиши 5 голосовых для Telegram — по 60-90 секунд. Контент на 5 дней.',exercises:['Губы × 20','Дыхание 4-7-8 × 4','МММ-резонанс 1 мин'],duration:'30 мин',tip:'Записывай пока голос разогрет — лучшие получаются после 3-4 подряд.',saliva:''},
-        {day:15,focus:'Живое выступление',task:'Выступи вживую — перед коллегами, партнёрами, семьёй. 5 минут.',exercises:['Дыхание 4-7-8 × 4','МММ-резонанс 1 мин','Выступление 5 мин'],duration:'30 мин',tip:'Смотри в глаза людям, делай паузы.',saliva:''},
-        {day:16,focus:'Разбор и коррекция',task:'Послушай 3 записи из разных дней. Что изменилось? Что ещё нужно улучшить?',exercises:['Губы × 20','МММ-резонанс × 5','Чтение вслух 5 мин'],duration:'20 мин',tip:'Слушай не что плохо — что стало лучше.',saliva:''},
-        {day:17,focus:'Прогулочный монолог',task:'Прогулка 10 минут — говори вслух всё что видишь и думаешь. Паузы вместо «эм».',exercises:['Дыхание 4-7-8 × 4','Импровизация — прогулка 10 мин'],duration:'15 мин',tip:'Никто не слышит — можно всё.',saliva:''},
-        {day:18,focus:'Видео 5 минут',task:'Запиши полноценное видео — 5 минут. История + продукты + призыв. Один дубль.',exercises:['Губы × 20','Дыхание 4-7-8 × 4','МММ-резонанс 1 мин'],duration:'30 мин',tip:'5 минут = ~500 слов при темпе 120 слов/мин плюс паузы.',saliva:''},
-        {day:19,focus:'Симуляция важной встречи',task:'Разыграй вслух встречу с директором крупной компании. Полный сценарий 10 минут.',exercises:['Дыхание 4-7-8 × 4','МММ-резонанс × 5','Питч — полный сценарий'],duration:'20 мин',tip:'Чем страшнее симуляция — тем спокойнее реальная встреча.',saliva:''},
-        {day:20,focus:'Передай знание',task:'Объясни кому-то одну технику дикции которую освоил.',exercises:['Диафрагмальное × 10','МММ-резонанс × 5','Фразы с резонансом 3 мин'],duration:'15 мин',tip:'Объяснение другому = понимаешь сам на глубоком уровне.',saliva:''},
-        {day:21,focus:'Финал всей программы',task:'Финальная запись — 3 минуты без подготовки о пути и планах. Сравни с Кругом 1 день 1.',exercises:['Губы × 20','Дыхание 4-7-8 × 4','МММ-резонанс 1 мин'],duration:'25 мин',tip:'63 дня осознанной работы = другой человек в разговоре.',saliva:''}
-      ]
-    }
-  ],
-  maintenance: {
-    title:'Режим поддержки', subtitle:'5 минут в день навсегда',
-    routine:['Губы + язык — 1 мин','МММ-резонанс — 30 сек','Диафрагмальное × 5','Одна скороговорка × 3','Намеренность дня']
-  }
-};
-
-const EXERCISES = [
-  {id:'lips',tag:'warm',label:'разминка',name:'Губы — рыбка',desc:'Размять круговую мышцу рта',text:'Хлопай губами как рыба — 20 раз.\n\nПотом: вытяни трубочкой вперёд на 2 сек → растяни в широкую улыбку → это один повтор × 10.\n\nЧувствуй как напрягается круговая мышца рта.',reps:'× 20 хлопков + 10 трубочка/улыбка',timer:60},
-  {id:'tongue',tag:'warm',label:'разминка',name:'Язык — чистка зубов',desc:'Активировать кончик языка',text:'Проведи кончиком языка по внутренней поверхности зубов — как чистишь зубы.\n\nСначала верхние слева направо, потом нижние справа налево. Это один круг. × 5 кругов в каждую сторону.\n\nКончик языка касается каждого зуба. Не торопись. Челюсть не двигается — только язык.',reps:'5 кругов × 2 направления',timer:60},
-  {id:'jaw',tag:'warm',label:'разминка',name:'Челюсть — жевание',desc:'Убрать зажатость',text:'Открой рот широко → медленно закрой × 10.\n\nПотом двигай нижней челюстью вперёд-назад × 5.\n\nПотом круговые движения × 5 в каждую сторону.\n\nДолжно чувствоваться лёгкое растяжение у уха. Если боль — уменьши амплитуду.',reps:'10 + 5 + 5 повторений',timer:60},
-  {id:'vowels',tag:'tongue',label:'артикуляция',name:'Гласные с усилием',desc:'Включить весь артикуляционный аппарат',text:'А — Э — И — О — У — Ы\n\nКаждую гласную произноси с преувеличенной артикуляцией — как будто объясняешь глухому.\n\nА — рот максимально открыт. И — губы растянуты. У — губы трубочкой. Ы — нижняя челюсть чуть вперёд.\n\nПо 3 раза каждую. Чувствуй разную позицию на каждом звуке.',reps:'6 звуков × 3 раза',timer:90},
-  {id:'pause',tag:'speed',label:'темп · ⚡ приоритет',name:'Замедлись вдвое',desc:'Твоя главная задача сейчас',text:'Расскажи что-нибудь — план на день, любую мысль — в два раза медленнее чем обычно.\n\nКаждое слово произноси полностью. Паузы между словами — осознанные.\n\nПоначалу будет казаться «слишком медленно» — это нормально. Запись на телефон покажет что со стороны звучит нормально.\n\nНе тараторь в конце предложения — темп равномерный до последнего слова.',reps:'2–3 минуты · каждый день',timer:120},
-  {id:'reading',tag:'voice',label:'голос · 🏆 главное',name:'Чтение вслух',desc:'Лучший тренажёр для всего сразу',text:'Любой текст — новость, статья, книга. Читай как диктор на радио:\n\nПосле запятой — лёгкая пауза + вдох носом.\nПосле точки — 2 секунды тишины.\n\nС выражением, не монотонно. Следи за окончаниями слов — не глотай последний слог.\n\nЗаписывай себя раз в 3 дня и слушай.',reps:'5–10 минут',timer:300},
-  {id:'mask',tag:'voice',label:'голос',name:'Звук в маску',desc:'Убрать глухость, добавить резонанс',text:'МММ с закрытым ртом 30 секунд → запомни ощущение вибрации на губах.\n\nТеперь говори фразы с тем же ощущением. Представь что звук летит вперёд — в зубы, в губы, в «маску» лица.\n\nПоложи палец на губы — должна чувствоваться лёгкая вибрация.\n\nНе повышай громкость. Резонанс — это не громкость.',reps:'30 сек МММ + 3-5 фраз',timer:60},
+// Программа — 63 дня
+const CIRCLES = [
+  {id:1,title:'Круг 1 — Фундамент',sub:'Дикция · Дыхание · Каша · Слюна',days:[
+    {f:'Знакомство с собой',t:'Запиши голос — прочитай «От топота копыт». Это точка отсчёта.',steps:[{ex:'lips',reps:'× 20'},{ex:'vowels',reps:'× 3 каждую'},{ex:'breath_diaphragm',reps:'× 10'}],tip:'Не оценивай — просто слушай себя со стороны.',saliva:'Перед записью: сглотни, опусти кончик языка вниз, расслабь челюсть.'},
+    {f:'Расслабление челюсти',t:'Весь день замечай — сжата ли челюсть? Зажатая челюсть = каша + слюна.',steps:[{ex:'jaw',reps:'× 15'},{ex:'lips',reps:'× 10'},{ex:'breath_diaphragm',reps:'× 10'}],tip:'Норма — между зубами помещается палец. Если нет — зажат.',saliva:'Расслабленная челюсть снижает слюноотделение. Главная задача недели.'},
+    {f:'Язык и кончик',t:'Произноси слова чётко заканчивая каждое. «Топот. Копыт. Летит.» — пауза после каждого.',steps:[{ex:'tongue',reps:'× 5 кругов'},{ex:'vowels',reps:'× 5'},{ex:'breath_diaphragm',reps:'× 8'}],tip:'Кончик языка — главный инструмент для Т, Д, Н, Л.',saliva:'Перед фразой — сглотни + вдох носом. Даёт 15-20 сек комфортной речи.'},
+    {f:'Первая скороговорка',t:'«Бобёр добр до бобрят» × 10. Медленно. Слышишь каждое окончание?',steps:[{ex:'lips',reps:'× 20'},{ex:'tt_bobbr',reps:'× 10 медленно'},{ex:'mmm',reps:'× 5'}],tip:'Не ускоряйся. Скорость — враг первой недели.',saliva:'Сглотни перед каждым повторением. Скоро войдёт в привычку.'},
+    {f:'Дыхание и голос',t:'Читай вслух 5 минут. После запятой — вдох носом. После точки — 2 сек тишины.',steps:[{ex:'breath_diaphragm',reps:'× 10'},{ex:'mmm',reps:'× 5'},{ex:'reading',reps:'5 мин'}],tip:'Голос идёт вперёд — в губы, не в горло.',saliva:'Пауза = время сглотнуть. Строй речь так чтобы паузы были естественными.'},
+    {f:'Замедление темпа',t:'Расскажи план на день в два раза медленнее. Запиши. Послушай.',steps:[{ex:'lips',reps:'× 20'},{ex:'slow',reps:'3 мин'},{ex:'tt_bobbr',reps:'× 10'}],tip:'Замедленный темп со стороны звучит нормально. Восприятие обманывает.',saliva:''},
+    {f:'Итог недели 1',t:'Запиши голос — та же фраза что в день 1. Сравни записи.',steps:[{ex:'lips',reps:'× 20'},{ex:'vowels',reps:'× 3 каждую'},{ex:'mmm',reps:'× 5'}],tip:'Даже маленький прогресс за 7 дней — уже не ноль.',saliva:'Оцени: стало ли меньше дискомфорта со слюной?'},
+    {f:'Скороговорки уровень 2',t:'«От топота копыт» — × 3 медленно, × 3 быстро. Контролируй окончания.',steps:[{ex:'lips',reps:'× 20'},{ex:'tt_topot',reps:'× 3+3'},{ex:'reading',reps:'5 мин'}],tip:'Окончание слова — такой же важный слог как первый.',saliva:''},
+    {f:'Пауза перед ответом',t:'В одном реальном разговоре — пауза 1-2 сек перед ответом. Не торопись.',steps:[{ex:'breath_diaphragm',reps:'× 10'},{ex:'slow',reps:'2 мин'},{ex:'tt_topot',reps:'× 6'}],tip:'Пауза перед ответом = уверенность. Это момент чтобы незаметно сглотнуть.',saliva:'Пауза перед ответом — идеальный момент сглотнуть незаметно.'},
+    {f:'Шипящие звуки',t:'«Шла Саша по шоссе» × 5. Ш и С — разные звуки, не мешай их.',steps:[{ex:'tongue',reps:'× 5 кругов'},{ex:'tt_sasha',reps:'× 5'},{ex:'breath_diaphragm',reps:'× 8'}],tip:'Ш — язык чашечкой. С — узкий, острый.',saliva:''},
+    {f:'Интонация вниз',t:'Произнеси 10 утверждений с понижением интонации в конце.',steps:[{ex:'vowels',reps:'× 3'},{ex:'intonation',reps:'× 10'},{ex:'reading',reps:'5 мин'}],tip:'Интонация вверх = неуверенность. Вниз = факт.',saliva:''},
+    {f:'Резонанс голоса',t:'МММ → говори фразы с тем же ощущением вибрации на губах.',steps:[{ex:'mmm',reps:'1 мин'},{ex:'mask',reps:'3 мин'},{ex:'breath_diaphragm',reps:'× 8'}],tip:'Палец на губы — должна чувствоваться вибрация.',saliva:''},
+    {f:'Первый питч вслух',t:'Расскажи о любом своём продукте 2 минуты. С паузами, медленно. Запиши.',steps:[{ex:'lips',reps:'× 20'},{ex:'mmm',reps:'× 5'},{ex:'pitch',reps:'2 мин'}],tip:'Первый раз соединяешь всё вместе.',saliva:'Сглотни перед началом. В паузах — быстрое незаметное сглатывание.'},
+    {f:'Итог недели 2',t:'Запись — расскажи о себе 1 минуту. Сравни с записями дня 1 и дня 7.',steps:[{ex:'lips',reps:'× 20'},{ex:'mask',reps:'2 мин'},{ex:'reading',reps:'5 мин'}],tip:'Слушай не что говоришь — а КАК.',saliva:''},
+    {f:'Пауза перед ключевым словом',t:'В разговоре — пауза ПЕРЕД ключевым словом. «Это стоит... ...4000 рублей».',steps:[{ex:'breath_diaphragm',reps:'× 10'},{ex:'slow',reps:'3 мин'},{ex:'reading',reps:'5 мин'}],tip:'Пауза перед главным словом = собеседник сам начинает вслушиваться.',saliva:''},
+    {f:'Быстро-медленно',t:'Питч: контекст — нормально, главное преимущество — замедлись и чуть тише.',steps:[{ex:'mmm',reps:'× 5'},{ex:'slow',reps:'3 мин'},{ex:'pitch',reps:'2 мин'}],tip:'Тишина и замедление привлекают больше чем громкость.',saliva:''},
+    {f:'Финальный босс скороговорок',t:'«Карл у Клары украл кораллы» × 5 медленно. Только если уровни 1-2 чисты.',steps:[{ex:'lips',reps:'× 20'},{ex:'tt_topot',reps:'× 5'},{ex:'tt_karl',reps:'× 5 медленно'}],tip:'Если путаешься — вернись к уровню 2.',saliva:''},
+    {f:'Боль → пауза → решение',t:'3 фразы по схеме: боль клиента → пауза 2 сек → решение. × 3 каждую.',steps:[{ex:'breath_diaphragm',reps:'× 10'},{ex:'intonation',reps:'× 5'},{ex:'objections',reps:'× 3'}],tip:'Пауза после боли — клиент её проживает. Потом решение = спасение.',saliva:''},
+    {f:'Живой звонок',t:'Позвони потенциальному клиенту применяя всё: темп, паузы, интонация вниз.',steps:[{ex:'breath_diaphragm',reps:'× 10'},{ex:'mmm',reps:'× 5'},{ex:'pitch',reps:'звонок'}],tip:'4-7-8 + МММ перед звонком — входишь в нужном состоянии.',saliva:'Сглотни прямо перед тем как начать говорить в трубку.'},
+    {f:'Голосовое для Telegram',t:'Запиши голосовое для канала — 60-90 сек. С паузами, с резонансом.',steps:[{ex:'lips',reps:'× 20'},{ex:'mmm',reps:'× 5'},{ex:'reading',reps:'5 мин'}],tip:'Голосовые слушают на 1.5-2x — говори чуть медленнее.',saliva:''},
+    {f:'Финал Круга 1',t:'Финальная запись — «От топота» + 1 мин о себе. Сравни с самого начала.',steps:[{ex:'lips',reps:'× 20'},{ex:'vowels',reps:'× 3'},{ex:'mmm',reps:'× 5'}],tip:'21 день = новый автоматизм. Это теперь твой базовый уровень.',saliva:'Оцени прогресс со слюной — должно быть заметно лучше.'},
+  ]},
+  {id:2,title:'Круг 2 — Речь продавца',sub:'Питчи · Звонки · Telegram-канал',days:[
+    {f:'Разогрев после паузы',t:'Полная разминка + скороговорки. Навык сохранился — убедись.',steps:[{ex:'lips',reps:'× 20'},{ex:'tt_topot',reps:'× 6'},{ex:'reading',reps:'5 мин'}],tip:'Неделя отдыха не убивает навык — она его закрепляет.',saliva:''},
+    {f:'Голос для видео',t:'Запиши 60-секундное видео для Telegram. Резонанс, паузы, смотри в камеру.',steps:[{ex:'mmm',reps:'1 мин'},{ex:'mask',reps:'2 мин'},{ex:'pitch',reps:'видео 60 сек'}],tip:'Первый дубль разогрев, второй рабочий.',saliva:''},
+    {f:'Структура питча',t:'Питч: боль → усиление → решение → результат. 90 секунд максимум.',steps:[{ex:'lips',reps:'× 20'},{ex:'intonation',reps:'× 5'},{ex:'pitch',reps:'× 3 дубля'}],tip:'Усиление боли — самая важная часть.',saliva:''},
+    {f:'Работа с возражениями',t:'3 возражения клиентов. Ответь на каждое — спокойно, с паузой.',steps:[{ex:'breath_diaphragm',reps:'× 10'},{ex:'intonation',reps:'× 5'},{ex:'objections',reps:'× 3'}],tip:'Спокойный голос на возражение = уверенность.',saliva:''},
+    {f:'Темп 120 слов/мин',t:'Читай текст трижды: быстро, 120 слов/мин, 90 слов/мин. Слышишь разницу?',steps:[{ex:'reading',reps:'× 3 темпа'},{ex:'slow',reps:'3 мин'},{ex:'breath_diaphragm',reps:'× 10'}],tip:'120 слов в минуту — оптимум для продаж.',saliva:''},
+    {f:'Голосовые вместо текста',t:'3 голосовых в рабочих чатах вместо текста. Паузы и резонанс.',steps:[{ex:'mmm',reps:'1 мин'},{ex:'mask',reps:'2 мин'},{ex:'pitch',reps:'3 голосовых'}],tip:'Голосовые сообщения — лучший ежедневный тренажёр.',saliva:''},
+    {f:'Итог недели 1',t:'Запись — Nizamov.tech за 90 секунд. Сравни с Кругом 1.',steps:[{ex:'lips',reps:'× 20'},{ex:'mmm',reps:'× 5'},{ex:'pitch',reps:'90 сек'}],tip:'Круг 2 идёт быстрее — фундамент уже есть.',saliva:''},
+    {f:'Сторителлинг',t:'История — как ты пришёл с завода в IT. 2 минуты. Паузы, эмоция.',steps:[{ex:'breath_diaphragm',reps:'× 10'},{ex:'mmm',reps:'× 5'},{ex:'pitch',reps:'история 2 мин'}],tip:'История продаёт лучше цифр. Паузы в истории = напряжение.',saliva:''},
+    {f:'Цифры с интонацией вниз',t:'5 фраз с цифрами. «За 14 дней↓. За 4000 рублей↓. Три клиента↓».',steps:[{ex:'intonation',reps:'× 10'},{ex:'pitch',reps:'с цифрами'},{ex:'mmm',reps:'× 5'}],tip:'Цифра с интонацией вниз = факт. Факт = доверие.',saliva:''},
+    {f:'Холодный звонок',t:'Позвони незнакомому клиенту. 4-7-8 перед звонком. Схема боль→пауза→решение.',steps:[{ex:'breath_diaphragm',reps:'× 10'},{ex:'mmm',reps:'× 5'},{ex:'pitch',reps:'звонок'}],tip:'4-7-8 снижает кортизол. Делай это всерьёз.',saliva:'Перед звонком сглотни. В паузах — незаметное сглатывание.'},
+    {f:'Видео для канала',t:'«Путь с завода в IT» — инструмент или урок. 90-120 секунд.',steps:[{ex:'lips',reps:'× 20'},{ex:'mmm',reps:'1 мин'},{ex:'pitch',reps:'видео 90 сек'}],tip:'Дубли — норма. Профессионалы пишут по 5-10 дублей.',saliva:''},
+    {f:'Тишина как инструмент',t:'После вопроса собеседника — пауза 3 секунды. Не заполняй тишину.',steps:[{ex:'slow',reps:'3 мин'},{ex:'intonation',reps:'× 5'},{ex:'breath_diaphragm',reps:'× 8'}],tip:'3 секунды тишины кажутся вечностью только тебе.',saliva:''},
+    {f:'Своя скороговорка',t:'Карл × 5 + придумай скороговорку из названий своих продуктов.',steps:[{ex:'tt_karl',reps:'× 5'},{ex:'mmm',reps:'× 5'},{ex:'reading',reps:'5 мин'}],tip:'Своя скороговорка = тренировка конкретных слов которые произносишь каждый день.',saliva:''},
+    {f:'Итог недели 2',t:'Запись — холодный питч 90 секунд. Применяй всё из Круга 2.',steps:[{ex:'lips',reps:'× 20'},{ex:'mmm',reps:'1 мин'},{ex:'pitch',reps:'× 2 дубля'}],tip:'Темп, паузы, интонация — три вещи для разбора.',saliva:''},
+    {f:'Тихо-уверенно vs громко',t:'Питч трижды: тихо-уверенно, нормально, громко. Какой лучше?',steps:[{ex:'mmm',reps:'1 мин'},{ex:'pitch',reps:'× 3 варианта'},{ex:'breath_diaphragm',reps:'× 8'}],tip:'Обычно тихо-уверенно выигрывает. Громкость ≠ убедительность.',saliva:''},
+    {f:'Серия голосовых',t:'3 голосовых по 30-40 секунд. Разные темы. Контент на 3 дня.',steps:[{ex:'breath_diaphragm',reps:'× 10'},{ex:'mmm',reps:'1 мин'},{ex:'pitch',reps:'3 голосовых'}],tip:'Короткие голосовые слушают полностью.',saliva:''},
+    {f:'Сложный вопрос клиента',t:'Придумай самый сложный вопрос. Ответь вслух — спокойно, без ускорения.',steps:[{ex:'breath_diaphragm',reps:'× 10'},{ex:'objections',reps:'× 3'},{ex:'intonation',reps:'× 5'}],tip:'Ускорение на сложном вопросе = выдаёшь неуверенность.',saliva:''},
+    {f:'Полный сценарий продажи',t:'Вслух: приветствие → боль → питч → возражение → закрытие. 3-4 минуты.',steps:[{ex:'lips',reps:'× 20'},{ex:'mmm',reps:'× 5'},{ex:'pitch',reps:'сценарий'}],tip:'Репетиция вслух — единственная подготовка к реальному разговору.',saliva:''},
+    {f:'Реальная встреча или звонок',t:'Встреча или звонок с клиентом. После — запиши что получилось.',steps:[{ex:'breath_diaphragm',reps:'× 10'},{ex:'mmm',reps:'× 5'},{ex:'pitch',reps:'встреча/звонок'}],tip:'Темп, паузы, интонация — что хорошо, что нет.',saliva:''},
+    {f:'Полноценный выпуск',t:'Видео для канала — 3-5 мин. История → урок → призыв.',steps:[{ex:'lips',reps:'× 20'},{ex:'mmm',reps:'1 мин'},{ex:'pitch',reps:'видео 3-5 мин'}],tip:'Три блока = три паузы между ними.',saliva:''},
+    {f:'Финал Круга 2',t:'Питч главного продукта 2 мин. Сравни с Кругом 1 день 21.',steps:[{ex:'lips',reps:'× 20'},{ex:'mmm',reps:'× 5'},{ex:'pitch',reps:'2 мин'}],tip:'Круг 2 закончен. Неделя отдыха — потом Круг 3.',saliva:''},
+  ]},
+  {id:3,title:'Круг 3 — Публичность',sub:'Выступления · Видео · Импровизация',days:[
+    {f:'Другой масштаб',t:'Расскажи о Nizamov.tech как будто говоришь перед залом из 50 человек.',steps:[{ex:'lips',reps:'× 20'},{ex:'mmm',reps:'1 мин'},{ex:'pitch',reps:'2 мин громко'}],tip:'Голос для зала — не громче, а проекция вперёд.',saliva:''},
+    {f:'Структура выступления',t:'5-минутное выступление о пути завод→IT. Тезисы, произнеси вслух.',steps:[{ex:'breath_diaphragm',reps:'× 10'},{ex:'mmm',reps:'1 мин'},{ex:'pitch',reps:'выступление 5 мин'}],tip:'Выступление без бумажки = доверие.',saliva:''},
+    {f:'Темп для аудитории',t:'Читай текст в темпе 100 слов/мин — темп публичного выступления.',steps:[{ex:'reading',reps:'100 слов/мин'},{ex:'slow',reps:'3 мин'},{ex:'breath_diaphragm',reps:'× 8'}],tip:'В зале нужно дать звуку время дойти до задних рядов.',saliva:''},
+    {f:'Акценты и выделение',t:'Абзац × 3 — каждый раз выделяй разные слова интонацией.',steps:[{ex:'vowels',reps:'× 3'},{ex:'intonation',reps:'× 10'},{ex:'reading',reps:'с акцентами'}],tip:'Выделение = пауза до + замедление + понижение после.',saliva:''},
+    {f:'Видео без дублей',t:'Видео для Telegram — один дубль, без остановок.',steps:[{ex:'mmm',reps:'1 мин'},{ex:'breath_diaphragm',reps:'× 10'},{ex:'pitch',reps:'один дубль'}],tip:'Живая речь с паузами цепляет больше идеального дубля.',saliva:''},
+    {f:'Импровизация 3 минуты',t:'Таймер 3 мин — говори без подготовки. Вместо «эм» — пауза.',steps:[{ex:'breath_diaphragm',reps:'× 10'},{ex:'improv',reps:'3 мин'},{ex:'mmm',reps:'× 5'}],tip:'Пауза вместо «эм» и «ну» — высший уровень.',saliva:''},
+    {f:'Итог недели 1',t:'Запись — 3 мин о пути без подготовки. Сравни с Кругом 1 день 1.',steps:[{ex:'lips',reps:'× 20'},{ex:'mmm',reps:'1 мин'},{ex:'improv',reps:'3 мин'}],tip:'Разница с первой записью — это результат твоей работы.',saliva:''},
+    {f:'Серийный контент',t:'3 видео за одну сессию. 45-60 секунд каждое. Разные темы.',steps:[{ex:'lips',reps:'× 20'},{ex:'mmm',reps:'1 мин'},{ex:'pitch',reps:'3 видео × 60 сек'}],tip:'Первое видео разогрев, второе-третье лучшие.',saliva:''},
+    {f:'Сессия вопросов-ответов',t:'Попроси кого-то задать 5 вопросов. Отвечай применяя все техники.',steps:[{ex:'breath_diaphragm',reps:'× 10'},{ex:'objections',reps:'× 5'},{ex:'intonation',reps:'× 5'}],tip:'Вопрос → пауза 2 сек → ответ.',saliva:''},
+    {f:'5-минутный питч',t:'Питч Nizamov.tech — полный: компания, продукты, результаты, цены.',steps:[{ex:'lips',reps:'× 20'},{ex:'mmm',reps:'1 мин'},{ex:'pitch',reps:'5 мин'}],tip:'5 минут = ~500 слов. Пиши тезисы, не скрипт.',saliva:''},
+    {f:'Голос в разных каналах',t:'Сравни: звонок, голосовое Telegram, видео, живой разговор.',steps:[{ex:'mmm',reps:'1 мин'},{ex:'mask',reps:'3 мин'},{ex:'pitch',reps:'в 4 форматах'}],tip:'Телефон срезает низкие частоты — говори чуть чётче.',saliva:''},
+    {f:'Стрессовая тренировка',t:'3 холодных звонка подряд. После каждого — 4-7-8 × 4.',steps:[{ex:'breath_diaphragm',reps:'× 10'},{ex:'mmm',reps:'× 5'},{ex:'pitch',reps:'3 звонка подряд'}],tip:'Третий звонок всегда лучше первого.',saliva:'Между звонками — сглотни, дышишь, МММ. 2 минуты.'},
+    {f:'Все скороговорки подряд',t:'Все 7 скороговорок без остановки. Медленно, чётко, окончания.',steps:[{ex:'lips',reps:'× 20'},{ex:'tt_bobbr',reps:'× 5'},{ex:'tt_topot',reps:'× 5'},{ex:'tt_sasha',reps:'× 5'},{ex:'tt_karl',reps:'× 3'}],tip:'Это тест осознанности, не скорости.',saliva:''},
+    {f:'Контент-план на 5 дней',t:'5 голосовых для Telegram по 60-90 сек. Контент на 5 дней.',steps:[{ex:'lips',reps:'× 20'},{ex:'mmm',reps:'1 мин'},{ex:'pitch',reps:'5 голосовых'}],tip:'Лучшие голосовые получаются после 3-4 подряд.',saliva:''},
+    {f:'Живое выступление',t:'Выступи вживую — перед коллегами, семьёй. 5 минут.',steps:[{ex:'breath_diaphragm',reps:'× 10'},{ex:'mmm',reps:'1 мин'},{ex:'pitch',reps:'выступление 5 мин'}],tip:'Смотри в глаза людям, делай паузы.',saliva:''},
+    {f:'Разбор и коррекция',t:'Послушай 3 записи из разных дней. Что изменилось?',steps:[{ex:'lips',reps:'× 20'},{ex:'mmm',reps:'× 5'},{ex:'reading',reps:'5 мин'}],tip:'Слушай не что плохо — что стало лучше.',saliva:''},
+    {f:'Прогулочный монолог',t:'Прогулка 10 мин — говори вслух всё что видишь. Паузы вместо «эм».',steps:[{ex:'breath_diaphragm',reps:'× 10'},{ex:'improv',reps:'прогулка 10 мин'}],tip:'Никто не слышит — можно всё.',saliva:''},
+    {f:'Видео 5 минут',t:'Видео для канала — 5 мин. История + продукты + призыв. Один дубль.',steps:[{ex:'lips',reps:'× 20'},{ex:'mmm',reps:'1 мин'},{ex:'pitch',reps:'видео 5 мин'}],tip:'5 мин = ~500 слов при темпе 120 слов/мин.',saliva:''},
+    {f:'Симуляция важной встречи',t:'Разыграй встречу с директором крупной компании вслух. 10 мин.',steps:[{ex:'breath_diaphragm',reps:'× 10'},{ex:'mmm',reps:'× 5'},{ex:'pitch',reps:'сценарий 10 мин'}],tip:'Чем страшнее симуляция — тем спокойнее реальная встреча.',saliva:''},
+    {f:'Передай знание',t:'Объясни кому-то одну технику дикции которую освоил.',steps:[{ex:'breath_diaphragm',reps:'× 8'},{ex:'mmm',reps:'× 5'},{ex:'mask',reps:'3 мин'}],tip:'Объяснение другому = понимаешь сам на глубоком уровне.',saliva:''},
+    {f:'Финал программы',t:'Финальная запись — 3 мин без подготовки. Сравни с самым первым днём.',steps:[{ex:'lips',reps:'× 20'},{ex:'vowels',reps:'× 3'},{ex:'mmm',reps:'1 мин'}],tip:'63 дня осознанной работы = другой человек в разговоре.',saliva:''},
+  ]},
 ];
 
-const TWISTERS = [
-  {id:'tt1',level:'Уровень 1 — губные',text:'Бобёр добр до бобрят.',tip:'Следи за Б и Р. «бобЁР», «добР», «бобРЯТ»',reps:'× 5 раз медленно'},
-  {id:'tt2',level:'Уровень 1 — губные',text:'Мама мыла Милу мылом.',tip:'Не сливай окончания. «мылА», «мылОМ»',reps:'× 5 раз'},
-  {id:'tt3',level:'Уровень 2 — переднеязычные',text:'От топота копыт пыль по полю летит.',tip:'Окончания: «копыТ», «летиТ» — чёткий Т в конце',reps:'× 3 медленно + × 3 быстро'},
-  {id:'tt4',level:'Уровень 2 — переднеязычные',text:'Дятел дерево долбил, деда дробью не убил.',tip:'Пауза после каждого слова на медленном темпе',reps:'× 3 раза'},
-  {id:'tt5',level:'Уровень 3 — шипящие',text:'Шла Саша по шоссе и сосала сушку.',tip:'Ш — язык чашечкой вверх. С — язык острый за нижними зубами',reps:'× 3 раза'},
-  {id:'tt6',level:'Уровень 3 — шипящие',text:'Сшит колпак не по-колпаковски.',tip:'Медленно — окончания важнее скорости',reps:'× 3 раза'},
-  {id:'tt7',level:'Уровень 4 — финальный босс',text:'Карл у Клары украл кораллы, а Клара у Карла украла кларнет.',tip:'Только когда уровни 1–3 звучат чисто',reps:'× 2 раза медленно'},
-];
-
-const BREATH_CONFIGS = {
-  '478':{name:'Техника 4-7-8',phases:[{l:'Вдох носом',t:4,instr:'Медленно вдыхай через нос...',scale:1.3},{l:'Задержка',t:7,instr:'Задержи дыхание...',scale:1.3},{l:'Выдох ртом',t:8,instr:'Медленно выдыхай через рот...',scale:1}],cycles:4},
-  'diaphragm':{name:'Диафрагмальное',phases:[{l:'Вдох животом',t:4,instr:'Рука на животе — она поднимается',scale:1.3},{l:'Выдох',t:4,instr:'Живот опускается, плечи не двигаются',scale:1}],cycles:8},
-  'box':{name:'Квадратное',phases:[{l:'Вдох',t:4,instr:'Вдох через нос...',scale:1.3},{l:'Задержка',t:4,instr:'Задержи...',scale:1.3},{l:'Выдох',t:4,instr:'Выдох через рот...',scale:1},{l:'Задержка',t:4,instr:'Задержи...',scale:1}],cycles:4},
+const BREATH = {
+  '478':{name:'Техника 4-7-8',phases:[{l:'Вдох носом',t:4,i:'Медленно вдыхай через нос...',s:1.3},{l:'Задержка',t:7,i:'Задержи дыхание...',s:1.3},{l:'Выдох ртом',t:8,i:'Медленно выдыхай через рот...',s:1}],cycles:4},
+  'diaphragm':{name:'Диафрагмальное',phases:[{l:'Вдох животом',t:4,i:'Живот вперёд, рука поднимается',s:1.3},{l:'Выдох',t:4,i:'Живот назад, плечи не двигаются',s:1}],cycles:8},
+  'box':{name:'Квадратное',phases:[{l:'Вдох',t:4,i:'Вдох через нос...',s:1.3},{l:'Задержка',t:4,i:'Задержи...',s:1.3},{l:'Выдох',t:4,i:'Выдох через рот...',s:1},{l:'Задержка',t:4,i:'Задержи...',s:1}],cycles:4},
 };
 
-// ─── STORAGE ──────────────────────────────────────
-const S={get:(k)=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))};
+// ═══════════════════════════════════════════════════
+// ХРАНИЛИЩЕ
+// ═══════════════════════════════════════════════════
+const S={
+  get:(k)=>{try{return JSON.parse(localStorage.getItem(k))}catch{return null}},
+  set:(k,v)=>localStorage.setItem(k,JSON.stringify(v)),
+};
 
-// ─── NAV ──────────────────────────────────────────
-const TABS=['home','exercises','twisters','breathing','seller','morning','program','progress'];
-function goTab(name){
-  TABS.forEach(t=>{
-    const s=document.getElementById('scr-'+t);
-    const n=document.getElementById('nav-'+t);
-    if(s)s.classList.toggle('active',t===name);
-    if(n)n.classList.toggle('active',t===name);
+// ═══════════════════════════════════════════════════
+// НАВИГАЦИЯ
+// ═══════════════════════════════════════════════════
+const SCREENS=['home','progress'];
+function goNav(name){
+  SCREENS.forEach(n=>{
+    document.getElementById('scr-'+n).classList.toggle('on',n===name);
+    const nb=document.getElementById('nav-'+n);
+    if(nb)nb.classList.toggle('on',n===name);
   });
   if(name==='progress')renderProgress();
   if(name==='home')renderHome();
-  if(name==='morning')loadIntention();
-  if(name==='program')renderProgramDay();
 }
 
-// ─── EXERCISES ────────────────────────────────────
-function buildExercises(){
-  const list=document.getElementById('ex-list');
-  list.innerHTML='';
-  EXERCISES.forEach(ex=>{
-    const el=document.createElement('div');
-    el.className='ex-card';el.id='ex-'+ex.id;
-    el.innerHTML=`<div class="ex-top" onclick="toggleEx('ex-${ex.id}')"><div><div class="tag tag-${ex.tag}">${ex.label}</div><div class="ex-name">${ex.name}</div><div class="ex-desc">${ex.desc}</div></div><svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg></div><div class="ex-body"><div class="ex-textbox">${ex.text.replace(/\n/g,'<br>')}</div><div class="ex-reps">${ex.reps}</div><button class="btn btn-accent btn-sm" onclick="startTimer(${ex.timer},'${ex.name}')">▶ Таймер</button></div>`;
-    list.appendChild(el);
+// ═══════════════════════════════════════════════════
+// ГЛАВНЫЙ ЭКРАН
+// ═══════════════════════════════════════════════════
+function getToday(){const d=new Date();return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;}
+function getGlobalDay(){return S.get('gday')||1;}
+function getDayData(gday){
+  const ci=Math.min(Math.floor((gday-1)/21),2);
+  const di=(gday-1)%21;
+  return{circle:CIRCLES[ci],day:CIRCLES[ci].days[di],ci,di,gday};
+}
+
+function renderHome(){
+  const gday=getGlobalDay();
+  const {circle,day,ci,di}=getDayData(gday);
+  const days=S.get('days')||{};
+  const done=days['d'+gday];
+
+  // Greeting
+  const h=new Date().getHours();
+  document.getElementById('greeting').textContent=h<12?'Доброе утро':h<17?'Добрый день':'Добрый вечер';
+
+  // Streak
+  let streak=0,i=gday;
+  while(i>=1&&(S.get('days')||{})['d'+i]){streak++;i--;}
+  document.getElementById('streak-num').textContent=streak;
+  document.getElementById('streak-sub').textContent=
+    streak===0?'Начни сегодня':streak===1?'Первый день!':`Отличная серия!`;
+
+  const dots=document.getElementById('streak-dots');
+  dots.innerHTML='';
+  for(let j=Math.max(1,gday-6);j<=gday;j++){
+    const d=document.createElement('div');
+    d.className='sdot'+((S.get('days')||{})['d'+j]?' on':'');
+    dots.appendChild(d);
+  }
+
+  // Day card
+  document.getElementById('hdc-circle').textContent=`${circle.title.split('—')[0].trim()}`;
+  document.getElementById('hdc-day').textContent=`День ${di+1} из 21`;
+  document.getElementById('hdc-focus').textContent=day.f;
+  document.getElementById('hdc-task').textContent=day.t;
+
+  // Steps preview
+  const stepsEl=document.getElementById('hdc-steps');
+  stepsEl.innerHTML='';
+  day.steps.forEach((s,idx)=>{
+    const ex=EX[s.ex];
+    if(!ex)return;
+    const div=document.createElement('div');
+    div.className='step-pill';
+    div.innerHTML=`<div class="step-num">${idx+1}</div><div class="step-name">${ex.name}</div><div class="step-dur">${s.reps}</div>`;
+    stepsEl.appendChild(div);
   });
-}
-function toggleEx(id){
-  const el=document.getElementById(id);
-  const was=el.classList.contains('open');
-  document.querySelectorAll('.ex-card').forEach(c=>c.classList.remove('open'));
-  if(!was)el.classList.add('open');
+
+  // Start button
+  const btn=document.getElementById('hdc-start');
+  if(done){
+    btn.innerHTML='✓ День выполнен';
+    btn.style.background='var(--success)';
+  } else {
+    btn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Начать тренировку';
+    btn.style.background='var(--accent)';
+  }
+
+  // Progress summary
+  const total=Object.values(days).filter(Boolean).length;
+  document.getElementById('prog-summary').textContent=
+    `${circle.title.split('—')[0].trim()} · ${total} дней выполнено`;
 }
 
-// ─── TWISTERS ─────────────────────────────────────
-function buildTwisters(){
-  const done=S.get('tt-done')||{};
-  const list=document.getElementById('tt-list');
-  list.innerHTML='';
-  TWISTERS.forEach(tt=>{
-    const el=document.createElement('div');
-    el.className='tt-card'+(done[tt.id]?' done':'');
-    el.innerHTML=`<div class="tt-level">${tt.level}</div><div class="tt-text">${tt.text}</div><div class="tt-bottom"><div><div style="font-size:12px;color:var(--muted)">${tt.tip}</div><div style="font-size:12px;color:var(--accent);margin-top:2px">${tt.reps}</div></div><div class="tt-check">${done[tt.id]?'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>':''}</div></div>`;
-    el.onclick=()=>{done[tt.id]=!done[tt.id];S.set('tt-done',done);buildTwisters();};
-    list.appendChild(el);
-  });
+// ═══════════════════════════════════════════════════
+// ТРЕНИРОВКА
+// ═══════════════════════════════════════════════════
+let woSteps=[], woCur=0, woGday=0;
+let tmrSecs=0,tmrLeft=0,tmrIv=null,tmrRun=false;
+const CIRC_R=55, CIRC_C=2*Math.PI*CIRC_R;
+
+function startWorkout(){
+  const gday=getGlobalDay();
+  const {day}=getDayData(gday);
+  woGday=gday;
+  woSteps=day.steps.map(s=>({...s,ex:EX[s.ex]})).filter(s=>s.ex);
+  woCur=0;
+  document.getElementById('wo-title').textContent=day.f;
+  document.getElementById('scr-workout').classList.add('on');
+  renderWoStep();
 }
 
-// ─── TIMER ────────────────────────────────────────
-let tmrTotal=0,tmrLeft=0,tmrIv=null,tmrRun=false;
-const CIRC=2*Math.PI*84;
-function startTimer(secs,name){
-  tmrTotal=secs;tmrLeft=secs;tmrRun=true;
-  document.getElementById('timer-name').textContent=name;
-  document.getElementById('timer-ov').classList.add('open');
-  document.getElementById('timer-toggle').textContent='Пауза';
-  updTimer();clearInterval(tmrIv);
-  tmrIv=setInterval(()=>{if(!tmrRun)return;tmrLeft--;updTimer();if(tmrLeft<=0){clearInterval(tmrIv);document.getElementById('timer-toggle').textContent='✓ Готово';}},1000);
+function renderWoStep(){
+  if(woCur>=woSteps.length){finishWorkout();return;}
+  const step=woSteps[woCur];
+  const ex=step.ex;
+  const total=woSteps.length;
+  document.getElementById('wo-prog').style.width=`${(woCur/total)*100}%`;
+  document.getElementById('wo-counter').textContent=`${woCur+1}/${total}`;
+  document.getElementById('wo-skip-btn').textContent=woCur===total-1?'Пропустить':'Пропустить';
+  document.getElementById('wo-done-btn').textContent=woCur===total-1?'Завершить день ✓':'Выполнено ✓';
+
+  // Get day saliva for last step
+  const {day}=getDayData(woGday);
+
+  const body=document.getElementById('wo-body');
+  body.innerHTML='';
+  body.scrollTop=0;
+
+  // Step card
+  const card=document.createElement('div');
+  card.className='wo-step-card fade-up';
+  card.innerHTML=`
+    <div class="wo-step-num">Шаг ${woCur+1} из ${total}</div>
+    <div class="wo-step-name">${ex.name}</div>
+    <div class="wo-step-tag tag-${ex.tag}">${ex.tagName} · ${step.reps}</div>
+    <div class="wo-how">${ex.how.replace(/\n/g,'<br>')}</div>
+    <div class="wo-focus"><span class="wo-focus-icon">👁</span><span><b>На что смотреть:</b> ${ex.focus}</span></div>
+    <div class="wo-mistake"><span class="wo-focus-icon">⚠️</span><span><b>Частая ошибка:</b> ${ex.mistake}</span></div>
+    ${day.saliva&&woCur===0?`<div class="wo-saliva">💧 <b>Совет по слюне:</b> ${day.saliva}</div>`:''}
+  `;
+  body.appendChild(card);
+
+  // Timer card
+  if(ex.timer>0){
+    stopTimer();
+    const tc=document.createElement('div');
+    tc.className='wo-timer';
+    const m=Math.floor(ex.timer/60),s=ex.timer%60;
+    tc.innerHTML=`
+      <div class="wo-timer-label">${ex.name}</div>
+      <div class="wo-timer-ring">
+        <svg width="130" height="130" viewBox="0 0 130 130">
+          <circle class="wtr-bg" cx="65" cy="65" r="${CIRC_R}"/>
+          <circle class="wtr-fg" id="wtr-fg" cx="65" cy="65" r="${CIRC_R}"
+            stroke-dasharray="${CIRC_C.toFixed(1)}" stroke-dashoffset="0"
+            style="transform:rotate(-90deg);transform-origin:center"/>
+        </svg>
+        <div class="wo-timer-time" id="wo-ttime">${m}:${s<10?'0':''}${s}</div>
+      </div>
+      <div class="wo-timer-btns">
+        <button class="wo-btn" onclick="stopTimer()">Стоп</button>
+        <button class="wo-btn wo-btn-prime" id="wo-tbtn" onclick="toggleTimer(${ex.timer})">▶ Старт</button>
+      </div>`;
+    body.appendChild(tc);
+  }
 }
-function updTimer(){
+
+function toggleTimer(initSecs){
+  if(!tmrRun&&tmrLeft===0){tmrSecs=initSecs;tmrLeft=initSecs;}
+  tmrRun=!tmrRun;
+  document.getElementById('wo-tbtn').textContent=tmrRun?'⏸ Пауза':'▶ Продолжить';
+  if(tmrRun){
+    clearInterval(tmrIv);
+    tmrIv=setInterval(()=>{
+      if(!tmrRun)return;
+      tmrLeft--;
+      updateTimerUI();
+      if(tmrLeft<=0){clearInterval(tmrIv);tmrRun=false;document.getElementById('wo-tbtn').textContent='✓ Готово';}
+    },1000);
+  }
+}
+function stopTimer(){
+  clearInterval(tmrIv);tmrRun=false;tmrLeft=0;tmrSecs=0;
+  const fg=document.getElementById('wtr-fg');
+  if(fg)fg.style.strokeDashoffset='0';
+  const tt=document.getElementById('wo-ttime');
+  if(tt)tt.textContent='0:00';
+  const tb=document.getElementById('wo-tbtn');
+  if(tb)tb.textContent='▶ Старт';
+}
+function updateTimerUI(){
   const m=Math.floor(tmrLeft/60),s=tmrLeft%60;
-  document.getElementById('timer-time').textContent=m+':'+(s<10?'0':'')+s;
-  const p=tmrTotal>0?(tmrTotal-tmrLeft)/tmrTotal:0;
-  document.getElementById('ring-fg').style.strokeDashoffset=CIRC*(1-p);
+  const tt=document.getElementById('wo-ttime');
+  if(tt)tt.textContent=`${m}:${s<10?'0':''}${s}`;
+  const fg=document.getElementById('wtr-fg');
+  if(fg&&tmrSecs>0){
+    const p=(tmrSecs-tmrLeft)/tmrSecs;
+    fg.style.strokeDashoffset=`${CIRC_C*(1-p)}`;
+  }
 }
-function toggleTimer(){tmrRun=!tmrRun;document.getElementById('timer-toggle').textContent=tmrRun?'Пауза':'Продолжить';}
-function resetTimer(){clearInterval(tmrIv);tmrRun=false;document.getElementById('timer-ov').classList.remove('open');}
 
-// ─── BREATHING ────────────────────────────────────
-let breathCfg=null,breathPhaseIdx=0,breathCycleIdx=0,breathCount=0,breathIv=null,breathRunning=false;
-function startBreath(type){
-  breathCfg=BREATH_CONFIGS[type];breathPhaseIdx=0;breathCycleIdx=0;breathCount=0;breathRunning=false;
-  document.getElementById('breath-title').textContent=breathCfg.name;
-  document.getElementById('breath-phase').textContent='Готов?';
-  document.getElementById('breath-count').textContent='—';
-  document.getElementById('breath-instr').textContent='Нажми старт и следи за кругом';
-  document.getElementById('breath-cycles-lbl').textContent='';
-  document.getElementById('breath-start-btn').textContent='Начать';
-  document.getElementById('breath-circle').style.transform='scale(1)';
-  document.getElementById('breath-ov').classList.add('open');
+function woDone(){
+  stopTimer();
+  woCur++;
+  if(woCur>=woSteps.length){finishWorkout();}
+  else{renderWoStep();}
 }
-function runBreath(){
-  if(breathRunning){breathRunning=false;clearInterval(breathIv);document.getElementById('breath-start-btn').textContent='Продолжить';return;}
-  breathRunning=true;document.getElementById('breath-start-btn').textContent='Пауза';nextBreathPhase();
+function woNext(){
+  stopTimer();
+  woCur++;
+  if(woCur>=woSteps.length){finishWorkout();}
+  else{renderWoStep();}
 }
-function nextBreathPhase(){
-  if(!breathRunning||!breathCfg)return;
-  const phase=breathCfg.phases[breathPhaseIdx];breathCount=phase.t;
-  document.getElementById('breath-phase').textContent=phase.l;
-  document.getElementById('breath-instr').textContent=phase.instr;
-  document.getElementById('breath-circle').style.transform='scale('+phase.scale+')';
-  document.getElementById('breath-count').textContent=breathCount;
-  document.getElementById('breath-cycles-lbl').textContent='Цикл '+(breathCycleIdx+1)+' из '+breathCfg.cycles;
-  clearInterval(breathIv);
-  breathIv=setInterval(()=>{
-    breathCount--;document.getElementById('breath-count').textContent=breathCount;
-    if(breathCount<=0){
-      clearInterval(breathIv);breathPhaseIdx++;
-      if(breathPhaseIdx>=breathCfg.phases.length){
-        breathPhaseIdx=0;breathCycleIdx++;
-        if(breathCycleIdx>=breathCfg.cycles){
-          document.getElementById('breath-phase').textContent='Готово';
-          document.getElementById('breath-count').textContent='✓';
-          document.getElementById('breath-instr').textContent='Практика завершена. Молодец.';
-          document.getElementById('breath-circle').style.transform='scale(1)';
-          breathRunning=false;document.getElementById('breath-start-btn').textContent='Ещё раз';return;
+function finishWorkout(){
+  stopTimer();
+  const days=S.get('days')||{};
+  days['d'+woGday]=true;
+  S.set('days',days);
+  document.getElementById('scr-workout').classList.remove('on');
+  renderHome();
+  // Show completion animation
+  const btn=document.getElementById('hdc-start');
+  btn.innerHTML='✓ День выполнен';
+  btn.style.background='var(--success)';
+}
+function closeWorkout(){
+  stopTimer();
+  document.getElementById('scr-workout').classList.remove('on');
+}
+
+// ═══════════════════════════════════════════════════
+// ДЫХАНИЕ
+// ═══════════════════════════════════════════════════
+let brCfg=null,brPhase=0,brCycle=0,brCnt=0,brIv=null,brRunning=false;
+const BR_CIRC=2*Math.PI*85;
+
+function openBreath(type){
+  brCfg=BREATH[type];brPhase=0;brCycle=0;brCnt=0;brRun=false;
+  document.getElementById('br-title').textContent=brCfg.name;
+  document.getElementById('br-phase').textContent='—';
+  document.getElementById('br-count').textContent='—';
+  document.getElementById('br-instr').textContent='Нажми «Начать» и следи за кругом';
+  document.getElementById('br-cycles').textContent='';
+  document.getElementById('br-btn').textContent='Начать';
+  document.getElementById('br-arc').style.strokeDashoffset=BR_CIRC;
+  document.getElementById('br-ring').style.transform='scale(1)';
+  document.getElementById('scr-breath').classList.add('on');
+}
+function brRun(){
+  if(brRun){brRun=false;clearInterval(brIv);document.getElementById('br-btn').textContent='Продолжить';return;}
+  brRunning=true;document.getElementById('br-btn').textContent='Пауза';nextBrPhase();
+}
+function nextBrPhase(){
+  if(!brRunning||!brCfg)return;
+  const ph=brCfg.phases[brPhase];brCnt=ph.t;
+  document.getElementById('br-phase').textContent=ph.l;
+  document.getElementById('br-instr').textContent=ph.i;
+  document.getElementById('br-ring').style.transform=`scale(${ph.s})`;
+  document.getElementById('br-count').textContent=brCnt;
+  document.getElementById('br-cycles').textContent=`Цикл ${brCycle+1} из ${brCfg.cycles}`;
+  document.getElementById('br-arc').style.strokeDashoffset=BR_CIRC;
+  clearInterval(brIv);
+  const totalSecs=ph.t;let elapsed=0;
+  brIv=setInterval(()=>{
+    brCnt--;elapsed++;
+    document.getElementById('br-count').textContent=brCnt;
+    document.getElementById('br-arc').style.strokeDashoffset=BR_CIRC*(1-elapsed/totalSecs);
+    if(brCnt<=0){
+      clearInterval(brIv);brPhase++;
+      if(brPhase>=brCfg.phases.length){
+        brPhase=0;brCycle++;
+        if(brCycle>=brCfg.cycles){
+          document.getElementById('br-phase').textContent='Готово';
+          document.getElementById('br-count').textContent='✓';
+          document.getElementById('br-instr').textContent='Практика завершена. Молодец.';
+          document.getElementById('br-ring').style.transform='scale(1)';
+          brRunning=false;document.getElementById('br-btn').textContent='Ещё раз';
+          brCycle=0;return;
         }
       }
-      setTimeout(nextBreathPhase,300);
+      setTimeout(nextBrPhase,200);
     }
   },1000);
 }
-function stopBreath(){clearInterval(breathIv);breathRunning=false;breathCfg=null;document.getElementById('breath-ov').classList.remove('open');}
+function closeBreath(){clearInterval(brIv);brRunning=false;document.getElementById('scr-breath').classList.remove('on');}
 
-// ─── PROGRAM ──────────────────────────────────────
-function renderProgramDay(){
-  const gDay=S.get('global-day')||1;
-  const cIdx=Math.floor((gDay-1)/21);
-  const dIdx=((gDay-1)%21);
-  const ctabs=document.getElementById('circle-tabs');
-  if(ctabs){
-    ctabs.innerHTML='';
-    PROGRAM.circles.forEach((c,i)=>{
-      const btn=document.createElement('button');
-      btn.className='c-tab'+(i===Math.min(cIdx,2)?' active':'');
-      btn.textContent='Круг '+c.id;
-      btn.onclick=()=>{document.querySelectorAll('.c-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderCircleView(i);};
-      ctabs.appendChild(btn);
-    });
-  }
-  renderCircleView(Math.min(cIdx,2),dIdx);
-}
-
-function renderCircleView(cIdx,hlDay){
-  const circle=PROGRAM.circles[cIdx];
-  const container=document.getElementById('program-days');
-  if(!container)return;
-  const gDay=S.get('global-day')||1;
-  const curC=Math.floor((gDay-1)/21);
-  const curD=((gDay-1)%21);
-  container.innerHTML='';
-  const hdr=document.createElement('div');
-  hdr.style.cssText='padding:12px 0 16px';
-  hdr.innerHTML=`<div style="font-size:17px;font-weight:500">${circle.title}</div><div style="font-size:13px;color:var(--muted);margin-top:3px">${circle.subtitle}</div>`;
-  container.appendChild(hdr);
-  circle.days.forEach((d,i)=>{
-    const gD=(cIdx*21)+i+1;
-    const isDone=(S.get('days')||{})['day'+gD];
-    const isToday=gD===gDay;
-    const isPast=gD<gDay;
-    const card=document.createElement('div');
-    card.style.cssText=`background:var(--bg2);border:0.5px solid ${isToday?'var(--accent)':isDone?'var(--success)':'var(--border)'};border-radius:var(--r);padding:14px 16px;margin-bottom:8px;cursor:pointer;opacity:${isPast&&!isDone?'0.5':'1'}`;
-    card.innerHTML=`<div style="display:flex;align-items:center;gap:12px"><div style="width:32px;height:32px;border-radius:50%;background:${isDone?'var(--success)':isToday?'var(--accent)':'var(--bg3)'};border:0.5px solid ${isDone?'var(--success)':isToday?'var(--accent)':'var(--border)'};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:${isDone||isToday?'#fff':'var(--muted)'};flex-shrink:0">${isDone?'✓':d.day}</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500;color:${isToday?'var(--accent)':'var(--text)'}">${d.focus}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${d.duration}${isToday?' · сегодня':''}</div></div><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg></div>`;
-    card.onclick=()=>showDayDetail(cIdx,i);
-    container.appendChild(card);
-  });
-  if(cIdx===2){
-    const m=document.createElement('div');
-    m.style.cssText='background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:0.5px solid var(--accent4);border-radius:var(--r);padding:16px;margin-top:8px';
-    m.innerHTML=`<div style="font-size:13px;font-weight:500;color:var(--accent4);margin-bottom:8px">${PROGRAM.maintenance.title}</div><div style="font-size:12px;color:var(--muted);margin-bottom:10px">${PROGRAM.maintenance.subtitle}</div>${PROGRAM.maintenance.routine.map(r=>`<div style="font-size:13px;color:var(--text);padding:4px 0;border-bottom:0.5px solid var(--border)">• ${r}</div>`).join('')}`;
-    container.appendChild(m);
-  }
-}
-
-function showDayDetail(cIdx,dayIdx){
-  const circle=PROGRAM.circles[cIdx];
-  const d=circle.days[dayIdx];
-  const gDay=(cIdx*21)+dayIdx+1;
-  const days=S.get('days')||{};
-  const isDone=days['day'+gDay];
-  const overlay=document.getElementById('day-detail-ov');
-  overlay.classList.add('open');
-  document.getElementById('dd-title').textContent='День '+d.day+' — '+d.focus;
-  document.getElementById('dd-circle').textContent=circle.title;
-  document.getElementById('dd-duration').textContent=d.duration;
-  document.getElementById('dd-task').textContent=d.task;
-
-  // Упражнения с описаниями
-  const exContainer=document.getElementById('dd-exercises');
-  exContainer.innerHTML='';
-  d.exercises.forEach(exStr=>{
-    const details=getExDetails(exStr);
-    const item=document.createElement('div');
-    item.style.cssText='border-bottom:0.5px solid var(--border);padding:10px 0';
-    if(details){
-      item.innerHTML=`
-        <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleExDetail(this)">
-          <div>
-            <div style="font-size:14px;font-weight:500;color:var(--text)">${details.name}</div>
-            <div style="font-size:12px;color:var(--accent);margin-top:2px">${exStr.match(/[×\d][^а-яё]*.*/i)?exStr.match(/(×.*)$/i)?exStr.match(/(×.*)$/i)[1]:'':''}</div>
-          </div>
-          <svg style="flex-shrink:0;transition:transform .2s" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M9 18l6-6-6-6"/></svg>
-        </div>
-        <div class="ex-detail-body" style="display:none;margin-top:10px">
-          <div style="font-size:13px;color:var(--muted);line-height:1.7;background:var(--bg3);border-radius:8px;padding:10px 12px;margin-bottom:6px">${details.how}</div>
-          <div style="font-size:12px;color:var(--accent2);margin-bottom:4px">👁 На что обращать внимание: <span style="color:var(--muted)">${details.focus}</span></div>
-          <div style="font-size:12px;color:var(--danger)">⚠️ Частая ошибка: <span style="color:var(--muted)">${details.mistake}</span></div>
-        </div>`;
-    } else {
-      item.innerHTML=`<div style="font-size:14px;color:var(--text);padding:2px 0">• ${exStr}</div>`;
-    }
-    exContainer.appendChild(item);
-  });
-
-  const salivaBlock=document.getElementById('dd-saliva-block');
-  if(d.saliva){salivaBlock.style.display='block';document.getElementById('dd-saliva').textContent=d.saliva;}
-  else{salivaBlock.style.display='none';}
-  document.getElementById('dd-tip').textContent=d.tip;
-  const doneBtn=document.getElementById('dd-done-btn');
-  doneBtn.textContent=isDone?'✓ Выполнен — отметить как нет':'Отметить выполненным';
-  doneBtn.style.background=isDone?'var(--success)':'var(--accent)';
-  doneBtn.onclick=()=>{days['day'+gDay]=!days['day'+gDay];S.set('days',days);closeDayDetail();renderProgramDay();renderHome();};
-}
-
-function toggleExDetail(el){
-  const body=el.parentElement.querySelector('.ex-detail-body');
-  const svg=el.querySelector('svg');
-  const isOpen=body.style.display!=='none';
-  body.style.display=isOpen?'none':'block';
-  svg.style.transform=isOpen?'':'rotate(90deg)';
-}
-
-function closeDayDetail(){document.getElementById('day-detail-ov').classList.remove('open');}
-
-// ─── MORNING RITUAL ───────────────────────────────
-function saveIntention(){
-  const val=document.getElementById('intention-input').value.trim();
-  if(!val)return;
-  S.set('intention-'+getToday(),val);
-  loadIntention();renderHome();
-}
-function loadIntention(){
-  const saved=S.get('intention-'+getToday());
-  const disp=document.getElementById('intention-display');
-  const inp=document.getElementById('intention-input');
-  if(saved){
-    disp.style.display='block';
-    disp.innerHTML=`<div style="background:var(--bg3);border-left:2px solid var(--accent4);border-radius:0 8px 8px 0;padding:10px 12px;font-size:14px;font-style:italic;color:var(--text);margin-top:8px">${saved}</div>`;
-    inp.value='';inp.placeholder='Изменить намеренность...';
-  } else {disp.style.display='none';}
-}
-
-// ─── PROGRESS & HOME ──────────────────────────────
-function getToday(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
-function calcStreak(days){const idx=S.get('global-day')||1;let s=0,i=idx;while(i>=1&&days['day'+i]){s++;i--;}return s;}
+// ═══════════════════════════════════════════════════
+// ПРОГРЕСС
+// ═══════════════════════════════════════════════════
 function renderProgress(){
   const days=S.get('days')||{};
-  const gDay=S.get('global-day')||1;
-  const grid=document.getElementById('prog-grid');
-  grid.innerHTML='';
-  for(let i=1;i<=63;i++){
-    const isDone=days['day'+i];const isToday=i===gDay;
-    const el=document.createElement('div');
-    el.className='prog-cell'+(isDone?' done':'')+(isToday&&!isDone?' today-cell':'');
-    el.style.fontSize='9px';el.textContent=i;
-    el.onclick=()=>{if(isToday){days['day'+i]=!days['day'+i];S.set('days',days);renderProgress();renderHome();}};
-    grid.appendChild(el);
-  }
+  const gday=getGlobalDay();
   const total=Object.values(days).filter(Boolean).length;
-  document.getElementById('stat-total').textContent=total;
-  document.getElementById('stat-streak').textContent=calcStreak(days);
-}
-function renderHome(){
-  const days=S.get('days')||{};
-  const total=Object.values(days).filter(Boolean).length;
-  document.getElementById('streak-num').textContent=calcStreak(days);
-  document.getElementById('total-lbl').textContent=total+' из 63';
-  const gDay=S.get('global-day')||1;
-  const cIdx=Math.min(Math.floor((gDay-1)/21),2);
-  const dIdx=(gDay-1)%21;
-  const circle=PROGRAM.circles[cIdx];
-  const dayData=circle?circle.days[dIdx]:null;
-  const focusEl=document.getElementById('today-focus');
-  if(focusEl&&dayData){
-    focusEl.innerHTML=`<div style="font-size:12px;color:var(--accent4);font-weight:500;margin-bottom:4px">${circle.title} · День ${dIdx+1}</div><div style="font-size:14px;font-weight:500">${dayData.focus}</div><div style="font-size:13px;color:var(--muted);margin-top:4px;line-height:1.6">${dayData.task}</div>${dayData.saliva?`<div style="margin-top:8px;font-size:12px;color:var(--accent3);border-left:3px solid var(--accent3);padding-left:8px">${dayData.saliva}</div>`:''}`;
-  }
-  const intention=S.get('intention-'+getToday());
-  const ritualEl=document.getElementById('ritual-home-status');
-  if(ritualEl)ritualEl.textContent=intention?'✓ «'+intention.substring(0,35)+(intention.length>35?'...':'')+'»':'Не выполнен';
-  const dotsEl=document.getElementById('week-dots');
-  if(dotsEl){
-    dotsEl.innerHTML='';
-    for(let i=Math.max(1,gDay-6);i<=Math.min(63,gDay);i++){
-      const el=document.createElement('div');
-      el.className='streak-dot'+(days['day'+i]?' done':'')+(i===gDay&&!days['day'+i]?' today':'');
-      el.textContent=i;dotsEl.appendChild(el);
-    }
-  }
+  document.getElementById('prog-header-sub').textContent=`${total} из 63 дней выполнено`;
+
+  const cont=document.getElementById('prog-circles');
+  cont.innerHTML='';
+
+  CIRCLES.forEach((circle,ci)=>{
+    const card=document.createElement('div');
+    card.className='circle-card';
+    const done21=circle.days.filter((_,i)=>days['d'+(ci*21+i+1)]).length;
+    card.innerHTML=`
+      <div class="cc-head">
+        <div><div class="cc-title">${circle.title}</div><div class="cc-sub">${circle.sub}</div></div>
+        <div class="cc-badge">${done21}/21</div>
+      </div>
+      <div class="cc-days" id="cc-days-${ci}"></div>`;
+    cont.appendChild(card);
+
+    const daysEl=document.getElementById(`cc-days-${ci}`);
+    circle.days.forEach((_,di)=>{
+      const gd=ci*21+di+1;
+      const isDone=days['d'+gd];
+      const isToday=gd===gday;
+      const isPast=gd<gday;
+      const dot=document.createElement('div');
+      dot.className=`day-dot${isDone?' done':isToday?' today':isPast?' locked':''}`;
+      dot.textContent=di+1;
+      dot.title=circle.days[di].f;
+      dot.onclick=()=>{
+        if(gd<=gday){
+          days['d'+gd]=!days['d'+gd];
+          S.set('days',days);
+          renderProgress();renderHome();
+        }
+      };
+      daysEl.appendChild(dot);
+    });
+  });
+
+  // Maintenance
+  const m=document.createElement('div');
+  m.className='maint-card';
+  m.innerHTML=`
+    <div class="maint-title">После 63 дней — Режим поддержки</div>
+    <div class="maint-sub">5 минут в день навсегда</div>
+    <div class="maint-items">
+      ${['Губы + язык — 1 мин','МММ-резонанс — 30 сек','Диафрагмальное × 5','Одна скороговорка × 3','Намеренность дня'].map(r=>`<div class="maint-item">• ${r}</div>`).join('')}
+    </div>`;
+  cont.appendChild(m);
 }
 
-// ─── INIT ─────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
 function init(){
-  const lastDate=S.get('last-date'),today=getToday();
+  // Advance day
+  const lastDate=S.get('lastDate'),today=getToday();
   if(lastDate!==today){
-    const gDay=S.get('global-day')||1;
-    if(lastDate&&gDay<63)S.set('global-day',Math.min(gDay+1,63));
-    S.set('last-date',today);
+    const gd=S.get('gday')||1;
+    const days=S.get('days')||{};
+    if(lastDate&&days['d'+gd]&&gd<63)S.set('gday',Math.min(gd+1,63));
+    S.set('lastDate',today);
   }
-  buildExercises();buildTwisters();renderHome();
+
+  renderHome();
+
+  // SW
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('sw.js').then(reg=>{
       reg.update();
@@ -1193,18 +979,19 @@ function init(){
         const nw=reg.installing;
         nw.addEventListener('statechange',()=>{
           if(nw.state==='installed'&&navigator.serviceWorker.controller)
-            document.getElementById('update-banner').style.display='block';
+            document.getElementById('upd').style.display='block';
         });
       });
     });
     navigator.serviceWorker.addEventListener('controllerchange',()=>location.reload());
   }
+
+  // Back button
   history.pushState(null,'',location.href);
   window.addEventListener('popstate',()=>{
-    if(document.getElementById('timer-ov').classList.contains('open')){resetTimer();}
-    else if(document.getElementById('breath-ov').classList.contains('open')){stopBreath();}
-    else if(document.getElementById('day-detail-ov').classList.contains('open')){closeDayDetail();}
-    else goTab('home');
+    if(document.getElementById('scr-breath').classList.contains('on')){closeBreath();}
+    else if(document.getElementById('scr-workout').classList.contains('on')){closeWorkout();}
+    else{goNav('home');}
     history.pushState(null,'',location.href);
   });
 }
