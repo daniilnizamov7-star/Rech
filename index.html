@@ -468,6 +468,55 @@ nav button.on{color:var(--accent)}
 </div>
 
 <!-- ═══════════════════════════════════════
+     REST WEEK SCREEN
+════════════════════════════════════════ -->
+<div class="scr" id="scr-rest">
+  <div style="padding:56px 24px 0;flex-shrink:0">
+    <div style="font-size:13px;color:var(--muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px" id="rest-circle-label">После Круга 1</div>
+    <div style="font-size:28px;font-weight:800;line-height:1.2">Неделя<br><em style="font-style:normal;color:var(--accent2)">восстановления</em></div>
+  </div>
+
+  <div style="padding:16px 24px 0">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px">
+      <div style="font-size:13px;color:var(--accent2);font-weight:600;margin-bottom:6px">Зачем эта неделя?</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7">Навык формируется не во время тренировки — а во время отдыха. Мозг закрепляет нейронные связи именно сейчас. Не пропускай эту неделю — она важнее любого упражнения.</div>
+    </div>
+  </div>
+
+  <div style="padding:0 24px">
+    <div style="font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Каждый день этой недели</div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:10px">
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">1</div>
+        <div><div style="font-size:14px;font-weight:500">Базовая разминка</div><div style="font-size:12px;color:var(--muted)">2 минуты — не пропускать</div></div>
+      </div>
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">2</div>
+        <div><div style="font-size:14px;font-weight:500">Осознанная пауза</div><div style="font-size:12px;color:var(--muted)">В одном разговоре — пауза 2 сек перед ответом</div></div>
+      </div>
+      <div style="padding:12px 16px;display:flex;align-items:center;gap:12px">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">3</div>
+        <div><div style="font-size:14px;font-weight:500">Никаких скороговорок</div><div style="font-size:12px;color:var(--muted)">Только наблюдение за собой в жизни</div></div>
+      </div>
+    </div>
+
+    <div style="background:#fef3c7;border-left:3px solid #d97706;border-radius:0 var(--r) var(--r) 0;padding:12px 14px;margin-bottom:10px;font-size:13px;color:#92400e;line-height:1.6">
+      🎯 <strong>Задание на 5-й день:</strong> Запиши голос и сравни с началом круга. Слышишь прогресс?
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:8px">Прогресс недели</div>
+      <div style="display:flex;gap:6px" id="rest-dots"></div>
+    </div>
+  </div>
+
+  <div style="padding:0 24px;margin-top:4px">
+    <button id="rest-day-btn" onclick="markRestDay()" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:15px;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer">Отметить день ✓</button>
+    <button id="rest-skip-btn" onclick="skipRest()" style="width:100%;background:transparent;color:var(--muted);border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:600;font-family:var(--font);cursor:pointer;margin-top:4px">Пропустить неделю → начать следующий круг</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
      NAV
 ════════════════════════════════════════ -->
 <nav>
@@ -1061,13 +1110,14 @@ function declDays(n){
 
 // ═══ НАВИГАЦИЯ ════════════════════════════════════
 function goNav(name){
-  ['home','progress'].forEach(n=>{
+  ['home','progress','rest'].forEach(n=>{
     document.getElementById('scr-'+n).classList.toggle('on',n===name);
     const b=document.getElementById('nav-'+n);
     if(b)b.classList.toggle('on',n===name);
   });
   if(name==='progress')renderProgress();
   if(name==='home')renderHome();
+  if(name==='rest')renderRest();
 }
 
 // ═══ ГЛАВНЫЙ ЭКРАН ════════════════════════════════
@@ -1267,7 +1317,12 @@ function finishWorkout(){
   days['d'+woGday]=true;
   S.set('days',days);
   document.getElementById('scr-workout').classList.remove('on');
-  renderHome();
+  // Проверяем нужна ли неделя отдыха
+  if(checkAndStartRest()){
+    goNav('rest');
+  } else {
+    renderHome();
+  }
 }
 function closeWorkout(){stopTimer();document.getElementById('scr-workout').classList.remove('on');}
 
@@ -1452,6 +1507,111 @@ function toggleDdEx(el){
 }
 function closeDayDetail(){document.getElementById('day-detail-ov').classList.remove('on');}
 
+
+// ═══ НЕДЕЛЯ ВОССТАНОВЛЕНИЯ ════════════════════════
+// Состояние: после дня 21 и после дня 42 — 7 дней отдыха
+// restPhase: 1 (после круга 1), 2 (после круга 2), 0 (не в отдыхе)
+
+function getAppState(){
+  const gday = getGday();
+  const restPhase = S.get('restPhase') || 0;
+  const restDay = S.get('restDay') || 0; // 1-7
+  // Если активна фаза отдыха
+  if(restPhase > 0 && restDay < 7) return 'rest';
+  // Если круг завершён но отдых ещё не начат
+  const days = S.get('days') || {};
+  if(gday === 21 && days['d21'] && restPhase === 0) return 'rest_start_1';
+  if(gday === 42 && days['d42'] && restPhase === 0) return 'rest_start_2';
+  return 'training';
+}
+
+function checkAndStartRest(){
+  const gday = getGday();
+  const days = S.get('days') || {};
+  const restPhase = S.get('restPhase') || 0;
+  // День 21 выполнен и отдых ещё не начат
+  if(days['d21'] && !days['d22'] && restPhase !== 1 && S.get('restDone1') !== true){
+    S.set('restPhase', 1);
+    S.set('restDay', 0);
+    return true;
+  }
+  // День 42 выполнен и отдых ещё не начат
+  if(days['d42'] && !days['d43'] && restPhase !== 2 && S.get('restDone2') !== true){
+    S.set('restPhase', 2);
+    S.set('restDay', 0);
+    return true;
+  }
+  return false;
+}
+
+function renderRest(){
+  const restPhase = S.get('restPhase') || 0;
+  const restDay = S.get('restDay') || 0;
+  const circleNum = restPhase;
+
+  document.getElementById('rest-circle-label').textContent = `После Круга ${circleNum}`;
+
+  // Точки прогресса
+  const dotsEl = document.getElementById('rest-dots');
+  dotsEl.innerHTML = '';
+  for(let i = 1; i <= 7; i++){
+    const dot = document.createElement('div');
+    dot.style.cssText = `width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;border:1.5px solid;${i<=restDay?'background:var(--accent2);border-color:var(--accent2);color:#fff':'i'===String(restDay+1)?'border-color:var(--accent);color:var(--accent);background:#fff':'background:var(--bg3);border-color:var(--border);color:var(--muted)'}`;
+    // Упрощённая логика цвета
+    if(i <= restDay){
+      dot.style.background = 'var(--accent2)';
+      dot.style.borderColor = 'var(--accent2)';
+      dot.style.color = '#fff';
+    } else if(i === restDay + 1){
+      dot.style.background = 'var(--bg2)';
+      dot.style.borderColor = 'var(--accent)';
+      dot.style.color = 'var(--accent)';
+    } else {
+      dot.style.background = 'var(--bg3)';
+      dot.style.borderColor = 'var(--border)';
+      dot.style.color = 'var(--muted)';
+    }
+    dot.textContent = i;
+    dotsEl.appendChild(dot);
+  }
+
+  const btn = document.getElementById('rest-day-btn');
+  if(restDay >= 7){
+    btn.textContent = '✓ Неделя завершена — начать Круг ' + (circleNum + 1);
+    btn.onclick = skipRest;
+  } else {
+    btn.textContent = 'Отметить день ' + (restDay + 1) + ' ✓';
+    btn.onclick = markRestDay;
+  }
+}
+
+function markRestDay(){
+  const restDay = (S.get('restDay') || 0) + 1;
+  S.set('restDay', restDay);
+  if(restDay >= 7){
+    // Неделя закончена — переходим к следующему кругу
+    finishRest();
+  } else {
+    renderRest();
+  }
+}
+
+function finishRest(){
+  const restPhase = S.get('restPhase') || 0;
+  S.set('restDone' + restPhase, true);
+  S.set('restPhase', 0);
+  S.set('restDay', 0);
+  // Переходим к следующему кругу
+  const nextDay = restPhase === 1 ? 22 : 43;
+  S.set('gday', nextDay);
+  goNav('home');
+}
+
+function skipRest(){
+  finishRest();
+}
+
+
 // ═══ INIT ════════════════════════════════════════
 function init(){
   const lastDate=S.get('lastDate'),today=getToday();
@@ -1461,7 +1621,16 @@ function init(){
     if(lastDate&&days['d'+gd]&&gd<63)S.set('gday',gd+1);
     S.set('lastDate',today);
   }
-  renderHome();
+  // При запуске проверяем — может мы в периоде отдыха
+  if(S.get('restPhase') && S.get('restPhase') > 0 && (S.get('restDay')||0) < 7){
+    // Восстанавливаем экран отдыха
+    ['home','progress','rest'].forEach(n=>{
+      document.getElementById('scr-'+n)?.classList.toggle('on', n==='rest');
+    });
+    renderRest();
+  } else {
+    renderHome();
+  }
 
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('sw.js').then(reg=>{
