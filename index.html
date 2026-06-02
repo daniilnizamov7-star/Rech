@@ -2,1491 +2,1463 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#f8f7f4">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Дикция">
-<title>Дикция</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f8f9fc">
+<title>Тренажёр фаундера</title>
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
-<!-- Системные шрифты — работает оффлайн -->
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 <style>
+:root {
+  --bg:     #f8f9fc;
+  --bg2:    #ffffff;
+  --bg3:    #f1f3f8;
+  --bg4:    #e8ebf2;
+  --border: rgba(0,0,0,0.08);
+  --border2:rgba(0,0,0,0.15);
+  --tx:     #111827;
+  --tx2:    #6b7280;
+  --tx3:    #9ca3af;
+  --acc:    #2563eb;
+  --acc2:   #1d4ed8;
+  --acc-bg: #eff6ff;
+  --acc-lt: #dbeafe;
+  --green:  #059669;
+  --green-bg:#ecfdf5;
+  --red:    #dc2626;
+  --red-bg: #fef2f2;
+  --amber:  #d97706;
+  --amber-bg:#fffbeb;
+  --purple: #7c3aed;
+  --purple-bg:#f5f3ff;
+  --blue:   #0284c7;
+  --blue-bg:#f0f9ff;
+  --font-h: system-ui, -apple-system, sans-serif;
+  --font:   system-ui, -apple-system, sans-serif;
+  --r:  14px;
+  --r2: 10px;
+  --r3: 8px;
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{
-  --bg:#f8f7f4;
-  --bg2:#ffffff;
-  --bg3:#f0ede8;
-  --border:#e8e3db;
-  --accent:#1a1a2e;
-  --accent2:#2563eb;
-  --accent3:#dc2626;
-  --success:#16a34a;
-  --warning:#d97706;
-  --text:#1a1a2e;
-  --muted:#7c7268;
-  --light:#a09890;
-  --r:14px;
-  --font:-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto','Helvetica Neue',Arial,sans-serif;
-}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);overflow:hidden}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--font);overflow:hidden}
 
-/* UPDATE BANNER */
-#upd{display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--accent2);color:#fff;font-size:13px;font-weight:600;padding:10px 16px;text-align:center;cursor:pointer}
+#app{display:flex;flex-direction:column;height:100vh;max-width:430px;margin:0 auto}
+#screen{flex:1;overflow-y:auto;overflow-x:hidden}
+#screen::-webkit-scrollbar{display:none}
 
-/* SCREENS */
-.scr{display:none;height:100dvh;overflow-y:auto;-webkit-overflow-scrolling:touch}
-.scr.on{display:flex;flex-direction:column}
+#update-banner{display:none;position:fixed;top:0;left:50%;transform:translateX(-50%);background:var(--amber);color:#fff;font-size:13px;font-weight:600;padding:10px 20px;border-radius:0 0 var(--r2) var(--r2);z-index:999;cursor:pointer;max-width:430px;width:100%;text-align:center}
 
-/* ─── HOME ─────────────────────────────────── */
-#scr-home{background:var(--bg)}
+#nav{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--border);background:var(--bg2);flex-shrink:0;padding-bottom:env(safe-area-inset-bottom)}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px 12px;cursor:pointer;border:none;background:none;color:var(--tx3);font-family:var(--font);font-size:10px;transition:color 0.15s}
+.nav-btn svg{width:22px;height:22px;stroke-width:1.8}
+.nav-btn.active{color:var(--acc)}
 
-.home-top{
-  padding:56px 24px 20px;
-  background:var(--bg);
-  flex-shrink:0;
-}
-.home-greeting{font-size:13px;color:var(--muted);font-weight:500;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px}
-.home-title{font-size:28px;font-weight:800;color:var(--text);line-height:1.15}
-.home-title em{font-style:normal;color:var(--accent2)}
+/* HOME */
+.home-header{padding:48px 20px 20px}
+.home-brand{font-size:11px;font-weight:600;color:var(--acc);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px}
+.home-title{font-size:24px;font-weight:700;color:var(--tx);line-height:1.2}
+.home-title span{color:var(--acc)}
+.home-sub{font-size:13px;color:var(--tx2);margin-top:8px;line-height:1.6}
 
-.home-streak{
-  display:flex;align-items:center;gap:10px;
-  background:var(--accent);color:#fff;
-  border-radius:var(--r);padding:12px 16px;
-  margin:16px 24px 0;
-}
-.streak-fire{font-size:22px}
-.streak-info{flex:1}
-.streak-num{font-size:20px;font-weight:800;line-height:1}
-.streak-sub{font-size:12px;opacity:.7;margin-top:2px}
-.streak-dots{display:flex;gap:4px}
-.sdot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3)}
-.sdot.on{background:#fff}
+.streak-row{margin:0 20px 20px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px;display:flex;align-items:center;gap:14px}
+.streak-icon{font-size:26px}
+.streak-val{font-size:22px;font-weight:700;color:var(--tx)}
+.streak-label{font-size:11px;color:var(--tx3);margin-top:1px}
+.streak-bar{flex:1}
+.xp-row{display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:5px}
+.xp-track{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.xp-fill{height:100%;background:var(--acc);border-radius:2px;transition:width 0.5s ease}
 
-.home-day-card{
-  margin:14px 24px 0;
-  background:var(--bg2);
-  border:1.5px solid var(--border);
-  border-radius:var(--r);
-  overflow:hidden;
-}
-.hdc-label{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 16px;
-  border-bottom:1px solid var(--border);
-}
-.hdc-badge{
-  font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
-  color:var(--accent2);background:#eff6ff;padding:3px 9px;border-radius:20px;
-}
-.hdc-day{font-size:12px;color:var(--muted);font-weight:500}
-.hdc-focus{font-size:18px;font-weight:700;padding:14px 16px 6px;line-height:1.3}
-.hdc-task{font-size:14px;color:var(--muted);padding:0 16px 14px;line-height:1.6}
-.hdc-steps{padding:0 16px;display:flex;flex-direction:column;gap:0}
-.step-pill{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 0;
-  border-top:1px solid var(--border);
-  font-size:13px;
-}
-.step-num{
-  width:22px;height:22px;border-radius:50%;
-  background:var(--bg3);
-  color:var(--muted);font-size:11px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
-.step-name{flex:1;font-weight:500;color:var(--text)}
-.step-dur{font-size:11px;color:var(--light)}
+.section-title{font-size:11px;font-weight:600;color:var(--tx3);letter-spacing:0.1em;text-transform:uppercase;padding:0 20px 10px}
+.modules-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 20px 20px}
+.module-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;cursor:pointer;transition:border-color 0.15s,box-shadow 0.15s;position:relative;overflow:hidden;-webkit-user-select:none;user-select:none}
+.module-card:active{box-shadow:0 0 0 2px var(--acc-lt)}
+.module-tag{font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px;padding:3px 8px;border-radius:20px;display:inline-block}
+.tag-biz{background:var(--purple-bg);color:var(--purple)}
+.tag-tech{background:var(--blue-bg);color:var(--blue)}
+.module-icon{font-size:22px;margin-bottom:6px}
+.module-name{font-size:13px;font-weight:600;color:var(--tx);line-height:1.3;margin-bottom:3px}
+.module-desc{font-size:11px;color:var(--tx3);line-height:1.4}
+.module-badge{position:absolute;top:10px;right:10px;font-size:10px;background:var(--green-bg);color:var(--green);padding:2px 7px;border-radius:20px;font-weight:600}
+.module-badge.ai-req{background:var(--amber-bg);color:var(--amber)}
 
-.hdc-start-btn{
-  margin:14px 16px 16px;
-  width:calc(100% - 32px);
-  background:var(--accent);color:#fff;
-  border:none;border-radius:10px;
-  padding:15px;font-size:16px;font-weight:700;
-  font-family:var(--font);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  transition:transform .1s,opacity .1s;
-}
-.hdc-start-btn:active{transform:scale(.97);opacity:.9}
+/* SCREEN HEADER */
+.prac-header{padding:48px 20px 16px;display:flex;align-items:flex-start;gap:12px}
+.back-btn{width:36px;height:36px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-top:2px}
+.back-btn svg{width:18px;height:18px;color:var(--tx2)}
+.prac-title-block .module-tag{margin-bottom:4px}
+.prac-title{font-size:17px;font-weight:700;color:var(--tx)}
+.prac-subtitle{font-size:12px;color:var(--tx2);margin-top:3px}
 
-.home-sections{padding:20px 24px 100px;display:flex;flex-direction:column;gap:10px}
-.hs-row{
-  display:grid;grid-template-columns:1fr 1fr;gap:10px;
-}
-.hs-card{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:var(--r);padding:14px;cursor:pointer;
-  transition:transform .1s;
-}
-.hs-card:active{transform:scale(.97)}
-.hs-icon{font-size:22px;margin-bottom:6px}
-.hs-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px}
-.hs-sub{font-size:11px;color:var(--muted)}
-.hs-card-wide{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:var(--r);padding:14px 16px;cursor:pointer;
-  display:flex;align-items:center;gap:12px;
-  transition:transform .1s;
-}
-.hs-card-wide:active{transform:scale(.97)}
+/* CHAT */
+.chat-wrap{display:flex;flex-direction:column;min-height:calc(100vh - 200px)}
+.chat-area{padding:0 16px 16px;display:flex;flex-direction:column;gap:10px;flex:1}
+.msg{max-width:85%;animation:fadeUp 0.25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg.ai{align-self:flex-start}
+.msg.user{align-self:flex-end}
+.msg.system{align-self:center;max-width:92%}
+.msg-bubble{padding:10px 14px;border-radius:var(--r);font-size:14px;line-height:1.6}
+.msg.ai .msg-bubble{background:var(--bg2);border:1px solid var(--border);color:var(--tx);border-bottom-left-radius:4px}
+.msg.user .msg-bubble{background:var(--acc);color:#fff;border-bottom-right-radius:4px}
+.msg.system .msg-bubble{background:var(--green-bg);border:1px solid rgba(5,150,105,0.2);color:var(--green);font-size:12px;text-align:center}
+.typing-dots{display:flex;gap:4px;padding:12px 14px}
+.typing-dots span{width:6px;height:6px;background:var(--tx3);border-radius:50%;animation:blink 1.2s infinite}
+.typing-dots span:nth-child(2){animation-delay:0.2s}
+.typing-dots span:nth-child(3){animation-delay:0.4s}
+@keyframes blink{0%,80%,100%{opacity:0.25}40%{opacity:1}}
+.chat-input-row{padding:10px 16px;display:flex;gap:8px;border-top:1px solid var(--border);background:var(--bg2);flex-shrink:0}
+.chat-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:9px 13px;color:var(--tx);font-family:var(--font);font-size:14px;resize:none;min-height:40px;max-height:110px;line-height:1.4}
+.chat-input:focus{outline:none;border-color:var(--acc)}
+.chat-input::placeholder{color:var(--tx3)}
+.send-btn{width:40px;height:40px;border-radius:var(--r2);background:var(--acc);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity 0.15s}
+.send-btn:disabled{opacity:0.35;cursor:default}
+.send-btn svg{width:17px;height:17px;color:#fff}
 
-/* ─── WORKOUT SCREEN ────────────────────────── */
-#scr-workout{background:var(--bg);position:fixed;inset:0;z-index:100;display:none;flex-direction:column}
-#scr-workout.on{display:flex}
+/* CARDS */
+.task-card{margin:0 16px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+.task-label{font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}
+.task-text{font-size:14px;color:var(--tx);line-height:1.6}
+.task-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{font-size:11px;padding:3px 9px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--tx2)}
 
-.wo-header{
-  padding:52px 20px 16px;
-  display:flex;align-items:center;gap:12px;
-  flex-shrink:0;
-  background:var(--bg);
-  border-bottom:1px solid var(--border);
-}
-.wo-back{
-  width:36px;height:36px;border-radius:50%;background:var(--bg3);
-  border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-}
-.wo-header-info{flex:1}
-.wo-title{font-size:16px;font-weight:700}
-.wo-progress-bar{
-  height:4px;background:var(--border);border-radius:2px;margin-top:6px;overflow:hidden;
-}
-.wo-progress-fill{height:100%;background:var(--accent2);border-radius:2px;transition:width .4s ease}
+/* SCENARIO */
+.scenario-card{margin:0 16px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+.scenario-avatar{width:46px;height:46px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:10px;border:1px solid var(--border)}
+.scenario-name{font-size:14px;font-weight:600;color:var(--tx)}
+.scenario-role{font-size:12px;color:var(--tx3);margin-top:1px}
+.scenario-goal{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--tx2);line-height:1.6}
+.score-row{display:flex;gap:8px;margin-top:12px}
+.score-chip{flex:1;background:var(--bg3);border-radius:var(--r3);padding:8px;text-align:center;border:1px solid var(--border)}
+.score-chip-val{font-size:15px;font-weight:700;color:var(--tx)}
+.score-chip-label{font-size:9px;color:var(--tx3);margin-top:2px;text-transform:uppercase;letter-spacing:0.05em}
 
-.wo-body{flex:1;overflow-y:auto;padding:20px 20px 0}
-.wo-step-card{
-  background:var(--bg2);border:1.5px solid var(--border);
-  border-radius:16px;padding:20px;margin-bottom:12px;
-}
-.wo-step-num{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
-.wo-step-name{font-size:20px;font-weight:800;margin-bottom:4px;line-height:1.2}
-.wo-step-tag{display:inline-block;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;margin-bottom:12px}
-.tag-warm{background:#fff7ed;color:#c2410c}
-.tag-artic{background:#eff6ff;color:#1d4ed8}
-.tag-breath{background:#f5f3ff;color:#6d28d9}
-.tag-tempo{background:#fef3c7;color:#92400e}
-.tag-voice{background:#f0fdf4;color:#166534}
-.tag-practice{background:#fdf2f8;color:#9d174d}
+/* SQL */
+.level-row{display:flex;gap:6px;padding:0 16px 14px;overflow-x:auto}
+.level-row::-webkit-scrollbar{display:none}
+.level-pill{flex-shrink:0;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--tx2);transition:all 0.15s}
+.level-pill.active{background:var(--acc);border-color:var(--acc);color:#fff}
+.level-pill.done{background:var(--green-bg);border-color:rgba(5,150,105,0.25);color:var(--green)}
+.sql-task{padding:0 16px}
+.sql-label{font-size:10px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px}
+.sql-context{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:13px;font-size:13px;color:var(--tx);line-height:1.6;margin-bottom:10px;white-space:pre-wrap}
+.sql-code{background:#1e1e2e;border:1px solid var(--border);border-radius:var(--r2);padding:13px;font-family:'Courier New',monospace;font-size:12px;color:#cdd6f4;line-height:1.7;white-space:pre-wrap;word-break:break-all;margin-bottom:10px}
+.sql-editor{width:100%;background:#1e1e2e;border:1.5px solid var(--border);border-radius:var(--r2);padding:13px;font-family:'Courier New',monospace;font-size:13px;color:#cdd6f4;line-height:1.7;min-height:90px;resize:vertical;margin-bottom:10px}
+.sql-editor:focus{outline:none;border-color:var(--acc)}
+.sql-editor::placeholder{color:#6c7086;font-family:var(--font);font-size:12px}
+.result-block{margin-top:10px;padding:11px 13px;border-radius:var(--r2);font-size:13px;line-height:1.6}
+.result-ok{background:var(--green-bg);border:1px solid rgba(5,150,105,0.25);color:var(--green)}
+.result-err{background:var(--red-bg);border:1px solid rgba(220,38,38,0.25);color:var(--red)}
 
-.wo-how{
-  font-size:14px;line-height:1.75;color:var(--text);
-  background:var(--bg3);border-radius:10px;
-  padding:14px;margin-bottom:10px;
-}
-.wo-focus{
-  display:flex;gap:8px;align-items:flex-start;
-  font-size:13px;line-height:1.6;color:var(--muted);
-  padding:8px 0;border-top:1px solid var(--border);
-  margin-top:2px;
-}
-.wo-focus-icon{flex-shrink:0;margin-top:1px}
-.wo-mistake{
-  display:flex;gap:8px;align-items:flex-start;
-  font-size:13px;line-height:1.6;color:var(--muted);
-  padding:8px 0;border-top:1px solid var(--border);
-}
-.wo-saliva{
-  margin-top:10px;
-  background:#fdf2f8;border-left:3px solid #db2777;
-  border-radius:0 8px 8px 0;padding:10px 12px;
-  font-size:13px;color:#831843;line-height:1.6;
-}
+/* BTN */
+.btn-row{display:flex;gap:8px}
+.btn-primary{flex:1;background:var(--acc);color:#fff;border:none;border-radius:var(--r2);padding:12px;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;transition:opacity 0.15s}
+.btn-primary:disabled{opacity:0.4;cursor:default}
+.btn-secondary{background:var(--bg2);color:var(--tx2);border:1px solid var(--border);border-radius:var(--r2);padding:12px 14px;font-family:var(--font);font-size:13px;cursor:pointer}
 
-.wo-timer{
-  background:var(--bg2);border:1.5px solid var(--border);
-  border-radius:16px;padding:20px;text-align:center;
-  margin-bottom:12px;
-}
-.wo-timer-ring{position:relative;width:130px;height:130px;margin:0 auto 14px}
-.wo-timer-ring svg{transform:rotate(-90deg)}
-.wtr-bg{fill:none;stroke:var(--border);stroke-width:5}
-.wtr-fg{fill:none;stroke:var(--accent2);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .9s linear}
-.wo-timer-time{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:28px;font-weight:800;color:var(--text);
-}
-.wo-timer-label{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:12px}
-.wo-timer-btns{display:flex;gap:8px;justify-content:center}
-.wo-btn{
-  padding:10px 20px;border-radius:8px;border:1.5px solid var(--border);
-  background:var(--bg3);color:var(--text);font-size:13px;font-weight:600;
-  font-family:var(--font);cursor:pointer;transition:transform .1s;
-}
-.wo-btn:active{transform:scale(.96)}
-.wo-btn-prime{background:var(--accent2);color:#fff;border-color:var(--accent2)}
+/* CODE REVIEW */
+.code-snippet{background:#1e1e2e;border:1px solid var(--border);border-radius:var(--r2);padding:15px;margin:0 16px 12px;font-family:'Courier New',monospace;font-size:12px;line-height:1.8;color:#cdd6f4;overflow-x:auto;white-space:pre}
+.bug-hunt{padding:0 16px 12px}
+.bug-item{background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r2);padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:border-color 0.15s,background 0.15s}
+.bug-item.sel{border-color:var(--acc);background:var(--acc-bg)}
+.bug-item.correct{border-color:var(--green);background:var(--green-bg)}
+.bug-item.wrong{border-color:var(--red);background:var(--red-bg)}
+.bug-item.missed{border-color:var(--amber);background:var(--amber-bg)}
+.bug-q{font-size:13px;color:var(--tx);line-height:1.4}
+.bug-exp{font-size:11px;color:var(--tx2);margin-top:4px;line-height:1.5;display:none}
 
-.wo-footer{
-  padding:14px 20px max(14px,env(safe-area-inset-bottom));
-  background:var(--bg);border-top:1px solid var(--border);
-  flex-shrink:0;
-  display:flex;gap:10px;
-}
-.wo-done-btn{
-  flex:1;background:var(--accent);color:#fff;
-  border:none;border-radius:10px;padding:14px;
-  font-size:15px;font-weight:700;font-family:var(--font);
-  cursor:pointer;transition:transform .1s,opacity .1s;
-}
-.wo-done-btn:active{transform:scale(.97)}
-.wo-skip{
-  background:var(--bg3);color:var(--muted);
-  border:none;border-radius:10px;padding:14px 16px;
-  font-size:13px;font-weight:600;font-family:var(--font);
-  cursor:pointer;
-}
+/* REVIEW OPTIONS */
+.review-context{margin:0 16px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:15px;font-size:14px;color:var(--tx);line-height:1.6}
+.review-options{padding:0 16px 12px}
+.review-opt{background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r2);padding:12px 14px;margin-bottom:8px;cursor:pointer;font-size:13px;color:var(--tx);line-height:1.4;transition:all 0.15s}
+.review-opt:active{background:var(--bg3)}
+.review-opt.correct{border-color:var(--green);background:var(--green-bg);color:var(--green)}
+.review-opt.wrong{border-color:var(--red);background:var(--red-bg);color:var(--red)}
+.review-explain{margin:0 16px 12px;background:var(--blue-bg);border:1px solid rgba(2,132,199,0.2);border-radius:var(--r2);padding:13px;font-size:13px;color:var(--tx2);line-height:1.6}
 
-/* ─── BREATH SCREEN ─────────────────────────── */
-#scr-breath{background:var(--bg);position:fixed;inset:0;z-index:150;display:none;flex-direction:column;align-items:center;justify-content:center;gap:0}
-#scr-breath.on{display:flex}
-.br-close{position:absolute;top:52px;right:20px;width:36px;height:36px;border-radius:50%;background:var(--bg3);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.br-title{font-size:14px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:32px}
-.br-ring-wrap{position:relative;margin-bottom:24px}
-.br-ring{transition:transform 3s ease-in-out}
-.br-ring-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
-.br-phase{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
-.br-count{font-size:52px;font-weight:800;color:var(--text);line-height:1}
-.br-instr{font-size:14px;color:var(--muted);text-align:center;max-width:240px;line-height:1.6;margin-bottom:20px}
-.br-cycles{font-size:12px;color:var(--light);margin-bottom:28px}
-.br-btn{padding:13px 36px;border-radius:10px;background:var(--accent);color:#fff;border:none;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer}
+/* STATS */
+.stats-screen{padding:48px 20px 24px}
+.stats-title{font-size:20px;font-weight:700;margin-bottom:20px}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:15px}
+.stat-val{font-size:24px;font-weight:700;color:var(--acc)}
+.stat-label{font-size:11px;color:var(--tx3);margin-top:3px}
+.history-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:11px 14px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center}
+.hist-name{font-size:13px;color:var(--tx)}
+.hist-score{font-size:12px;font-weight:600;color:var(--green)}
 
-/* ─── PROGRESS SCREEN ───────────────────────── */
-#scr-progress{background:var(--bg)}
-.prog-header{padding:52px 24px 20px;flex-shrink:0}
-.prog-h1{font-size:26px;font-weight:800;margin-bottom:2px}
-.prog-sub{font-size:13px;color:var(--muted)}
+/* ECON INPUTS */
+.econ-input{width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r2);padding:10px 13px;color:var(--tx);font-size:14px;font-family:var(--font)}
+.econ-input:focus{outline:none;border-color:var(--acc)}
 
-.prog-circles{padding:0 24px;display:flex;flex-direction:column;gap:12px;padding-bottom:100px}
-.circle-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
-.cc-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.cc-title{font-size:15px;font-weight:700}
-.cc-sub{font-size:12px;color:var(--muted);margin-top:2px}
-.cc-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:#eff6ff;color:var(--accent2)}
-.cc-days{display:flex;flex-wrap:wrap;gap:5px;padding:14px 16px}
-.day-dot{
-  width:32px;height:32px;border-radius:8px;
-  background:var(--bg3);border:1.5px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:600;color:var(--muted);
-  cursor:pointer;transition:all .15s;
-}
-.day-dot.done{background:var(--accent2);border-color:var(--accent2);color:#fff}
-.day-dot.today{border-color:var(--accent);color:var(--accent);background:#fff}
-.day-dot.locked{opacity:.35}
+/* GIT */
+.git-step{background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r2);padding:11px 14px;margin-bottom:8px;cursor:pointer;font-family:'Courier New',monospace;font-size:12px;color:var(--tx);transition:all 0.15s;line-height:1.5}
+.git-step.sel{border-color:var(--acc);background:var(--acc-bg);color:var(--acc2)}
+.git-step.correct{border-color:var(--green);background:var(--green-bg)}
+.git-step.wrong{border-color:var(--red);background:var(--red-bg)}
 
-.maint-card{
-  background:linear-gradient(135deg,#eff6ff,#f5f3ff);
-  border:1px solid #c7d2fe;border-radius:var(--r);
-  padding:16px;
-}
-.maint-title{font-size:14px;font-weight:700;color:var(--accent2);margin-bottom:4px}
-.maint-sub{font-size:12px;color:var(--muted);margin-bottom:10px}
-.maint-items{display:flex;flex-direction:column;gap:4px}
-.maint-item{font-size:13px;color:var(--text);padding:4px 0;border-bottom:1px solid var(--border)}
-.maint-item:last-child{border-bottom:none}
+/* TOAST */
+#toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--tx);color:var(--bg);font-size:12px;padding:8px 18px;border-radius:100px;opacity:0;transition:all 0.25s;pointer-events:none;white-space:nowrap;z-index:200}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* ─── BOTTOM NAV ────────────────────────────── */
-nav{
-  position:fixed;bottom:0;left:0;right:0;z-index:90;
-  background:var(--bg2);border-top:1px solid var(--border);
-  display:flex;padding:6px 0 max(6px,env(safe-area-inset-bottom));
-}
-nav button{
-  flex:1;background:none;border:none;color:var(--muted);
-  display:flex;flex-direction:column;align-items:center;gap:2px;
-  font-size:10px;font-weight:600;font-family:var(--font);
-  cursor:pointer;padding:4px 0;transition:color .15s;
-}
-nav button svg{width:22px;height:22px}
-nav button.on{color:var(--accent)}
+/* NO API MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:300;display:flex;align-items:flex-end;justify-content:center;padding:0}
+.modal-box{background:var(--bg2);border-radius:var(--r) var(--r) 0 0;padding:24px 20px 36px;width:100%;max-width:430px;animation:slideUp 0.25s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 
-/* ─── UTILITIES ─────────────────────────────── */
-.hidden{display:none!important}
-#day-detail-ov{display:none}#day-detail-ov.on{display:flex}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.fade-up{animation:fadeUp .3s ease forwards}
+.screen-in{animation:sIn 0.2s ease}
+@keyframes sIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
 </style>
 </head>
 <body>
-
-<!-- Автообновление через SW -->
-
-<!-- ═══════════════════════════════════════
-     HOME
-════════════════════════════════════════ -->
-<div class="scr on" id="scr-home">
-  <div class="home-top">
-    <div class="home-greeting" id="greeting">Доброе утро</div>
-    <div class="home-title">Готов <em>говорить</em><br>чётче?</div>
-  </div>
-
-  <div class="home-streak" id="streak-card">
-    <div class="streak-fire">🔥</div>
-    <div class="streak-info">
-      <div class="streak-num" id="streak-num">0 дней подряд</div>
-      <div class="streak-sub" id="streak-sub">Начни сегодня</div>
-    </div>
-    <div class="streak-dots" id="streak-dots"></div>
-  </div>
-
-  <div class="home-day-card" id="home-day-card">
-    <div class="hdc-label">
-      <div class="hdc-badge" id="hdc-circle">Круг 1</div>
-      <div class="hdc-day" id="hdc-day">День 1 из 21</div>
-    </div>
-    <div class="hdc-focus" id="hdc-focus">Загрузка...</div>
-    <div class="hdc-task" id="hdc-task"></div>
-    <div class="hdc-steps" id="hdc-steps"></div>
-    <div id="hdc-awareness" style="display:none;margin:0 16px 0;background:#fef3c7;border-left:3px solid #d97706;border-radius:0 8px 8px 0;padding:10px 12px;font-size:13px;color:#92400e;line-height:1.5">
-      🎯 <strong>Задание дня:</strong> <span id="awareness-text"></span>
-    </div>
-    <button class="hdc-start-btn" id="hdc-start" onclick="startWorkout()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-      Начать тренировку
+<div id="update-banner" onclick="location.reload()">🔄 Обновление — нажми для установки</div>
+<div id="app">
+  <div id="screen"></div>
+  <nav id="nav">
+    <button class="nav-btn" id="nav-home" onclick="navigate('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+      <span>Модули</span>
     </button>
-  </div>
-
-  <div class="home-sections">
-    <div class="hs-row">
-      <div class="hs-card" onclick="openBreath('478')">
-        <div class="hs-icon">🫁</div>
-        <div class="hs-title">4-7-8</div>
-        <div class="hs-sub">Перед звонком</div>
-      </div>
-      <div class="hs-card" onclick="openBreath('box')">
-        <div class="hs-icon">⬜</div>
-        <div class="hs-title">Квадратное</div>
-        <div class="hs-sub">Концентрация</div>
-      </div>
-    </div>
-    <div class="hs-card-wide" onclick="goNav('progress')">
-      <div style="font-size:22px">📋</div>
-      <div>
-        <div class="hs-title">Вся программа — 63 дня</div>
-        <div class="hs-sub" id="prog-summary">Круг 1 · 0 дней выполнено</div>
-      </div>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════
-     WORKOUT
-════════════════════════════════════════ -->
-<div class="scr" id="scr-workout">
-  <div class="wo-header">
-    <button class="wo-back" onclick="closeWorkout()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    <button class="nav-btn" id="nav-practice" onclick="navigate('practice')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+      <span>Практика</span>
     </button>
-    <div class="wo-header-info">
-      <div class="wo-title" id="wo-title">Тренировка</div>
-      <div class="wo-progress-bar"><div class="wo-progress-fill" id="wo-prog" style="width:0%"></div></div>
-    </div>
-    <div style="font-size:13px;color:var(--muted);font-weight:600" id="wo-counter">1/1</div>
-  </div>
-  <div class="wo-body" id="wo-body"></div>
-  <div class="wo-footer">
-    <button class="wo-skip" onclick="woNext()" id="wo-skip-btn">Пропустить</button>
-    <button class="wo-done-btn" onclick="woDone()" id="wo-done-btn">Выполнено ✓</button>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════
-     BREATH
-════════════════════════════════════════ -->
-<div class="scr" id="scr-breath">
-  <button class="br-close" onclick="closeBreath()">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg>
-  </button>
-  <div class="br-title" id="br-title">4-7-8</div>
-  <div id="br-desc" style="font-size:13px;color:var(--muted);text-align:center;max-width:260px;line-height:1.5;margin-bottom:16px;margin-top:-8px"></div>
-  <div class="br-ring-wrap">
-    <div class="br-ring" id="br-ring">
-      <svg width="200" height="200" viewBox="0 0 200 200">
-        <circle cx="100" cy="100" r="85" fill="none" stroke="var(--border)" stroke-width="6"/>
-        <circle cx="100" cy="100" r="85" fill="none" stroke="var(--accent2)" stroke-width="6"
-          stroke-linecap="round" stroke-dasharray="534" id="br-arc"
-          style="transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset .9s linear;stroke-dashoffset:534"/>
-      </svg>
-    </div>
-    <div class="br-ring-inner">
-      <div class="br-phase" id="br-phase">—</div>
-      <div class="br-count" id="br-count">—</div>
-    </div>
-  </div>
-  <div class="br-instr" id="br-instr">Нажми «Начать» и следи за кругом</div>
-  <div class="br-cycles" id="br-cycles"></div>
-  <button class="br-btn" id="br-btn" onclick="brRun()">Начать</button>
-</div>
-
-<!-- ═══════════════════════════════════════
-     PROGRESS
-════════════════════════════════════════ -->
-<div class="scr" id="scr-progress">
-  <div class="prog-header">
-    <div class="prog-h1">Программа</div>
-    <div class="prog-sub" id="prog-header-sub">63 дня · 3 круга</div>
-  </div>
-  <div class="prog-circles" id="prog-circles"></div>
-</div>
-
-<!-- ═══════════════════════════════════════
-     DAY DETAIL OVERLAY
-════════════════════════════════════════ -->
-<div id="day-detail-ov" style="position:fixed;inset:0;z-index:200;background:var(--bg);overflow-y:auto;flex-direction:column">
-  <div style="position:sticky;top:0;background:var(--bg);padding:52px 20px 14px;border-bottom:1px solid var(--border);z-index:10;display:flex;align-items:flex-start;gap:12px">
-    <button onclick="closeDayDetail()" style="width:36px;height:36px;border-radius:50%;background:var(--bg3);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    <button class="nav-btn" id="nav-stats" onclick="navigate('stats')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span>Прогресс</span>
     </button>
-    <div>
-      <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em" id="dd-circle"></div>
-      <div style="font-size:20px;font-weight:800;margin-top:3px;line-height:1.2" id="dd-focus"></div>
-    </div>
-  </div>
-  <div style="padding:16px 20px 100px">
-    <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;font-weight:600">Задание</div>
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;font-size:14px;line-height:1.7;margin-bottom:16px" id="dd-task"></div>
-
-    <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;font-weight:600">Упражнения — нажми чтобы раскрыть</div>
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:0 14px;margin-bottom:16px" id="dd-exercises"></div>
-
-    <div id="dd-saliva-block" style="display:none;margin-bottom:16px">
-      <div style="font-size:12px;color:#be185d;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;font-weight:600">Совет по слюне</div>
-      <div style="background:#fdf2f8;border-left:3px solid #db2777;border-radius:0 var(--r) var(--r) 0;padding:12px 14px;font-size:13px;color:#831843;line-height:1.6" id="dd-saliva"></div>
-    </div>
-
-    <div id="dd-awareness-block" style="display:none;margin-bottom:16px">
-      <div style="font-size:12px;color:#92400e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;font-weight:600">🎯 Задание дня — осознанная пауза</div>
-      <div style="background:#fef3c7;border-left:3px solid #d97706;border-radius:0 var(--r) var(--r) 0;padding:12px 14px;font-size:13px;color:#92400e;line-height:1.6" id="dd-awareness"></div>
-    </div>
-    <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;font-weight:600">Совет дня</div>
-    <div style="background:#eff6ff;border-left:3px solid var(--accent2);border-radius:0 var(--r) var(--r) 0;padding:12px 14px;font-size:13px;color:var(--text);line-height:1.6;margin-bottom:20px" id="dd-tip"></div>
-
-    <button id="dd-done-btn" style="width:100%;padding:14px;border-radius:10px;border:none;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer;color:#fff;display:none">Отметить выполненным ✓</button>
-  </div>
+  </nav>
 </div>
-
-<!-- ═══════════════════════════════════════
-     NAV
-════════════════════════════════════════ -->
-<nav>
-  <button class="on" id="nav-home" onclick="goNav('home')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-    Сегодня
-  </button>
-  <button id="nav-progress" onclick="goNav('progress')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-    Программа
-  </button>
-</nav>
-
-
+<div id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════════════
-// БАЗА УПРАЖНЕНИЙ
-// ═══════════════════════════════════════════════════
-const EX = {
-  // РАЗМИНКА — базовая, 2 минуты, каждый день
-  warmup:{name:'Базовая разминка',tag:'warm',tagName:'Разминка',timer:120,
-    how:'Это делается каждый день — 2 минуты, не пропускать.\n\n1. Губы-рыбка × 10 — хлопай губами как рыба\n2. Трубочка→улыбка × 10 — тяни вперёд, растягивай\n3. Язык по зубам × 3 круга — изнутри, не торопись\n4. Челюсть вниз-вверх × 10 — медленно, широко\n5. А-Э-И-О-У-Ы × 2 — с преувеличением',
-    focus:'Почувствуй что лицо «проснулось» — небольшое тепло в щеках и губах.',
-    mistake:'Не торопись. Разминка не про количество — про качество движений.'},
+// ─── CONFIG ───────────────────────────────────────────────
+const API_KEY = 'YOUR_API_KEY';
+const MODEL   = 'claude-sonnet-4-20250514';
+function hasAPI(){ return API_KEY && API_KEY !== 'YOUR_API_KEY'; }
 
-  // БЛОК 1: ТЕЛО
-  jaw_release:{name:'Освобождение челюсти',tag:'warm',tagName:'Блок 1 — Тело',timer:180,
-    how:'Это твоё главное упражнение первой недели.\n\nПоложи 2 пальца вертикально между зубами — это правильный зазор.\n\nТеперь говори вслух любой текст удерживая этот зазор.\n\nПервые 3 дня — просто читай текст с зазором.\nДни 4-7 — читай и следи за слюной (она уменьшится когда челюсть расслабится).',
-    focus:'Зажатая челюсть — причина 70% «каши». Почувствуй разницу между зажатой и свободной.',
-    mistake:'Не форсируй зазор. Два пальца — мягко, без боли.'},
+// ─── STATE ────────────────────────────────────────────────
+let S = JSON.parse(localStorage.getItem('tf_v2') || '{}');
+S.streak       = S.streak       || 0;
+S.xp           = S.xp           || 0;
+S.sqlDone      = S.sqlDone      || [];
+S.reviewDone   = S.reviewDone   || 0;
+S.negotN       = S.negotN       || 0;
+S.cdevN        = S.cdevN        || 0;
+S.lastDate     = S.lastDate     || '';
+S.startDate    = S.startDate    || new Date().toDateString();
+S.testDone     = S.testDone     || [];
+S.restSessions = S.restSessions || 0;
+function save(){ localStorage.setItem('tf_v2', JSON.stringify(S)); }
 
-  tongue_precise:{name:'Точность языка',tag:'warm',tagName:'Блок 1 — Тело',timer:180,
-    how:'Произноси по одному слогу, максимально чётко:\n\nТА-ТА-ТА × 10\nДА-ДА-ДА × 10\nНА-НА-НА × 10\nЛА-ЛА-ЛА × 10\n\nКончик языка бьёт точно в бугорок за верхними зубами — не в зубы, не в нёбо.\nПосле каждой серии — пауза 3 секунды.',
-    focus:'Т, Д, Н, Л — это кончик языка. Именно он отвечает за чёткость окончаний.',
-    mistake:'Не ускоряйся. Если ускорился — стоп, 3 секунды, начни снова.'},
+// ─── ЦИКЛ 21+7 ────────────────────────────────────────────
+function getCycleInfo(){
+  const start = new Date(S.startDate);
+  const today = new Date();
+  const dayTotal = Math.max(1, Math.floor((today - start) / 86400000) + 1);
+  const cycleLen = 28;
+  const dayInCycle = ((dayTotal-1) % cycleLen) + 1;
+  const cycleNum = Math.floor((dayTotal-1) / cycleLen) + 1;
+  const phase = dayInCycle <= 21 ? 'active' : 'rest';
+  const dayInPhase = phase === 'active' ? dayInCycle : dayInCycle - 21;
+  const daysLeft = phase === 'active' ? 21 - dayInCycle : 28 - dayInCycle;
+  return { dayTotal, dayInCycle, cycleNum, phase, dayInPhase, daysLeft };
+}
 
-  breath_base:{name:'Диафрагмальное дыхание',tag:'breath',tagName:'Блок 1 — Тело',timer:120,
-    how:'Ляг или сядь. Одна рука на животе, другая на груди.\n\nВдох носом 4 сек — живот поднимается, грудь НЕ двигается.\nВыдох ртом 6 сек — живот опускается.\n\n× 10 вдохов. Каждый день.\n\nПочему это важно: грудное дыхание = зажатый голос + быстрый темп. Диафрагмальное = низкий голос + естественные паузы.',
-    focus:'Рука на груди должна быть неподвижна. Вся работа в животе.',
-    mistake:'Не поднимай плечи — это признак что дышишь грудью.'},
-
-  // БЛОК 2: ТЕМП
-  pause_training:{name:'Осознанная пауза',tag:'tempo',tagName:'Блок 2 — Темп',timer:180,
-    how:'Твой главный враг — автопилот. Он включается через 8 секунд.\n\nУпражнение:\nПрочитай вслух одно предложение. СТОП. Пауза 3 секунды.\nСледующее предложение. СТОП. Пауза 3 секунды.\n\nДелай это 3 минуты с любым текстом.\n\nВ реальном разговоре сегодня: перед каждым ответом — пауза 1-2 секунды. Намеренно. Даже если кажется неловко.',
-    focus:'Пауза не слабость — это контроль. Собеседник воспринимает её как вдумчивость.',
-    mistake:'Не заполняй паузу «эм» или «ну». Тишина лучше паразитов.'},
-
-  slow_half:{name:'Половинная скорость',tag:'tempo',tagName:'Блок 2 — Темп',timer:180,
-    how:'Расскажи что-нибудь в 2 раза медленнее чем обычно.\n\nНЕ замедляй отдельные слова — замедли всё равномерно.\n\nПроверка: запись на телефон. Если кажется что слишком медленно — значит правильно. Со стороны это звучит нормально.\n\nПрактика в жизни: сегодня в одном разговоре говори в половину скорости.',
-    focus:'Почувствуй каждое окончание слова. «КопыТ», «летиТ» — Т слышен чётко.',
-    mistake:'Не замедляй только начало фразы и ускоряйся к концу. Темп равномерный.'},
-
-  endings:{name:'Чёткие окончания',tag:'tempo',tagName:'Блок 2 — Темп',timer:180,
-    how:'Читай вслух любой текст, но после каждого слова — пауза 1 секунда.\n\n«Карл.» (пауза) «у.» (пауза) «Клары.» (пауза) «украл.» (пауза)\n\nЗвучит как робот — это нормально. Цель: услышать каждое окончание.\n\nПосле 3 минут «роботом» — читай нормально, но сохраняй осознанность окончаний.',
-    focus:'Последний слог — такой же важный как первый.',
-    mistake:'Не глоти окончание ради скорости. Лучше медленно и чётко.'},
-
-  // БЛОК 3: ГОЛОС
-  mmm_resonance:{name:'МММ — резонанс',tag:'voice',tagName:'Блок 3 — Голос',timer:120,
-    how:'Закрой рот, расслабь челюсть.\nПроизнеси «Мммм» протяжно — как будто пробуешь вкусную еду.\n\nДолжна ощущаться вибрация:\n- На губах\n- В переносице\n- В верхнем нёбе\n\n× 5 раз по 5 секунд.\n\nПотом говори фразы удерживая это ощущение вибрации спереди.',
-    focus:'Положи палец на губы — должна чувствоваться лёгкая вибрация. Звук идёт вперёд.',
-    mistake:'Не напрягай горло. МММ идёт в губы, не внутрь.'},
-
-  intonation_down:{name:'Интонация вниз',tag:'voice',tagName:'Блок 3 — Голос',timer:120,
-    how:'Произнеси 10 утверждений с понижением голоса в конце:\n\n«Это стоит 4000 рублей↓»\n«Я запускаю продукт в сентябре↓»\n«Три клиента уже используют↓»\n\nГолос в конце фразы плавно идёт вниз — не обрывается.\n\nПочему важно: интонация вверх = вопрос = неуверенность.\nИнтонация вниз = утверждение = уверенность.',
-    focus:'Финальное слово звучит так же чётко как первое, но ниже по тону.',
-    mistake:'Не заглатывай последнее слово. Его должно быть слышно.'},
-
-  reading_aloud:{name:'Чтение вслух — диктор',tag:'voice',tagName:'Блок 3 — Голос',timer:300,
-    how:'Любой текст — новость, статья. Читай как диктор на радио:\n\nПосле запятой: лёгкая пауза + вдох носом\nПосле точки: 2 секунды тишины\nПосле абзаца: глубокий вдох\n\nСлышишь как меняется восприятие?\n\nЗаписывай себя раз в 7 дней — это главный инструмент обратной связи.',
-    focus:'Следи за окончаниями слов. После каждой точки — реально останавливайся.',
-    mistake:'Не читай «для себя вслух». Читай для воображаемой аудитории.'},
-
-  // БЛОК 4: ПРОДАЖИ
-  pitch_pain:{name:'Боль → Пауза → Решение',tag:'practice',tagName:'Блок 4 — Продажи',timer:180,
-    how:'Самая важная структура в продажах:\n\n1. Называешь боль клиента\n2. ПАУЗА 2-3 секунды — клиент её проживает\n3. Называешь решение\n\nПример:\n«Вы тратите 3 часа в день на ручной учёт...» (пауза)\n«...мы автоматизируем это за неделю.»\n\nПрочитай вслух × 3 раза с настоящей паузой.',
-    focus:'Пауза после боли — ключ. Именно в этот момент клиент думает «да, это моя проблема».',
-    mistake:'Не торопись к решению. Дай боли «повисеть» 2-3 секунды.'},
-
-  pitch_slow_fast:{name:'Быстро-Медленно',tag:'practice',tagName:'Блок 4 — Продажи',timer:180,
-    how:'Контекст — нормальный темп.\nКлючевое слово — ЗАМЕДЛИСЬ и чуть тише.\n\nПример:\n«Другие агентства делают это за 3 месяца...» (нормально)\n«...мы делаем» (замедляешься)\n«за две недели.» (медленно и чётко)\n\nЭто создаёт естественный акцент без повышения голоса.',
-    focus:'Тишина и замедление привлекают внимание сильнее громкости.',
-    mistake:'Один акцент на предложение. Не замедляй каждое слово.'},
-
-  pitch_full:{name:'Полный питч 90 секунд',tag:'practice',tagName:'Блок 4 — Продажи',timer:90,
-    how:'Расскажи о любом своём продукте за 90 секунд:\n\n1. Боль (15 сек) + пауза\n2. Усиление боли (15 сек)\n3. Решение (20 сек) — замедлись на ключевом слове\n4. Результат с цифрой (15 сек) — интонация вниз\n5. Призыв (15 сек)\n\nЗапись обязательна. Прослушай — где ускорился?',
-    focus:'Интонация вниз на цифре и на призыве. «4000 рублей↓» — это факт.',
-    mistake:'Не читай по скрипту. Тезисы — да, скрипт — нет.'},
-
-  objection_calm:{name:'Возражение — спокойный голос',tag:'practice',tagName:'Блок 4 — Продажи',timer:180,
-    how:'Придумай сложное возражение: «дорого», «уже есть», «не сейчас».\n\nОтвечай вслух:\n1. Пауза 2 секунды перед ответом\n2. Голос спокойный, темп медленнее обычного\n3. Интонация вниз в конце ответа\n\n× 3 разных возражения.\n\nПочему темп важен: ускорение на возражении = выдаёшь тревогу = клиент чувствует слабость.',
-    focus:'Самый спокойный голос — на самом сложном вопросе.',
-    mistake:'Не объясняй слишком много. Краткий уверенный ответ сильнее длинного.'},
-
-  // БЛОК 5: ПУБЛИЧНОСТЬ
-  video_record:{name:'Видео без дублей',tag:'practice',tagName:'Блок 5 — Публичность',timer:90,
-    how:'Запись для Telegram — один дубль, без остановок.\n\n90 секунд. Структура:\n- Крючок (15 сек): начни с боли или вопроса\n- Суть (60 сек): один урок или инструмент\n- Призыв (15 сек): что сделать прямо сейчас\n\nПервый дубль = разогрев. Второй = рабочий.\nЕсли нет второго — первый и есть рабочий.',
-    focus:'Смотри в камеру, не на себя на экране.',
-    mistake:'Не останавливайся на ошибках. Живая речь с паузами цепляет больше идеального.'},
-
-  improv_monologue:{name:'Монолог без подготовки',tag:'practice',tagName:'Блок 5 — Публичность',timer:180,
-    how:'Таймер 3 минуты. Говори без подготовки на тему:\n«Почему малый бизнес в России должен автоматизироваться»\n\nПравила:\n- Вместо «эм» и «ну» — пауза\n- Каждые 30 секунд — намеренная пауза 2 секунды\n- Интонация вниз на каждом утверждении\n\nЗапись обязательна.',
-    focus:'Паузы — это не незнание. Это обдуманность.',
-    mistake:'Не останавливайся полностью. Пауза — потом продолжай.'},
-
-  // БЛОК 6: АВТОМАТИЗМ
-  stress_calls:{name:'Стрессовая тренировка',tag:'practice',tagName:'Блок 6 — Автоматизм',timer:600,
-    how:'3 холодных звонка подряд.\n\nПеред каждым:\n1. Диафрагмальное дыхание × 5\n2. МММ-резонанс × 3\n3. Напомни себе намеренность дня\n\nМежду звонками — 2 минуты восстановления.\n\nПосле всех трёх: запиши что было хорошо и что нет.\n\nЦель: к звонку 3 темп и паузы такие же как в упражнениях.',
-    focus:'Третий звонок всегда лучше первого — голос разогревается.',
-    mistake:'Не оценивай себя во время звонка. Только после.'},
-
-  // ДЫХАНИЕ
-  breath_478:{name:'Техника 4-7-8',tag:'breath',tagName:'Дыхание',timer:120,
-    how:'Перед важным звонком или встречей.\n\nВдох носом — 4 секунды\nЗадержка — 7 секунд\nВыдох ртом — 8 секунд\n\n× 4 цикла = 2 минуты.\n\nНаучный факт: 7 секунд задержки активируют парасимпатическую нервную систему и буквально снижают кортизол.',
-    focus:'7 секунд задержки — ключевые. Именно они гасят адреналин.',
-    mistake:'Не торопи выдох. 8 секунд — медленно и равномерно.'},
+// Тест по окончании активной фазы
+const CYCLE_TESTS = {
+  c1: {
+    title: 'Итоговый тест — Цикл 1',
+    questions: [
+      { q: 'Клиент говорит: "Дорого". Что отвечаешь?',
+        opts: ['Хорошо, сделаю скидку', 'Дорого по сравнению с чем?', 'Это стандартная цена', 'Подумайте сами'],
+        c: 1, exp: '✅ "Дорого по сравнению с чем?" — классический вопрос на уточнение. Переводит разговор с цены на ценность. Скидка сразу — потеря позиции.' },
+      { q: 'Что такое LTV?',
+        opts: ['Цена привлечения клиента', 'Суммарная выручка с клиента за всё время', 'Ежемесячная подписка', 'Маржа в месяц'],
+        c: 1, exp: '✅ LTV = MRR × среднее время жизни. Показывает сколько клиент принесёт всего.' },
+      { q: 'SELECT * FROM orders WHERE user_id = ? — что не так при отсутствии RLS?',
+        opts: ['Неправильный синтаксис', 'Без RLS сервер отдаёт ВСЕ заказы до фильтрации', 'SELECT * медленный', 'Ничего, всё правильно'],
+        c: 1, exp: '✅ Без RLS даже с фильтром на клиенте — данные уже скачаны. Нужна политика на уровне БД.' },
+      { q: 'В Customer Dev интервью клиент говорит "нам всё нравится". Что делаешь?',
+        opts: ['Записываешь как позитивный отзыв', 'Спрашиваешь: расскажи про последний раз когда было неудобно', 'Предлагаешь купить', 'Заканчиваешь интервью'],
+        c: 1, exp: '✅ "Всё нравится" — защитная реакция. Конкретный вопрос про прошлый опыт вытаскивает реальные боли.' },
+      { q: 'git revert vs git reset — в чём разница для прода?',
+        opts: ['Одно и то же', 'revert создаёт новый коммит отмены — безопасно для прода', 'reset безопаснее', 'Оба одинаково опасны'],
+        c: 1, exp: '✅ revert не переписывает историю — создаёт новый коммит. reset --hard удаляет коммиты и опасен если уже запушил.' }
+    ]
+  }
 };
 
-// ═══════════════════════════════════════════════════
-// ПРОГРАММА — ПРАВИЛЬНАЯ МЕТОДИКА
-// 6 блоков по принципу: осознание → изоляция → интеграция → автоматизм
-// ═══════════════════════════════════════════════════
-const CIRCLES = [
-  // ───────────────────────────────────────────────────
-  // КРУГ 1: ТЕЛО + ТЕМП (21 день)
-  // Принцип: одна привычка за раз
-  // ───────────────────────────────────────────────────
-  {id:1, title:'Круг 1 — Фундамент', sub:'Тело · Дыхание · Темп',
-   desc:'Убираем физические зажимы и ломаем автопилот. Одна новая привычка в неделю.',
-   days:[
-    // НЕДЕЛЯ 1: только тело (дни 1-7)
-    // Одно упражнение — довести до автоматизма
-    {f:'Точка отсчёта',
-     t:'Запиши голос — прочитай: «От топота копыт пыль по полю летит». Сохрани. Это твоё зеркало через 63 дня.',
-     week:1, weekTheme:'Тело',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'jaw_release',reps:'3 мин'}],
-     tip:'Не оценивай запись. Просто сохрани.',
-     saliva:'Сегодня замечай — сжата ли у тебя челюсть прямо сейчас. Скорее всего да.',
-     awareness:'Один раз сегодня: перед тем как ответить — пауза 1 секунда.'},
-    {f:'Зажатая челюсть',
-     t:'Весь день замечай сжатие челюсти. Каждый раз как замечаешь — расслабь.',
-     week:1, weekTheme:'Тело',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'jaw_release',reps:'3 мин'}],
-     tip:'Зажатая челюсть = каша + слюна + быстрый темп. Всё связано.',
-     saliva:'Расслабленная челюсть снижает слюноотделение. Это физика.',
-     awareness:'Один разговор сегодня: замечай сжатие и расслабляй прямо во время разговора.'},
-    {f:'Язык — точность',
-     t:'ТА-ДА-НА-ЛА по 10 раз каждый. Кончик языка бьёт точно в бугорок за зубами.',
-     week:1, weekTheme:'Тело',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'tongue_precise',reps:'3 мин'}],
-     tip:'Т, Д, Н, Л — это окончания слов. Именно они «съедаются».',
-     saliva:'Перед каждой серией слогов — сглотни.',
-     awareness:'Один разговор: после каждой своей фразы — пауза 1 секунда.'},
-    {f:'Дыхание животом',
-     t:'Рука на животе. 10 вдохов так чтобы рука поднималась, а грудь не двигалась.',
-     week:1, weekTheme:'Тело',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'breath_base',reps:'2 мин'}],
-     tip:'Грудное дыхание создаёт зажатый голос. Диафрагмальное — расслабленный и низкий.',
-     saliva:'',
-     awareness:'Перед важным разговором: 5 диафрагмальных вдохов.'},
-    {f:'Тело + дыхание вместе',
-     t:'Читай вслух с освобождённой челюстью и диафрагмальным дыханием одновременно.',
-     week:1, weekTheme:'Тело',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'jaw_release',reps:'2 мин'},{ex:'breath_base',reps:'2 мин'}],
-     tip:'Почувствуй как меняется голос когда тело расслаблено.',
-     saliva:'',
-     awareness:'Два пальца между зубами пока говоришь — 30 секунд в любом разговоре.'},
-    {f:'Закрепление',
-     t:'Снова челюсть + язык + дыхание. Сегодня делай медленнее чем обычно.',
-     week:1, weekTheme:'Тело',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'jaw_release',reps:'2 мин'},{ex:'tongue_precise',reps:'2 мин'}],
-     tip:'Медленное выполнение = более глубокий нейронный след.',
-     saliva:'',
-     awareness:'Один разговор полностью с расслабленной челюстью.'},
-    {f:'Итог недели 1 — запись',
-     t:'Запиши голос — та же фраза что в день 1. Сравни. Слышишь разницу в качестве звука?',
-     week:1, weekTheme:'Тело',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'jaw_release',reps:'2 мин'},{ex:'breath_base',reps:'2 мин'}],
-     tip:'Разница будет в качестве голоса, не в дикции — дикция придёт позже.',
-     saliva:'Оцени: стало ли меньше слюны? Если да — ты уже расслабил челюсть.',
-     awareness:'Сравни записи. Одна привычка за 7 дней — это реальный прогресс.'},
+function renderCycleTest(cycleKey){
+  const test = CYCLE_TESTS[cycleKey];
+  if(!test) return;
+  let qi = 0, score = 0, answered = false;
 
-    // НЕДЕЛЯ 2: добавляем темп (дни 8-14)
-    {f:'Осознанная пауза — день 1',
-     t:'Это главное упражнение этой недели. Одна пауза — намеренно — в каждом разговоре.',
-     week:2, weekTheme:'Темп',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'pause_training',reps:'3 мин'}],
-     tip:'Пауза перед ответом = ты думаешь. Собеседник воспринимает это как уверенность.',
-     saliva:'',
-     awareness:'КАЖДЫЙ разговор сегодня: пауза 1-2 секунды перед ответом. Считай сколько раз получилось.'},
-    {f:'Половинная скорость',
-     t:'Расскажи что-нибудь в 2 раза медленнее. Запиши. Послушай.',
-     week:2, weekTheme:'Темп',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'slow_half',reps:'3 мин'}],
-     tip:'Если кажется «слишком медленно» — значит правильно.',
-     saliva:'',
-     awareness:'Один разговор в половину скорости. Неловкость пройдёт через 3 дня.'},
-    {f:'Чёткие окончания',
-     t:'Читай с паузой 1 секунду после каждого слова. Звучит как робот — так и нужно.',
-     week:2, weekTheme:'Темп',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'endings',reps:'3 мин'}],
-     tip:'Последний слог слова — такой же важный как первый.',
-     saliva:'',
-     awareness:'Пауза после каждого своего предложения в одном разговоре.'},
-    {f:'Автопилот — замечай',
-     t:'Сегодня замечай КОГДА включается автопилот. Засеки время — через сколько секунд.',
-     week:2, weekTheme:'Темп',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'pause_training',reps:'3 мин'},{ex:'slow_half',reps:'2 мин'}],
-     tip:'Твой результат был 8 секунд. Цель к концу программы — 30+ секунд.',
-     saliva:'',
-     awareness:'Засеки в реальном разговоре — через сколько секунд ты потерял осознанность.'},
-    {f:'Скороговорка уровень 1',
-     t:'«Бобёр добр до бобрят» × 10. НЕ на скорость — на чёткость каждого звука.',
-     week:2, weekTheme:'Темп',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'endings',reps:'2 мин'},{ex:'pause_training',reps:'2 мин'}],
-     tip:'Скороговорки — не про скорость. Про то чтобы услышать каждый звук.',
-     saliva:'',
-     awareness:'Пауза перед ответом + медленный темп — сегодня оба сразу.'},
-    {f:'Скороговорка уровень 2',
-     t:'«От топота копыт пыль по полю летит» — × 3 медленно, × 3 нормально. Окончания!',
-     week:2, weekTheme:'Темп',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'endings',reps:'2 мин'},{ex:'slow_half',reps:'2 мин'}],
-     tip:'«копыТ», «летиТ» — слышишь финальный Т? Именно он «съедается».',
-     saliva:'',
-     awareness:''},
-    {f:'Итог недели 2 — запись',
-     t:'Запись — та же фраза + расскажи о себе 1 минуту. Сравни с неделями 1 и 0.',
-     week:2, weekTheme:'Темп',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'pause_training',reps:'2 мин'},{ex:'slow_half',reps:'2 мин'}],
-     tip:'Слушай темп — он должен стать заметно медленнее.',
-     saliva:'',
-     awareness:'Засеки снова: через сколько секунд включается автопилот? Больше 8?'},
-
-    // НЕДЕЛЯ 3: добавляем голос (дни 15-21)
-    {f:'Резонанс — МММ',
-     t:'МММ 30 сек → говори фразы с тем же ощущением вибрации на губах.',
-     week:3, weekTheme:'Голос',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'mmm_resonance',reps:'2 мин'},{ex:'pause_training',reps:'2 мин'}],
-     tip:'Звук должен идти вперёд — в губы, не в горло.',
-     saliva:'',
-     awareness:''},
-    {f:'Интонация вниз',
-     t:'10 утверждений с понижением голоса в конце. «4000 рублей↓» = факт, не вопрос.',
-     week:3, weekTheme:'Голос',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'intonation_down',reps:'2 мин'},{ex:'mmm_resonance',reps:'2 мин'}],
-     tip:'Интонация вверх = неуверенность. Вниз = уверенность. Особенно на цене.',
-     saliva:'',
-     awareness:'Когда называешь цену или срок — интонация вниз.'},
-    {f:'Чтение вслух — диктор',
-     t:'5 минут любого текста как диктор. После точки — 2 секунды тишины.',
-     week:3, weekTheme:'Голос',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'reading_aloud',reps:'5 мин'}],
-     tip:'Записывай себя. Это главный инструмент обратной связи.',
-     saliva:'',
-     awareness:''},
-    {f:'Всё вместе — тело + темп + голос',
-     t:'Читай вслух: расслабленная челюсть + паузы после точек + МММ-резонанс спереди.',
-     week:3, weekTheme:'Голос',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'mmm_resonance',reps:'2 мин'},{ex:'reading_aloud',reps:'3 мин'}],
-     tip:'Первый раз соединяешь всё вместе. Не перфекционируй — просто делай.',
-     saliva:'',
-     awareness:'Один разговор: тело + темп + голос одновременно.'},
-    {f:'Шипящие Ш и С',
-     t:'«Шла Саша по шоссе» × 5. Ш — язык чашечкой. С — острый. Разные звуки.',
-     week:3, weekTheme:'Голос',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'tongue_precise',reps:'2 мин'},{ex:'intonation_down',reps:'2 мин'}],
-     tip:'Произнеси «Шшш» потом «Ссс» отдельно — чувствуешь разницу?',
-     saliva:'',
-     awareness:''},
-    {f:'Финальный босс скороговорок',
-     t:'«Карл у Клары украл кораллы» × 5 — только если Бобёр и Топот звучат чисто.',
-     week:3, weekTheme:'Голос',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'endings',reps:'2 мин'},{ex:'mmm_resonance',reps:'2 мин'}],
-     tip:'Это тест осознанности — не скорости.',
-     saliva:'',
-     awareness:''},
-    {f:'Итог Круга 1 — финальная запись',
-     t:'Запись: «От топота» + 1 минута о себе. Сравни все 3 записи: день 1, 7, 14, 21.',
-     week:3, weekTheme:'Голос',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'mmm_resonance',reps:'2 мин'},{ex:'reading_aloud',reps:'3 мин'}],
-     tip:'21 день = новый автоматизм. Тело, темп, голос — это теперь твой базовый уровень.',
-     saliva:'Оцени прогресс со слюной за 21 день.',
-     awareness:'Засеки: через сколько секунд автопилот? Должно быть 15+ секунд.'},
-  ]},
-
-  // ───────────────────────────────────────────────────
-  // КРУГ 2: ПРОДАЖИ (21 день)
-  // Принцип: применяем в реальных ситуациях
-  // ───────────────────────────────────────────────────
-  {id:2, title:'Круг 2 — Речь продавца', sub:'Питчи · Звонки · Telegram',
-   desc:'Фундамент заложен. Теперь применяем в реальных ситуациях продаж.',
-   days:[
-    // НЕДЕЛЯ 4: питч (дни 22-28)
-    {f:'Разогрев',
-     t:'Полная разминка + скороговорки. Проверь — навык из Круга 1 сохранился.',
-     week:4, weekTheme:'Питч',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'pause_training',reps:'2 мин'},{ex:'mmm_resonance',reps:'2 мин'}],
-     tip:'Неделя отдыха не убивает навык — она его закрепляет.',
-     saliva:'', awareness:''},
-    {f:'Боль → Пауза → Решение',
-     t:'Самая важная техника продаж голосом. Пауза после боли — клиент проживает её.',
-     week:4, weekTheme:'Питч',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'pitch_pain',reps:'3 мин'}],
-     tip:'Пауза после боли = клиент думает «да, это моя проблема». Потом решение = спасение.',
-     saliva:'', awareness:'В одном разговоре: назови боль клиента и сделай паузу 2 секунды.'},
-    {f:'Быстро-Медленно',
-     t:'Контекст — нормально. Ключевое слово — замедлись и чуть тише.',
-     week:4, weekTheme:'Питч',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'pitch_slow_fast',reps:'3 мин'}],
-     tip:'Один акцент на предложение. Не замедляй всё подряд.',
-     saliva:'', awareness:''},
-    {f:'Питч 90 секунд — первый',
-     t:'Расскажи о любом продукте Nizamov.tech за 90 сек. Запись обязательна.',
-     week:4, weekTheme:'Питч',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'mmm_resonance',reps:'1 мин'},{ex:'pitch_full',reps:'90 сек'}],
-     tip:'Первый дубль — разогрев. Второй — рабочий.',
-     saliva:'', awareness:''},
-    {f:'Интонация на цифрах',
-     t:'«За 14 дней↓. За 4000 рублей↓. Три клиента↓.» — каждая цифра вниз.',
-     week:4, weekTheme:'Питч',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'intonation_down',reps:'2 мин'},{ex:'pitch_full',reps:'90 сек'}],
-     tip:'Цифра с интонацией вниз = факт. Факт = доверие.',
-     saliva:'', awareness:'Называешь цену — интонация вниз.'},
-    {f:'Тихо-уверенно vs громко',
-     t:'Питч трижды: тихо-уверенно, нормально, громко. Запись. Какой лучше?',
-     week:4, weekTheme:'Питч',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'mmm_resonance',reps:'1 мин'},{ex:'pitch_full',reps:'90 сек × 3'}],
-     tip:'Обычно тихо-уверенно выигрывает. Громкость ≠ убедительность.',
-     saliva:'', awareness:''},
-    {f:'Итог недели 4',
-     t:'Запись питча. Сравни с неделей 0 и неделей 3.',
-     week:4, weekTheme:'Питч',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'pause_training',reps:'2 мин'},{ex:'pitch_full',reps:'90 сек'}],
-     tip:'Слушай три вещи: темп, паузы, интонация на ключевых словах.',
-     saliva:'', awareness:''},
-
-    // НЕДЕЛЯ 5: звонки (дни 29-35)
-    {f:'Холодный звонок — подготовка',
-     t:'4-7-8 перед звонком + МММ. Потом звони.',
-     week:5, weekTheme:'Звонки',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'breath_478',reps:'2 мин'},{ex:'mmm_resonance',reps:'1 мин'}],
-     tip:'4-7-8 буквально снижает кортизол. Делай всерьёз.',
-     saliva:'Сглотни прямо перед тем как начать говорить в трубку.', awareness:''},
-    {f:'Возражения — спокойный голос',
-     t:'3 сложных возражения. Пауза 2 сек → ответ спокойно → интонация вниз.',
-     week:5, weekTheme:'Звонки',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'objection_calm',reps:'3 мин'}],
-     tip:'Ускорение на возражении = выдаёшь тревогу = клиент чувствует слабость.',
-     saliva:'', awareness:'Один реальный звонок — применяй спокойный голос на возражении.'},
-    {f:'Тишина как инструмент',
-     t:'После вопроса клиента — пауза 3 секунды. Не заполняй тишину.',
-     week:5, weekTheme:'Звонки',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'pause_training',reps:'3 мин'}],
-     tip:'3 секунды тишины кажутся вечностью только тебе. Собеседник воспринимает как вдумчивость.',
-     saliva:'', awareness:'Один звонок: после вопроса клиента — 3 секунды молчания.'},
-    {f:'Полный сценарий продажи',
-     t:'Вслух: приветствие → боль → питч → возражение → закрытие. 4 минуты.',
-     week:5, weekTheme:'Звонки',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'mmm_resonance',reps:'1 мин'},{ex:'pitch_full',reps:'4 мин'}],
-     tip:'Репетиция вслух = единственная подготовка к реальному разговору.',
-     saliva:'', awareness:''},
-    {f:'Голосовые для Telegram',
-     t:'3 голосовых по 30-40 сек. Разные темы. Контент на 3 дня.',
-     week:5, weekTheme:'Звонки',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'mmm_resonance',reps:'1 мин'},{ex:'video_record',reps:'3 × 40 сек'}],
-     tip:'Голосовые слушают на скорости 1.5-2x — говори чуть медленнее обычного.',
-     saliva:'', awareness:''},
-    {f:'Сторителлинг — завод в IT',
-     t:'История как ты пришёл с завода в IT. 2 минуты. Паузы в нужных местах.',
-     week:5, weekTheme:'Звонки',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'pitch_slow_fast',reps:'2 мин'},{ex:'pitch_full',reps:'2 мин'}],
-     tip:'История продаёт лучше цифр. Пауза в истории = напряжение.',
-     saliva:'', awareness:''},
-    {f:'Итог недели 5',
-     t:'Реальный звонок потенциальному клиенту. После — запиши что хорошо, что нет.',
-     week:5, weekTheme:'Звонки',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'breath_478',reps:'2 мин'},{ex:'mmm_resonance',reps:'1 мин'}],
-     tip:'Самооценка после встречи: темп, паузы, интонация.',
-     saliva:'', awareness:'Засеки через сколько секунд автопилот на реальном звонке.'},
-
-    // НЕДЕЛЯ 6: Telegram + видео (дни 36-42)
-    {f:'Видео 60 секунд',
-     t:'Один дубль для Telegram. Крючок → суть → призыв.',
-     week:6, weekTheme:'Telegram',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'mmm_resonance',reps:'1 мин'},{ex:'video_record',reps:'60 сек'}],
-     tip:'Смотри в камеру, не на себя на экране.',
-     saliva:'', awareness:''},
-    {f:'Серийный контент',
-     t:'3 видео за одну сессию. 45-60 сек каждое. Разные темы.',
-     week:6, weekTheme:'Telegram',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'mmm_resonance',reps:'1 мин'},{ex:'video_record',reps:'3 × 60 сек'}],
-     tip:'Первое видео — разогрев. Второе-третье — лучшие.',
-     saliva:'', awareness:''},
-    {f:'Импровизация 3 минуты',
-     t:'Без подготовки — говори 3 минуты. Вместо «эм» — пауза.',
-     week:6, weekTheme:'Telegram',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'improv_monologue',reps:'3 мин'}],
-     tip:'Пауза вместо «эм» — высший уровень.',
-     saliva:'', awareness:''},
-    {f:'Видео без дублей',
-     t:'Один дубль 90 секунд — без остановок даже если ошибся.',
-     week:6, weekTheme:'Telegram',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'mmm_resonance',reps:'1 мин'},{ex:'video_record',reps:'90 сек'}],
-     tip:'Живая речь с паузами цепляет больше идеального дубля.',
-     saliva:'', awareness:''},
-    {f:'5 голосовых — контент-план',
-     t:'5 голосовых по 60-90 сек. Контент на 5 дней.',
-     week:6, weekTheme:'Telegram',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'mmm_resonance',reps:'1 мин'},{ex:'video_record',reps:'5 × 90 сек'}],
-     tip:'Записывай пока голос разогрет — лучшие получаются после 3-4 подряд.',
-     saliva:'', awareness:''},
-    {f:'Объяснить технику другому',
-     t:'Объясни кому-то одну технику дикции которую освоил.',
-     week:6, weekTheme:'Telegram',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'pause_training',reps:'2 мин'}],
-     tip:'Объяснение другому = понимаешь сам на глубоком уровне.',
-     saliva:'', awareness:''},
-    {f:'Итог Круга 2',
-     t:'Финальная запись Круга 2 — питч 2 мин. Сравни с Кругом 1.',
-     week:6, weekTheme:'Telegram',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'mmm_resonance',reps:'1 мин'},{ex:'pitch_full',reps:'2 мин'}],
-     tip:'Круг 2 закончен. Неделя отдыха — потом финальный круг.',
-     saliva:'', awareness:'Засеки: через сколько секунд автопилот? Цель — 20+ секунд.'},
-  ]},
-
-  // ───────────────────────────────────────────────────
-  // КРУГ 3: АВТОМАТИЗМ (21 день)
-  // Принцип: всё должно работать без сознательного контроля
-  // ───────────────────────────────────────────────────
-  {id:3, title:'Круг 3 — Автоматизм', sub:'Публичность · Стресс · Финал',
-   desc:'Навык работает — теперь делаем его автоматическим под давлением.',
-   days:[
-    // НЕДЕЛЯ 7: публичность (дни 43-49)
-    {f:'Масштаб — зал из 50',
-     t:'Расскажи о Nizamov.tech как будто перед залом. Проекция вперёд, не громкость.',
-     week:7, weekTheme:'Публичность',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'mmm_resonance',reps:'2 мин'},{ex:'pitch_full',reps:'2 мин'}],
-     tip:'МММ перед залом — обязательно.',
-     saliva:'', awareness:''},
-    {f:'Темп для аудитории',
-     t:'100 слов в минуту — темп публичного выступления. Засеки.',
-     week:7, weekTheme:'Публичность',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'slow_half',reps:'3 мин'},{ex:'reading_aloud',reps:'3 мин'}],
-     tip:'В зале звуку нужно время дойти до задних рядов.',
-     saliva:'', awareness:''},
-    {f:'Акценты и выделение',
-     t:'Один абзац × 3 — выделяй разные слова. Слышишь как меняется смысл?',
-     week:7, weekTheme:'Публичность',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'intonation_down',reps:'2 мин'},{ex:'reading_aloud',reps:'3 мин'}],
-     tip:'Выделение = пауза до + замедление + понижение после.',
-     saliva:'', awareness:''},
-    {f:'5-минутный питч',
-     t:'Полный питч Nizamov.tech — компания, продукты, результаты, цены.',
-     week:7, weekTheme:'Публичность',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'mmm_resonance',reps:'1 мин'},{ex:'pitch_full',reps:'5 мин'}],
-     tip:'5 минут = ~500 слов. Пиши тезисы, не скрипт.',
-     saliva:'', awareness:''},
-    {f:'Выступление вживую',
-     t:'Перед коллегами, семьёй, партнёрами — 5 минут на любую тему.',
-     week:7, weekTheme:'Публичность',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'breath_478',reps:'2 мин'},{ex:'mmm_resonance',reps:'1 мин'}],
-     tip:'Живая аудитория — другой уровень. Смотри в глаза, делай паузы.',
-     saliva:'', awareness:''},
-    {f:'Прогулочный монолог',
-     t:'Прогулка 10 минут — говори вслух всё что видишь. Паузы вместо «эм».',
-     week:7, weekTheme:'Публичность',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'improv_monologue',reps:'10 мин'}],
-     tip:'Никто не слышит — можно всё.',
-     saliva:'', awareness:''},
-    {f:'Итог недели 7',
-     t:'Запись — 3 мин без подготовки о пути и планах. Сравни с самой первой.',
-     week:7, weekTheme:'Публичность',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'mmm_resonance',reps:'2 мин'},{ex:'improv_monologue',reps:'3 мин'}],
-     tip:'Разница между записью 1 и сейчас — это и есть результат.',
-     saliva:'', awareness:'Через сколько секунд автопилот? Должно быть 25+.'},
-
-    // НЕДЕЛЯ 8: стресс-тренировка (дни 50-56)
-    {f:'Стрессовая тренировка — 3 звонка',
-     t:'3 холодных звонка подряд. После каждого — 4-7-8 × 4.',
-     week:8, weekTheme:'Стресс',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'breath_478',reps:'2 мин'},{ex:'stress_calls',reps:'3 звонка'}],
-     tip:'Третий звонок лучше первого. Голос разогревается.',
-     saliva:'Между звонками: сглотни, 4-7-8, МММ.', awareness:''},
-    {f:'Сложный вопрос клиента',
-     t:'Самый страшный вопрос который может задать клиент. Ответь спокойно × 3.',
-     week:8, weekTheme:'Стресс',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'objection_calm',reps:'3 мин'},{ex:'pause_training',reps:'2 мин'}],
-     tip:'Чем страшнее симуляция — тем спокойнее реальная встреча.',
-     saliva:'', awareness:''},
-    {f:'Симуляция важной встречи',
-     t:'Разыграй встречу с директором крупной компании вслух. 10 минут.',
-     week:8, weekTheme:'Стресс',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'breath_478',reps:'2 мин'},{ex:'pitch_full',reps:'10 мин'}],
-     tip:'Вслух — не про себя. Только вслух создаёт нейронный след.',
-     saliva:'', awareness:''},
-    {f:'Видео под давлением',
-     t:'Запись видео с условием: если сказал «эм» или «ну» — начни заново.',
-     week:8, weekTheme:'Стресс',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'mmm_resonance',reps:'1 мин'},{ex:'video_record',reps:'90 сек'}],
-     tip:'Это жёсткое условие ускоряет замену паразитов паузами.',
-     saliva:'', awareness:''},
-    {f:'Все скороговорки подряд',
-     t:'Все 5 скороговорок без остановки. Медленно, чётко, каждое окончание.',
-     week:8, weekTheme:'Стресс',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'endings',reps:'2 мин'},{ex:'tongue_precise',reps:'2 мин'}],
-     tip:'Это тест осознанности под нагрузкой.',
-     saliva:'', awareness:''},
-    {f:'Реальная встреча',
-     t:'Живая встреча или звонок с клиентом. Применяй всё. После — разбор.',
-     week:8, weekTheme:'Стресс',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'breath_478',reps:'2 мин'},{ex:'mmm_resonance',reps:'1 мин'}],
-     tip:'Самооценка после: темп / паузы / интонация. Что хорошо, что нет.',
-     saliva:'', awareness:'Засеки через сколько секунд автопилот во встрече.'},
-    {f:'Итог недели 8',
-     t:'Запись питча и монолога. Сравни с неделями 0, 3, 6.',
-     week:8, weekTheme:'Стресс',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'mmm_resonance',reps:'2 мин'},{ex:'pitch_full',reps:'2 мин'}],
-     tip:'Ты уже в финальной прямой.',
-     saliva:'', awareness:''},
-
-    // НЕДЕЛЯ 9: финал (дни 57-63)
-    {f:'Голос в разных каналах',
-     t:'Сравни: звонок / голосовое / видео / живой разговор. Что корректировать?',
-     week:9, weekTheme:'Финал',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'mmm_resonance',reps:'2 мин'},{ex:'reading_aloud',reps:'3 мин'}],
-     tip:'Телефон срезает низкие частоты — там нужно говорить чуть чётче.',
-     saliva:'', awareness:''},
-    {f:'Контент-план на неделю',
-     t:'7 голосовых для Telegram по 60-90 сек. Контент на всю следующую неделю.',
-     week:9, weekTheme:'Финал',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'mmm_resonance',reps:'1 мин'},{ex:'video_record',reps:'7 × 90 сек'}],
-     tip:'Записывай пока голос разогрет.',
-     saliva:'', awareness:''},
-    {f:'Полный питч Nizamov.tech',
-     t:'Питч всей компании — 5 минут. Структура: история → продукты → кейсы → призыв.',
-     week:9, weekTheme:'Финал',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'breath_478',reps:'2 мин'},{ex:'pitch_full',reps:'5 мин'}],
-     tip:'Это твой главный питч. Он должен быть отточен.',
-     saliva:'', awareness:''},
-    {f:'Передай знание',
-     t:'Объясни кому-то всю методику — почему паузы важнее скорости.',
-     week:9, weekTheme:'Финал',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'pause_training',reps:'2 мин'}],
-     tip:'Объяснение другому = понимаешь сам на уровне глубже.',
-     saliva:'', awareness:''},
-    {f:'Стресс-тест финальный',
-     t:'5 звонков подряд. Сохраняй темп и паузы от первого до последнего.',
-     week:9, weekTheme:'Финал',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'breath_478',reps:'2 мин'},{ex:'stress_calls',reps:'5 звонков'}],
-     tip:'Если темп одинаков от звонка 1 до звонка 5 — навык стал автоматическим.',
-     saliva:'', awareness:'Засеки: через сколько секунд автопилот? Цель — 30+ секунд.'},
-    {f:'Финальная запись — сравнение',
-     t:'Запись: «От топота» + 3 мин о себе и планах. Без подготовки.',
-     week:9, weekTheme:'Финал',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'mmm_resonance',reps:'2 мин'},{ex:'reading_aloud',reps:'3 мин'}],
-     tip:'Разница с днём 1 — это 63 дня осознанной работы.',
-     saliva:'', awareness:''},
-    {f:'День 63 — Финал программы',
-     t:'Слушай все записи: день 1, 7, 14, 21, 42, 63. Это твой путь.',
-     week:9, weekTheme:'Финал',
-     steps:[{ex:'warmup',reps:'2 мин'},{ex:'mmm_resonance',reps:'2 мин'},{ex:'pitch_full',reps:'2 мин'}],
-     tip:'63 дня осознанной работы = автоматический навык. Переходи в режим поддержки.',
-     saliva:'', awareness:'Финальный замер: через сколько секунд автопилот? Должно быть 30+ секунд.'},
-  ]},
-];
-
-const BREATH={
-  '478':{name:'Техника 4-7-8',desc:'Гасит адреналин за 2 минуты. Перед важным звонком или встречей.',
-    phases:[{l:'Вдох носом',t:4,i:'Медленно вдыхай через нос...',s:1.3},{l:'Задержка',t:7,i:'Задержи дыхание — это ключевая фаза...',s:1.3},{l:'Выдох ртом',t:8,i:'Медленно выдыхай через рот...',s:1}],cycles:4},
-  'diaphragm':{name:'Диафрагмальное',desc:'Каждое утро. Опускает голос, убирает зажатость.',
-    phases:[{l:'Вдох животом',t:4,i:'Живот вперёд, рука поднимается',s:1.3},{l:'Выдох',t:6,i:'Живот назад, плечи неподвижны',s:1}],cycles:8},
-  'box':{name:'Квадратное',desc:'Для концентрации. Используют спецназ перед операцией.',
-    phases:[{l:'Вдох',t:4,i:'Вдох через нос...',s:1.3},{l:'Задержка',t:4,i:'Задержи...',s:1.3},{l:'Выдох',t:4,i:'Выдох через рот...',s:1},{l:'Задержка',t:4,i:'Задержи...',s:1}],cycles:4},
-};
-
-// ═══ ХРАНИЛИЩЕ ════════════════════════════════════
-const S={
-  get:(k)=>{try{return JSON.parse(localStorage.getItem(k))}catch{return null}},
-  set:(k,v)=>localStorage.setItem(k,JSON.stringify(v)),
-};
-
-// ═══ СКЛОНЕНИЕ ════════════════════════════════════
-function declDays(n){
-  const abs=Math.abs(n)%100, t=abs%10;
-  if(abs>10&&abs<20)return n+' дней';
-  if(t===1)return n+' день';
-  if(t>=2&&t<=4)return n+' дня';
-  return n+' дней';
-}
-
-// ═══ НАВИГАЦИЯ ════════════════════════════════════
-function goNav(name){
-  ['home','progress'].forEach(n=>{
-    document.getElementById('scr-'+n).classList.toggle('on',n===name);
-    const b=document.getElementById('nav-'+n);
-    if(b)b.classList.toggle('on',n===name);
-  });
-  if(name==='progress')renderProgress();
-  if(name==='home')renderHome();
-}
-
-// ═══ ГЛАВНЫЙ ЭКРАН ════════════════════════════════
-function getToday(){const d=new Date();return`${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;}
-function getGday(){return S.get('gday')||1;}
-function getDayData(gday){
-  const ci=Math.min(Math.floor((gday-1)/21),2);
-  const di=(gday-1)%21;
-  return{circle:CIRCLES[ci],day:CIRCLES[ci].days[di],ci,di};
-}
-
-function renderHome(){
-  const gday=getGday();
-  const{circle,day,ci,di}=getDayData(gday);
-  const days=S.get('days')||{};
-  const done=!!days['d'+gday];
-
-  const h=new Date().getHours();
-  document.getElementById('greeting').textContent=
-    h<6?'Доброй ночи':h<12?'Доброе утро':h<17?'Добрый день':'Добрый вечер';
-
-  let streak=0,i=gday;
-  while(i>=1&&(S.get('days')||{})['d'+i]){streak++;i--;}
-  document.getElementById('streak-num').textContent=declDays(streak)+' подряд';
-  document.getElementById('streak-sub').textContent=
-    streak===0?'Начни сегодня — первый шаг самый важный':
-    streak<7?'Хорошее начало — не останавливайся!':
-    streak<21?'Отличная серия! Привычка формируется.':'Навык становится автоматическим!';
-
-  const dotsEl=document.getElementById('streak-dots');
-  dotsEl.innerHTML='';
-  for(let j=Math.max(1,gday-6);j<=gday;j++){
-    const d=document.createElement('div');
-    d.className='sdot'+((S.get('days')||{})['d'+j]?' on':'');
-    dotsEl.appendChild(d);
-  }
-
-  // Неделя и тема
-  document.getElementById('hdc-circle').textContent=`${circle.title} · Неделя ${day.week}`;
-  document.getElementById('hdc-day').textContent=`День ${di+1} из 21 · Неделя ${day.week} · ${day.weekTheme}`;
-  document.getElementById('hdc-focus').textContent=day.f;
-  document.getElementById('hdc-task').textContent=day.t;
-
-  // Осознанная пауза (если есть)
-  const awarenessEl=document.getElementById('hdc-awareness');
-  if(awarenessEl){
-    if(day.awareness&&day.awareness.length>0){
-      awarenessEl.style.display='block';
-      awarenessEl.querySelector('#awareness-text').textContent=day.awareness;
-    } else {
-      awarenessEl.style.display='none';
-    }
-  }
-
-  const stepsEl=document.getElementById('hdc-steps');
-  stepsEl.innerHTML='';
-  day.steps.slice(0,3).forEach((s,idx)=>{
-    const ex=EX[s.ex];if(!ex)return;
-    const div=document.createElement('div');
-    div.className='step-pill';
-    div.innerHTML=`<div class="step-num">${idx+1}</div><div class="step-name">${ex.name}</div><div class="step-dur">${s.reps}</div>`;
-    stepsEl.appendChild(div);
-  });
-
-  const btn=document.getElementById('hdc-start');
-  if(done){
-    btn.innerHTML='✓ Выполнен · Повторить упражнения';
-    btn.style.background='var(--success)';
-  } else {
-    btn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Начать тренировку';
-    btn.style.background='var(--accent)';
-  }
-  btn.onclick=startWorkout;
-
-  const total=Object.values(S.get('days')||{}).filter(Boolean).length;
-  document.getElementById('prog-summary').textContent=
-    `${circle.title.split('—')[0].trim()} · ${total} ${total===1?'день':total<5?'дня':'дней'} выполнено`;
-}
-
-// ═══ ТРЕНИРОВКА ═══════════════════════════════════
-let woSteps=[],woCur=0,woGday=0;
-let tmrSecs=0,tmrLeft=0,tmrIv=null,tmrRunning=false;
-const CIRC_R=55,CIRC_C=2*Math.PI*CIRC_R;
-
-function startWorkout(){
-  const gday=getGday();
-  const{day}=getDayData(gday);
-  woGday=gday;
-  woSteps=day.steps.map(s=>({...s,ex:EX[s.ex]})).filter(s=>s.ex);
-  woCur=0;
-  document.getElementById('wo-title').textContent=day.f;
-  document.getElementById('scr-workout').classList.add('on');
-  renderWoStep();
-}
-
-function renderWoStep(){
-  if(woCur>=woSteps.length){finishWorkout();return;}
-  const step=woSteps[woCur];
-  const ex=step.ex;
-  const total=woSteps.length;
-  const isLast=woCur===total-1;
-
-  document.getElementById('wo-prog').style.width=`${(woCur/total)*100}%`;
-  document.getElementById('wo-counter').textContent=`${woCur+1} / ${total}`;
-  document.getElementById('wo-done-btn').textContent=isLast?'Завершить день ✓':'Выполнено ✓';
-
-  const{day}=getDayData(woGday);
-  const body=document.getElementById('wo-body');
-  body.innerHTML='';
-  body.scrollTop=0;
-
-  const card=document.createElement('div');
-  card.className='wo-step-card fade-up';
-  card.innerHTML=`
-    <div class="wo-step-num">Шаг ${woCur+1} из ${total}</div>
-    <div class="wo-step-name">${ex.name}</div>
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-      <span class="wo-step-tag tag-${ex.tag}">${ex.tagName}</span>
-      <span style="font-size:13px;font-weight:600;color:var(--accent2)">${step.reps}</span>
-    </div>
-    <div class="wo-how">${ex.how.replace(/\n/g,'<br>')}</div>
-    <div class="wo-focus"><span class="wo-focus-icon">👁</span><span><strong>На что смотреть:</strong> ${ex.focus}</span></div>
-    <div class="wo-mistake"><span class="wo-focus-icon">⚠️</span><span><strong>Частая ошибка:</strong> ${ex.mistake}</span></div>
-    ${day.saliva&&woCur===0?`<div class="wo-saliva">💧 <strong>Совет по слюне:</strong> ${day.saliva}</div>`:''}
-  `;
-  body.appendChild(card);
-
-  if(ex.timer>0){
-    stopTimer();
-    const m=Math.floor(ex.timer/60),s=ex.timer%60;
-    const tc=document.createElement('div');
-    tc.className='wo-timer';
-    tc.innerHTML=`
-      <div class="wo-timer-label">Таймер · ${ex.name}</div>
-      <div class="wo-timer-ring">
-        <svg width="130" height="130" viewBox="0 0 130 130">
-          <circle class="wtr-bg" cx="65" cy="65" r="${CIRC_R}"/>
-          <circle class="wtr-fg" id="wtr-fg" cx="65" cy="65" r="${CIRC_R}"
-            stroke-dasharray="${CIRC_C.toFixed(1)}" stroke-dashoffset="0"
-            style="transform:rotate(-90deg);transform-origin:center"/>
-        </svg>
-        <div class="wo-timer-time" id="wo-ttime">${m}:${s<10?'0':''}${s}</div>
-      </div>
-      <div class="wo-timer-btns">
-        <button class="wo-btn" onclick="stopTimer()">Сброс</button>
-        <button class="wo-btn wo-btn-prime" id="wo-tbtn" onclick="toggleTimer(${ex.timer})">▶ Старт</button>
-      </div>`;
-    body.appendChild(tc);
-  }
-
-  // Осознанная пауза в тренировке (последний шаг)
-  if(isLast){
-    if(day.awareness&&day.awareness.length>0){
-      const aw=document.createElement('div');
-      aw.style.cssText='background:#fef3c7;border-left:3px solid #d97706;border-radius:0 10px 10px 0;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#92400e;line-height:1.6';
-      aw.innerHTML=`🎯 <strong>Осознанная пауза — задание дня:</strong><br>${day.awareness}`;
-      body.appendChild(aw);
-    }
-    if(day.tip){
-      const tipCard=document.createElement('div');
-      tipCard.style.cssText='background:#eff6ff;border-left:3px solid var(--accent2);border-radius:0 10px 10px 0;padding:12px 14px;margin-bottom:12px;font-size:13px;color:var(--text);line-height:1.6';
-      tipCard.innerHTML=`💡 <strong>Совет дня:</strong> ${day.tip}`;
-      body.appendChild(tipCard);
-    }
-  }
-}
-
-function toggleTimer(initSecs){
-  if(!tmrRunning&&tmrLeft===0){tmrSecs=initSecs;tmrLeft=initSecs;}
-  tmrRunning=!tmrRunning;
-  const btn=document.getElementById('wo-tbtn');
-  if(btn)btn.textContent=tmrRunning?'⏸ Пауза':'▶ Продолжить';
-  if(tmrRunning){
-    clearInterval(tmrIv);
-    tmrIv=setInterval(()=>{
-      if(!tmrRunning)return;
-      tmrLeft--;updateTimerUI();
-      if(tmrLeft<=0){clearInterval(tmrIv);tmrRunning=false;const b=document.getElementById('wo-tbtn');if(b)b.textContent='✓ Готово';}
-    },1000);
-  }
-}
-function stopTimer(){
-  clearInterval(tmrIv);tmrRunning=false;tmrLeft=0;tmrSecs=0;
-  const fg=document.getElementById('wtr-fg');if(fg)fg.style.strokeDashoffset='0';
-}
-function updateTimerUI(){
-  const m=Math.floor(tmrLeft/60),s=tmrLeft%60;
-  const tt=document.getElementById('wo-ttime');if(tt)tt.textContent=`${m}:${s<10?'0':''}${s}`;
-  const fg=document.getElementById('wtr-fg');
-  if(fg&&tmrSecs>0)fg.style.strokeDashoffset=`${CIRC_C*(tmrLeft/tmrSecs)}`;
-}
-function woDone(){stopTimer();woCur++;renderWoStep();}
-function woNext(){stopTimer();woCur++;renderWoStep();}
-function finishWorkout(){
-  stopTimer();
-  const days=S.get('days')||{};
-  days['d'+woGday]=true;
-  S.set('days',days);
-  document.getElementById('scr-workout').classList.remove('on');
-  renderHome();
-}
-function closeWorkout(){stopTimer();document.getElementById('scr-workout').classList.remove('on');}
-
-// ═══ ДЫХАНИЕ ══════════════════════════════════════
-let brCfg=null,brPhaseIdx=0,brCycleIdx=0,brCnt=0,brIv=null,brIsRunning=false;
-const BR_CIRC=2*Math.PI*85;
-
-function openBreath(type){
-  brCfg=BREATH[type];brPhaseIdx=0;brCycleIdx=0;brCnt=0;brIsRunning=false;
-  clearInterval(brIv);
-  document.getElementById('br-title').textContent=brCfg.name;
-  document.getElementById('br-desc').textContent=brCfg.desc;
-  document.getElementById('br-phase').textContent='—';
-  document.getElementById('br-count').textContent='—';
-  document.getElementById('br-instr').textContent='Нажми «Начать» и следи за кругом';
-  document.getElementById('br-cycles').textContent='';
-  document.getElementById('br-btn').textContent='Начать';
-  document.getElementById('br-arc').style.strokeDashoffset=BR_CIRC;
-  document.getElementById('br-ring').style.transform='scale(1)';
-  document.getElementById('scr-breath').classList.add('on');
-}
-function brRun(){
-  if(brIsRunning){brIsRunning=false;clearInterval(brIv);document.getElementById('br-btn').textContent='Продолжить';return;}
-  brIsRunning=true;document.getElementById('br-btn').textContent='Пауза';nextBrPhase();
-}
-function nextBrPhase(){
-  if(!brIsRunning||!brCfg)return;
-  const ph=brCfg.phases[brPhaseIdx];brCnt=ph.t;
-  document.getElementById('br-phase').textContent=ph.l;
-  document.getElementById('br-instr').textContent=ph.i;
-  document.getElementById('br-ring').style.transform=`scale(${ph.s})`;
-  document.getElementById('br-count').textContent=brCnt;
-  document.getElementById('br-cycles').textContent=`Цикл ${brCycleIdx+1} из ${brCfg.cycles}`;
-  document.getElementById('br-arc').style.strokeDashoffset=BR_CIRC;
-  clearInterval(brIv);
-  const total=ph.t;let elapsed=0;
-  brIv=setInterval(()=>{
-    brCnt--;elapsed++;
-    document.getElementById('br-count').textContent=brCnt;
-    document.getElementById('br-arc').style.strokeDashoffset=BR_CIRC*(1-elapsed/total);
-    if(brCnt<=0){
-      clearInterval(brIv);brPhaseIdx++;
-      if(brPhaseIdx>=brCfg.phases.length){
-        brPhaseIdx=0;brCycleIdx++;
-        if(brCycleIdx>=brCfg.cycles){
-          document.getElementById('br-phase').textContent='Готово';
-          document.getElementById('br-count').textContent='✓';
-          document.getElementById('br-instr').textContent='Практика завершена. Молодец.';
-          document.getElementById('br-ring').style.transform='scale(1)';
-          brIsRunning=false;brCycleIdx=0;
-          document.getElementById('br-btn').textContent='Ещё раз';return;
-        }
-      }
-      setTimeout(nextBrPhase,200);
-    }
-  },1000);
-}
-function closeBreath(){clearInterval(brIv);brIsRunning=false;brCfg=null;document.getElementById('scr-breath').classList.remove('on');}
-
-// ═══ ПРОГРАММА ════════════════════════════════════
-function renderProgress(){
-  const days=S.get('days')||{};
-  const gday=getGday();
-  const total=Object.values(days).filter(Boolean).length;
-  document.getElementById('prog-header-sub').textContent=
-    `${total} из 63 ${total===1?'день':total<5?'дня':'дней'} выполнено`;
-
-  const cont=document.getElementById('prog-circles');
-  cont.innerHTML='';
-
-  CIRCLES.forEach((circle,ci)=>{
-    const done21=circle.days.filter((_,i)=>days['d'+(ci*21+i+1)]).length;
-    const card=document.createElement('div');
-    card.className='circle-card';
-    card.innerHTML=`
-      <div class="cc-head">
-        <div><div class="cc-title">${circle.title}</div><div class="cc-sub">${circle.sub}</div><div style="font-size:12px;color:var(--muted);margin-top:3px">${circle.desc}</div></div>
-        <div class="cc-badge">${done21}/21</div>
-      </div>
-      <div class="cc-days" id="cc-${ci}"></div>`;
-    cont.appendChild(card);
-
-    const dEl=document.getElementById('cc-'+ci);
-    circle.days.forEach((_,di)=>{
-      const gd=ci*21+di+1;
-      const isDone=!!days['d'+gd];
-      const isToday=gd===gday;
-      const isFuture=gd>gday;
-      const dot=document.createElement('div');
-      dot.className=`day-dot${isDone?' done':isToday?' today':isFuture?' locked':''}`;
-      dot.textContent=di+1;
-      dot.title=`День ${di+1}: ${circle.days[di].f}`;
-      dot.style.cursor='pointer';
-      dot.onclick=()=>openDayDetail(ci,di);
-      dEl.appendChild(dot);
-    });
-  });
-
-  const m=document.createElement('div');
-  m.className='maint-card';
-  m.innerHTML=`
-    <div class="maint-title">После 63 дней — Режим поддержки</div>
-    <div class="maint-sub">5 минут в день навсегда</div>
-    <div class="maint-items">
-      ${['Базовая разминка — 2 мин','МММ-резонанс — 30 сек','Диафрагмальное × 5','Осознанная пауза в одном разговоре','Одна скороговорка × 3'].map(r=>`<div class="maint-item">• ${r}</div>`).join('')}
-    </div>`;
-  cont.appendChild(m);
-}
-
-// ═══ ДЕТАЛИ ДНЯ ═══════════════════════════════════
-function openDayDetail(ci,di){
-  const circle=CIRCLES[ci];
-  const day=circle.days[di];
-  const gd=ci*21+di+1;
-  const days=S.get('days')||{};
-  const isDone=!!days['d'+gd];
-  const isToday=gd===getGday();
-  const isFuture=gd>getGday();
-
-  document.getElementById('dd-circle').textContent=`${circle.title} · Неделя ${day.week} · ${day.weekTheme}`;
-  document.getElementById('dd-focus').textContent=day.f;
-  document.getElementById('dd-task').textContent=day.t;
-
-  const exEl=document.getElementById('dd-exercises');
-  exEl.innerHTML='';
-  day.steps.forEach((s,idx)=>{
-    const ex=EX[s.ex];if(!ex)return;
-    const item=document.createElement('div');
-    item.style.cssText='padding:12px 0;border-bottom:1px solid var(--border)';
-    item.innerHTML=`
-      <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;gap:8px" onclick="toggleDdEx(this)">
-        <div style="flex:1">
-          <div style="font-size:14px;font-weight:600">${idx+1}. ${ex.name}</div>
-          <div style="font-size:12px;color:var(--accent2);margin-top:2px">${s.reps}</div>
+  function renderQ(){
+    if(qi >= test.questions.length){
+      // Итог теста
+      S.testDone.push(cycleKey); S.restSessions++; save();
+      addXP(score * 20);
+      document.getElementById('screen').innerHTML = `<div class="screen-in">
+        <div class="prac-header">
+          <div class="back-btn" onclick="navigate('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15,18 9,12 15,6"/></svg></div>
+          <div class="prac-title-block">
+            <div class="module-tag tag-biz">итоговый тест</div>
+            <div class="prac-title">Результат</div>
+          </div>
         </div>
-        <svg style="flex-shrink:0;transition:transform .2s" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-      </div>
-      <div class="dd-ex-body" style="display:none;margin-top:10px">
-        <div style="font-size:13px;color:var(--text);line-height:1.75;background:var(--bg3);border-radius:8px;padding:12px;margin-bottom:8px">${ex.how.replace(/\n/g,'<br>')}</div>
-        <div style="font-size:12px;color:var(--muted);padding:4px 0">👁 <strong>На что смотреть:</strong> ${ex.focus}</div>
-        <div style="font-size:12px;color:var(--muted);padding:4px 0">⚠️ <strong>Частая ошибка:</strong> ${ex.mistake}</div>
+        <div style="padding:20px 16px;text-align:center">
+          <div style="font-size:48px;margin-bottom:12px">${score >= 4 ? '🏆' : score >= 3 ? '✅' : '📚'}</div>
+          <div style="font-size:24px;font-weight:700;color:var(--tx);margin-bottom:8px">${score}/${test.questions.length} правильно</div>
+          <div style="font-size:13px;color:var(--tx2);margin-bottom:24px">${score>=4?'Отлично! Цикл пройден на отлично':score>=3?'Хорошо! Есть что закрепить':'Стоит повторить пройденный материал'}</div>
+          <div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:6px">+${score*20} XP</div>
+          <button class="btn-primary" onclick="navigate('home')">На главную</button>
+        </div>
       </div>`;
-    exEl.appendChild(item);
-  });
-
-  // Осознанная пауза
-  const awEl=document.getElementById('dd-awareness-block');
-  if(awEl){
-    if(day.awareness&&day.awareness.length>0){
-      awEl.style.display='block';
-      document.getElementById('dd-awareness').textContent=day.awareness;
-    } else {
-      awEl.style.display='none';
+      return;
     }
+    const q = test.questions[qi];
+    answered = false;
+    document.getElementById('screen').innerHTML = `<div class="screen-in">
+      <div class="prac-header">
+        <div class="back-btn" onclick="navigate('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15,18 9,12 15,6"/></svg></div>
+        <div class="prac-title-block">
+          <div class="module-tag tag-biz">итоговый тест</div>
+          <div class="prac-title">${test.title}</div>
+          <div class="prac-subtitle">Вопрос ${qi+1}/${test.questions.length}</div>
+        </div>
+      </div>
+      <div class="review-context" style="font-size:14px;font-weight:500">${q.q}</div>
+      <div class="review-options" id="test-opts">
+        ${q.opts.map((o,i)=>`<div class="review-opt" id="topt-${i}" onclick="answerTest(${i},${q.c},'${q.exp.replace(/'/g,"&#39;")}')">${o}</div>`).join('')}
+      </div>
+      <div id="test-exp" style="display:none" class="review-explain"></div>
+      <div style="padding:0 16px 20px;margin-top:8px">
+        <button class="btn-primary" id="next-btn" style="display:none" onclick="qi++;renderQ()">Следующий вопрос →</button>
+      </div>
+    </div>`;
   }
 
-  document.getElementById('dd-tip').textContent=day.tip;
-  const salBlock=document.getElementById('dd-saliva-block');
-  if(day.saliva){salBlock.style.display='block';document.getElementById('dd-saliva').textContent=day.saliva;}
-  else{salBlock.style.display='none';}
-
-  const doneBtn=document.getElementById('dd-done-btn');
-  doneBtn.textContent=isDone?'✓ Выполнен — снять отметку':'Отметить выполненным ✓';
-  doneBtn.style.background=isDone?'var(--success)':'var(--accent)';
-  doneBtn.style.display=!isFuture?'block':'none';
-  doneBtn.onclick=()=>{
-    days['d'+gd]=!days['d'+gd];
-    S.set('days',days);
-    closeDayDetail();
-    renderProgress();
-    renderHome();
+  window.answerTest = function(i, correct, exp){
+    if(answered) return;
+    answered = true;
+    if(i === correct) score++;
+    document.querySelectorAll('.review-opt').forEach((el,idx)=>{
+      el.onclick = null;
+      if(idx===correct) el.className='review-opt correct';
+      else if(idx===i) el.className='review-opt wrong';
+    });
+    const expEl = document.getElementById('test-exp');
+    expEl.style.display='block'; expEl.textContent=exp;
+    document.getElementById('next-btn').style.display='block';
   };
 
-  document.getElementById('day-detail-ov').classList.add('on');
+  renderQ();
 }
-function toggleDdEx(el){
-  const body=el.parentElement.querySelector('.dd-ex-body');
-  const svg=el.querySelector('svg');
-  const open=body.style.display!=='none';
-  body.style.display=open?'none':'block';
-  svg.style.transform=open?'':'rotate(90deg)';
-}
-function closeDayDetail(){document.getElementById('day-detail-ov').classList.remove('on');}
 
-// ═══ INIT ════════════════════════════════════════
-function init(){
-  const lastDate=S.get('lastDate'),today=getToday();
-  if(lastDate!==today){
-    const gd=S.get('gday')||1;
-    const days=S.get('days')||{};
-    if(lastDate&&days['d'+gd]&&gd<63)S.set('gday',gd+1);
-    S.set('lastDate',today);
+// streak check
+(function(){
+  const today = new Date().toDateString();
+  if(S.lastDate !== today){
+    const yest = new Date(Date.now()-86400000).toDateString();
+    S.streak = (S.lastDate === yest) ? S.streak+1 : 1;
+    S.lastDate = today;
+    save();
   }
-  renderHome();
+})();
 
-  if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('sw.js').then(reg=>{
-      reg.update();
-      reg.addEventListener('updatefound',()=>{
-        const nw=reg.installing;
-        nw.addEventListener('statechange',()=>{
-          if(nw.state==='installed'&&navigator.serviceWorker.controller)
-            nw.postMessage('SKIP_WAITING');
-        });
+// ─── NAVIGATION (history-based, fixes Android back) ───────
+let currentPage = 'home';
+
+function navigate(page, pushState=true){
+  clearInterval(copyTimer);
+  currentPage = page;
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const navMap = {home:'nav-home', practice:'nav-practice', stats:'nav-stats',
+                  negot:'nav-practice', cdev:'nav-practice', sql:'nav-practice',
+                  review:'nav-practice', econ:'nav-practice', copy:'nav-practice',
+                  arch:'nav-practice', git:'nav-practice', cycletest:'nav-practice'};
+  const navId = navMap[page] || 'nav-home';
+  document.getElementById(navId)?.classList.add('active');
+
+  if(pushState) history.pushState({page}, '', '#'+page);
+
+  const renders = {
+    home: renderHome, stats: renderStats,
+    negot: renderNegot, cdev: renderCdev,
+    sql: renderSQL, review: renderReview,
+    econ: renderEcon, copy: renderCopy,
+    arch: renderArch, git: renderGit,
+    practice: ()=> renderSQL(),
+    cycletest: ()=>{
+      const ci = getCycleInfo();
+      const key = 'c'+ci.cycleNum;
+      if(CYCLE_TESTS[key]) renderCycleTest(key);
+      else { toast('Тест недоступен'); navigate('home'); }
+    }
+  };
+  (renders[page] || renders.home)();
+  document.getElementById('screen').scrollTop = 0;
+}
+
+window.addEventListener('popstate', e => {
+  clearInterval(copyTimer);
+  const page = e.state?.page;
+  if (!page) {
+    // нет состояния — пушим home чтобы не выйти из приложения
+    history.pushState({page:'home'}, '', '#home');
+    navigate('home', false);
+  } else {
+    navigate(page, false);
+  }
+});
+
+// initial history — два entry: один для перехвата, один рабочий
+history.replaceState({page:'home'}, '', '#home');
+history.pushState({page:'home'}, '', '#home');
+
+// ─── TOAST ────────────────────────────────────────────────
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2000);
+}
+function addXP(n){ S.xp+=n; save(); toast('+'+n+' XP 🎯'); }
+
+// ─── NO API MODAL ─────────────────────────────────────────
+function showNoAPI(){
+  const old = document.getElementById('no-api-m');
+  if(old) old.remove();
+  const m = document.createElement('div');
+  m.id='no-api-m'; m.className='modal-overlay';
+  m.innerHTML=`<div class="modal-box">
+    <div style="font-size:30px;margin-bottom:12px">🔑</div>
+    <div style="font-size:17px;font-weight:700;color:var(--tx);margin-bottom:8px">Нужен API ключ</div>
+    <div style="font-size:13px;color:var(--tx2);line-height:1.6;margin-bottom:16px">
+      Этот модуль работает через Claude AI.<br>Стоимость ~200₽/мес при ежедневном использовании.
+    </div>
+    <div style="background:var(--bg3);border-radius:var(--r2);padding:13px;margin-bottom:16px">
+      <div style="font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">Как получить</div>
+      <div style="font-size:12px;color:var(--tx2);line-height:1.9">
+        1. Открой <strong>console.anthropic.com</strong><br>
+        2. API Keys → Create Key<br>
+        3. В index.html найди строку:<br>
+        <code style="background:var(--bg4);padding:2px 6px;border-radius:4px;font-size:11px">const API_KEY = 'YOUR_API_KEY'</code><br>
+        4. Замени на свой ключ
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="document.getElementById('no-api-m').remove()" class="btn-secondary" style="flex:1">Закрыть</button>
+      <button onclick="window.open('https://console.anthropic.com','_blank');document.getElementById('no-api-m').remove()" class="btn-primary" style="flex:1">Получить ключ</button>
+    </div>
+  </div>`;
+  m.addEventListener('click', e=>{ if(e.target===m) m.remove(); });
+  document.body.appendChild(m);
+}
+
+// ─── AI CHAT ──────────────────────────────────────────────
+async function aiChat(system, messages){
+  if(!hasAPI()) throw new Error('no-api');
+  const r = await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ model:MODEL, max_tokens:1000, system, messages })
+  });
+  const d = await r.json();
+  if(!r.ok) throw new Error(d.error?.message || 'API error');
+  return d.content?.[0]?.text || '';
+}
+
+function showTyping(area){
+  const d=document.createElement('div');
+  d.className='msg ai'; d.id='typing';
+  d.innerHTML='<div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
+  area.appendChild(d); area.scrollTop=area.scrollHeight;
+}
+function removeTyping(){ document.getElementById('typing')?.remove(); }
+
+function appendMsg(area, role, text){
+  const d=document.createElement('div');
+  d.className='msg '+role;
+  d.innerHTML='<div class="msg-bubble">'+text.replace(/\n/g,'<br>')+'</div>';
+  area.appendChild(d); area.scrollTop=area.scrollHeight;
+}
+
+function autoResize(ta){
+  ta.style.height='auto';
+  ta.style.height=Math.min(ta.scrollHeight,110)+'px';
+}
+
+// ─── HOME ─────────────────────────────────────────────────
+function renderHome(){
+  const lvl = Math.floor(S.xp/100);
+  const xpPct = S.xp%100;
+  const ci = getCycleInfo();
+  const isRest = ci.phase === 'rest';
+  const testKey = 'c'+ci.cycleNum;
+  const testAvail = isRest && !S.testDone.includes(testKey) && CYCLE_TESTS[testKey];
+
+  // Баннер фазы
+  let phaseBanner = '';
+  if(isRest){
+    phaseBanner = `<div style="margin:0 16px 16px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:12px">
+      <div style="font-size:24px">🌙</div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:#166534">Неделя закрепления — День ${ci.dayInPhase}/7</div>
+        <div style="font-size:12px;color:#15803d;margin-top:2px">Повторяй пройденное, мозг консолидирует знания. Ещё ${ci.daysLeft} дней.</div>
+        ${testAvail ? `<div style="margin-top:8px"><button onclick="navigate('cycletest')" style="background:#16a34a;color:#fff;border:none;border-radius:var(--r2);padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer">Пройти итоговый тест цикла ${ci.cycleNum} →</button></div>` : ''}
+        ${S.testDone.includes(testKey) ? '<div style="font-size:11px;color:#15803d;margin-top:6px">✅ Тест цикла пройден</div>' : ''}
+      </div>
+    </div>`;
+  } else {
+    const pct = Math.round((ci.dayInPhase/21)*100);
+    phaseBanner = `<div style="margin:0 16px 16px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:var(--r);padding:14px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-size:13px;font-weight:600;color:#1e40af">Цикл ${ci.cycleNum} — День ${ci.dayInPhase}/21</div>
+        <div style="font-size:12px;color:#3b82f6">${ci.daysLeft} дней до отдыха</div>
+      </div>
+      <div style="height:6px;background:#dbeafe;border-radius:3px;overflow:hidden">
+        <div style="height:100%;background:linear-gradient(90deg,#3b82f6,#2563eb);border-radius:3px;width:${pct}%;transition:width 0.5s"></div>
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('screen').innerHTML=`<div class="screen-in">
+    <div class="home-header">
+      <div class="home-brand">Nizamov.tech</div>
+      <div class="home-title">Тренажёр<br><span>фаундера</span></div>
+      <div class="home-sub">Бизнес и технические навыки — через практику</div>
+    </div>
+    <div class="streak-row">
+      <div class="streak-icon">🔥</div>
+      <div><div class="streak-val">${S.streak}</div><div class="streak-label">дней подряд</div></div>
+      <div class="streak-bar">
+        <div class="xp-row"><span>Уровень ${lvl}</span><span>${S.xp} XP</span></div>
+        <div class="xp-track"><div class="xp-fill" style="width:${xpPct}%"></div></div>
+      </div>
+    </div>
+    ${phaseBanner}
+
+    <div class="section-title">Бизнес</div>
+    <div class="modules-grid">
+      <div class="module-card" onclick="navigate('negot')">
+        <div class="module-tag tag-biz">переговоры</div>
+        <div class="module-icon">🎭</div>
+        <div class="module-name">Симулятор переговоров</div>
+        <div class="module-desc">ИИ-клиент, живой диалог, разбор</div>
+        ${S.negotN>0?`<div class="module-badge">${S.negotN} сессий</div>`:'<div class="module-badge ai-req">AI</div>'}
+      </div>
+      <div class="module-card" onclick="navigate('cdev')">
+        <div class="module-tag tag-biz">customer dev</div>
+        <div class="module-icon">🎤</div>
+        <div class="module-name">Интервью с клиентом</div>
+        <div class="module-desc">Учишься слушать, не продавать</div>
+        ${S.cdevN>0?`<div class="module-badge">${S.cdevN} сессий</div>`:'<div class="module-badge ai-req">AI</div>'}
+      </div>
+      <div class="module-card" onclick="navigate('econ')">
+        <div class="module-tag tag-biz">экономика</div>
+        <div class="module-icon">📊</div>
+        <div class="module-name">Юнит-экономика</div>
+        <div class="module-desc">LTV, CAC, маржа своих проектов</div>
+      </div>
+      <div class="module-card" onclick="navigate('copy')">
+        <div class="module-tag tag-biz">копирайтинг</div>
+        <div class="module-icon">✍️</div>
+        <div class="module-name">Питч за 3 минуты</div>
+        <div class="module-desc">Пишешь — ИИ оценивает и учит</div>
+        <div class="module-badge ai-req">AI</div>
+      </div>
+    </div>
+
+    <div class="section-title">Технические</div>
+    <div class="modules-grid">
+      <div class="module-card" onclick="navigate('sql')">
+        <div class="module-tag tag-tech">SQL</div>
+        <div class="module-icon">🗄️</div>
+        <div class="module-name">SQL-квесты</div>
+        <div class="module-desc">По твоим таблицам Supabase</div>
+        ${S.sqlDone.length>0?`<div class="module-badge">${S.sqlDone.length}/5 выполнено</div>`:''}
+      </div>
+      <div class="module-card" onclick="navigate('review')">
+        <div class="module-tag tag-tech">код</div>
+        <div class="module-icon">🔍</div>
+        <div class="module-name">Код-ревью</div>
+        <div class="module-desc">Найди баги в JS/Supabase коде</div>
+        ${S.reviewDone>0?`<div class="module-badge">${S.reviewDone} решено</div>`:''}
+      </div>
+      <div class="module-card" onclick="navigate('arch')">
+        <div class="module-tag tag-tech">архитектура</div>
+        <div class="module-icon">🏗️</div>
+        <div class="module-name">Арх. дилеммы</div>
+        <div class="module-desc">Кейсы из твоих PWA-проектов</div>
+      </div>
+      <div class="module-card" onclick="navigate('git')">
+        <div class="module-tag tag-tech">git</div>
+        <div class="module-icon">🌿</div>
+        <div class="module-name">Git-сценарии</div>
+        <div class="module-desc">Реальные ситуации с репо</div>
+      </div>
+    </div>
+    ${isRest ? `
+    <div class="section-title" style="color:#166534">🌙 Неделя закрепления</div>
+    <div class="modules-grid">
+      <div class="module-card" onclick="navigate('negot')" style="border-color:#bbf7d0;background:#f0fdf4">
+        <div class="module-tag" style="background:#dcfce7;color:#166534">повторение</div>
+        <div class="module-icon">🎭</div>
+        <div class="module-name">Финальные переговоры</div>
+        <div class="module-desc">Самый сложный клиент — всё что знаешь</div>
+      </div>
+      <div class="module-card" onclick="navigate('review')" style="border-color:#bbf7d0;background:#f0fdf4">
+        <div class="module-tag" style="background:#dcfce7;color:#166534">повторение</div>
+        <div class="module-icon">🔍</div>
+        <div class="module-name">Код-ревью микс</div>
+        <div class="module-desc">Все типы задач вперемешку</div>
+      </div>
+      <div class="module-card" onclick="navigate('sql')" style="border-color:#bbf7d0;background:#f0fdf4">
+        <div class="module-tag" style="background:#dcfce7;color:#166534">повторение</div>
+        <div class="module-icon">🗄️</div>
+        <div class="module-name">SQL марафон</div>
+        <div class="module-desc">Прогони все задачи заново</div>
+      </div>
+      <div class="module-card" onclick="navigate('arch')" style="border-color:#bbf7d0;background:#f0fdf4">
+        <div class="module-tag" style="background:#dcfce7;color:#166534">повторение</div>
+        <div class="module-icon">🏗️</div>
+        <div class="module-name">Архитектурный финал</div>
+        <div class="module-desc">Все дилеммы по кругу</div>
+      </div>
+    </div>` : ''}
+    <div style="height:20px"></div>
+  </div>`;
+}
+
+// ─── ПЕРЕГОВОРЫ ───────────────────────────────────────────
+const NEGOT_LIST = [
+  {
+    name:'Александр Прончев', role:'Директор, парк Ракета (ТРК Таганай)', emoji:'🎡',
+    budget:'4 000–8 000 ₽/мес', pain:'Очереди на кассе, ручной учёт гостей',
+    system:`Ты Александр Прончев, директор развлекательного парка "Ракета" в Челябинске. 45 лет, скептичен — уже обжигался на IT-подрядчиках. Беспокоит: очереди в выходные, ручной учёт посещаемости, нет программы лояльности. Деньги есть, но боишься снова выкинуть. Отвечай как занятой директор: коротко, встречные вопросы, немного скептично. Не называй бюджет первым. Начни с: "Ну слушаю. Что за система такая?"`,
+    opener:`Ну слушаю. Что за система такая?`
+  },
+  {
+    name:'Лилия Хасанова', role:'Владелица кофейни "Восток", Уфа', emoji:'☕',
+    budget:'2 000–3 500 ₽/мес', pain:'Нет повторных клиентов, не знает кто постоянный гость',
+    system:`Ты Лилия Хасанова, владелица небольшой кофейни "Восток" в Уфе. 35 лет, сама за стойкой, 3 сотрудника. Проблема: половина клиентов приходит раз и не возвращается — не понимаешь почему. Слышала про программы лояльности но не знаешь как работает. Немного устала, нет времени разбираться в технологиях. Муж говорит не тратить деньги. Говори по-женски, немного устало, доброжелательно. Начни с: "Да, алло. Это по поводу кофейни?"`,
+    opener:`Да, алло. Это по поводу кофейни?`
+  },
+  {
+    name:'Рустам Галиев', role:'Владелец автосервиса "СТО №1", Челябинск', emoji:'🔧',
+    budget:'5 000–10 000 ₽/мес', pain:'Мастера отвлекаются на звонки, клиенты забывают про ТО',
+    system:`Ты Рустам Галиев, владелец автосервиса. 42 года, ценишь конкретику и время. Проблема: мастера всё время отвлекаются на звонки для записи, клиенты пропадают и не возвращаются на ТО. Деньги есть, если видишь реальную пользу. Если продавец мямлит или льёт воду — обрываешь. Говори кратко и жёстко. Начни с: "Чем занимаешься? Конкретно, без воды."`,
+    opener:`Чем занимаешься? Конкретно, без воды.`
+  }
+];
+
+let negotHistory=[], negotScenario=null, negotDone=false;
+
+function renderNegot(){
+  if(!hasAPI()){ showNoAPI(); navigate('home',false); return; }
+  negotScenario = NEGOT_LIST[Math.floor(Math.random()*NEGOT_LIST.length)];
+  negotHistory=[]; negotDone=false;
+  const s=negotScenario;
+  document.getElementById('screen').innerHTML=`<div class="screen-in">
+    <div class="prac-header">
+      <div class="back-btn" onclick="navigate('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15,18 9,12 15,6"/></svg></div>
+      <div class="prac-title-block">
+        <div class="module-tag tag-biz">переговоры</div>
+        <div class="prac-title">Симулятор переговоров</div>
+        <div class="prac-subtitle">Живой диалог → разбор</div>
+      </div>
+    </div>
+    <div class="scenario-card">
+      <div class="scenario-avatar">${s.emoji}</div>
+      <div class="scenario-name">${s.name}</div>
+      <div class="scenario-role">${s.role}</div>
+      <div class="scenario-goal">
+        <strong>Цель:</strong> продать PWA-систему за ${s.budget}<br>
+        <strong>Боль клиента:</strong> ${s.pain}
+      </div>
+      <div class="score-row">
+        <div class="score-chip"><div class="score-chip-val" id="sc-l">—</div><div class="score-chip-label">слушание</div></div>
+        <div class="score-chip"><div class="score-chip-val" id="sc-p">—</div><div class="score-chip-label">боль</div></div>
+        <div class="score-chip"><div class="score-chip-val" id="sc-c">—</div><div class="score-chip-label">закрытие</div></div>
+      </div>
+    </div>
+    <div class="chat-wrap">
+      <div class="chat-area" id="chat-area"></div>
+    </div>
+  </div>
+  <div class="chat-input-row">
+    <textarea class="chat-input" id="chat-inp" placeholder="Твой ответ клиенту..." rows="1"
+      oninput="autoResize(this)" onkeydown="chatKey(event,'negot')"></textarea>
+    <button class="send-btn" id="send-btn" onclick="sendNegot()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg>
+    </button>
+  </div>`;
+  const area=document.getElementById('chat-area');
+  appendMsg(area,'system','Сцена: ты звонишь '+s.name.split(' ')[0]+' впервые. Говори первым.');
+  setTimeout(()=>{ appendMsg(area,'ai',s.opener); }, 500);
+}
+
+async function sendNegot(){
+  if(negotDone) return;
+  const inp=document.getElementById('chat-inp');
+  const text=inp.value.trim();
+  if(!text) return;
+  inp.value=''; inp.style.height='';
+  const btn=document.getElementById('send-btn');
+  btn.disabled=true;
+  const area=document.getElementById('chat-area');
+  appendMsg(area,'user',text);
+  negotHistory.push({role:'user',content:text});
+  showTyping(area);
+
+  try {
+    const msgs = negotHistory.slice(-10);
+    const reply = await aiChat(
+      negotScenario.system+'\n\nОтвечай как клиент, 1-3 предложения. После каждых 3 реплик добавляй в конце: [SCORE:L/P/C] где L=слушание 1-10, P=боль выявлена 1-10, C=к закрытию 1-10',
+      msgs
+    );
+    removeTyping();
+    const sc = reply.match(/\[SCORE:(\d+)\/(\d+)\/(\d+)\]/);
+    const clean = reply.replace(/\[SCORE:[^\]]+\]/g,'').trim();
+    negotHistory.push({role:'assistant',content:clean});
+    appendMsg(area,'ai',clean);
+    if(sc){
+      document.getElementById('sc-l').textContent=sc[1]+'/10';
+      document.getElementById('sc-p').textContent=sc[2]+'/10';
+      document.getElementById('sc-c').textContent=sc[3]+'/10';
+      if(+sc[1]+ +sc[2]+ +sc[3]>=21) addXP(5);
+    }
+    if(negotHistory.length>=12){
+      negotDone=true; S.negotN++; save(); addXP(20);
+      appendMsg(area,'system','Сессия завершена! Получи разбор ниже.');
+      const db=document.createElement('div');
+      db.style='padding:0 16px 16px';
+      db.innerHTML='<button class="btn-primary" onclick="getNegotDebrief()">Разбор ошибок и рекомендации</button>';
+      document.querySelector('.screen-in').appendChild(db);
+    } else {
+      btn.disabled=false;
+    }
+  } catch(e){
+    removeTyping();
+    appendMsg(area,'system','Ошибка API. Проверь ключ.');
+    btn.disabled=false;
+  }
+}
+
+async function getNegotDebrief(){
+  const area=document.getElementById('chat-area');
+  showTyping(area);
+  const tr=negotHistory.map(m=>(m.role==='user'?'Продавец':'Клиент')+': '+m.content).join('\n');
+  try{
+    const d=await aiChat(
+      'Ты эксперт по B2B продажам. Разбери переговоры кратко: 3 сильных момента ✅, 3 ошибки ❌, 2 конкретные техники для улучшения. Без воды, по-русски.',
+      [{role:'user',content:'Клиент: '+negotScenario.name+' ('+negotScenario.role+')\n\n'+tr}]
+    );
+    removeTyping(); appendMsg(area,'ai',d); addXP(10);
+  }catch(e){ removeTyping(); appendMsg(area,'system','Ошибка API.'); }
+}
+
+// ─── CUSTOMER DEV ─────────────────────────────────────────
+const CDEV_LIST=[
+  {name:'Тимур, 38 лет', role:'Владелец 2 барбершопов, Челябинск', goal:'Узнай реальные боли в управлении записью и персоналом', emoji:'✂️',
+   system:'Ты Тимур, владелец двух барбершопов. Занятой, говоришь коротко. Если спрашивают про "систему" или "автоматизацию" сразу — насторожись. Если задают открытые вопросы про бизнес — отвечай честно. Проблемы реально есть: мастера опаздывают, клиенты звонят а не пишут, теряешь записи. Говори живо. 2-3 предложения.'},
+  {name:'Наиля, 31 год', role:'Управляющая фитнес-студией, Уфа', goal:'Выясни как ведёт учёт клиентов и что болит больше всего', emoji:'🏋️',
+   system:'Ты Наиля, управляешь фитнес-студией на 200 клиентов. Excel + WhatsApp для учёта. Проблема: теряешь клиентов которые "пропадают" после 1-2 месяцев — не знаешь почему и не можешь вернуть. Если интервьюер слушает — открывайся. Если давит — закрывайся. 2-3 предложения.'},
+  {name:'Сергей Иванов, 50 лет', role:'Директор ветклиники, 5 врачей', goal:'Пойми проблемы с записью и картами животных', emoji:'🐾',
+   system:'Ты Сергей, директор ветклиники. Бумажный журнал записи, карты в папках. Реально болит: клиенты путаются с расписанием, врачи тратят время на поиск карт. Старомодный, не доверяешь технологиям по умолчанию. Если вопросы умные — постепенно открывайся. 2-3 предложения.'}
+];
+
+let cdevHistory=[], cdevScenario=null, cdevDone=false;
+
+function renderCdev(){
+  if(!hasAPI()){ showNoAPI(); navigate('home',false); return; }
+  cdevScenario=CDEV_LIST[Math.floor(Math.random()*CDEV_LIST.length)];
+  cdevHistory=[]; cdevDone=false;
+  const s=cdevScenario;
+  document.getElementById('screen').innerHTML=`<div class="screen-in">
+    <div class="prac-header">
+      <div class="back-btn" onclick="navigate('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15,18 9,12 15,6"/></svg></div>
+      <div class="prac-title-block">
+        <div class="module-tag tag-biz">customer dev</div>
+        <div class="prac-title">Интервью с клиентом</div>
+        <div class="prac-subtitle">Слушай — не продавай</div>
+      </div>
+    </div>
+    <div class="task-card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <div style="font-size:28px">${s.emoji}</div>
+        <div><div style="font-size:14px;font-weight:600;color:var(--tx)">${s.name}</div><div style="font-size:12px;color:var(--tx3)">${s.role}</div></div>
+      </div>
+      <div class="task-label">Твоя задача</div>
+      <div class="task-text">${s.goal}</div>
+      <div class="task-chips">
+        <div class="chip">открытые вопросы</div>
+        <div class="chip">не продавай</div>
+        <div class="chip">копай глубже</div>
+      </div>
+    </div>
+    <div class="chat-wrap">
+      <div class="chat-area" id="chat-area">
+        <div class="msg system"><div class="msg-bubble">Ты позвонил и сказал что изучаешь рынок. Начни разговор.</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="chat-input-row">
+    <textarea class="chat-input" id="chat-inp" placeholder="Твой вопрос..." rows="1"
+      oninput="autoResize(this)" onkeydown="chatKey(event,'cdev')"></textarea>
+    <button class="send-btn" id="send-btn" onclick="sendCdev()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg>
+    </button>
+  </div>`;
+}
+
+async function sendCdev(){
+  if(cdevDone) return;
+  const inp=document.getElementById('chat-inp');
+  const text=inp.value.trim();
+  if(!text) return;
+  inp.value=''; inp.style.height='';
+  const btn=document.getElementById('send-btn');
+  btn.disabled=true;
+  const area=document.getElementById('chat-area');
+  appendMsg(area,'user',text);
+  cdevHistory.push({role:'user',content:text});
+  showTyping(area);
+  try{
+    const reply=await aiChat(cdevScenario.system, cdevHistory.slice(-10));
+    removeTyping();
+    const clean=reply.replace(/\[.*?\]/g,'').trim();
+    cdevHistory.push({role:'assistant',content:clean});
+    appendMsg(area,'ai',clean);
+    if(cdevHistory.length>=10){
+      cdevDone=true; S.cdevN++; save(); addXP(20);
+      appendMsg(area,'system','Интервью завершено! Получи разбор ниже.');
+      const db=document.createElement('div');
+      db.style='padding:0 16px 16px';
+      db.innerHTML='<button class="btn-primary" onclick="getCdevDebrief()">Разбор — что узнал и как улучшить</button>';
+      document.querySelector('.screen-in').appendChild(db);
+    } else { btn.disabled=false; }
+  }catch(e){ removeTyping(); appendMsg(area,'system','Ошибка API.'); btn.disabled=false; }
+}
+
+async function getCdevDebrief(){
+  const area=document.getElementById('chat-area');
+  showTyping(area);
+  const tr=cdevHistory.map(m=>(m.role==='user'?'Интервьюер':'Респондент')+': '+m.content).join('\n');
+  try{
+    const d=await aiChat(
+      'Эксперт по Customer Development. Разбери интервью:\n1. Какие боли удалось выявить\n2. Где начинал продавать вместо слушать ❌\n3. Сильные вопросы ✅\n4. 2 вопроса которые стоило задать но не задал\nКратко, по-русски.',
+      [{role:'user',content:'Интервью с '+cdevScenario.name+':\n\n'+tr}]
+    );
+    removeTyping(); appendMsg(area,'ai',d); addXP(10);
+  }catch(e){ removeTyping(); appendMsg(area,'system','Ошибка API.'); }
+}
+
+// ─── SQL ──────────────────────────────────────────────────
+const SQL_TASKS=[
+  {id:'s1',lvl:'A1',title:'Клиенты Ракеты',
+   ctx:'Таблица profiles:\n  id, name, phone, role, created_at\nРоли: client | admin',
+   q:'Выбери все записи где role = client, отсортируй по created_at по убыванию. Покажи только name и phone.',
+   hint:"SELECT name, phone\nFROM profiles\nWHERE role = '...'\nORDER BY created_at ...;",
+   keys:['select','name','phone','from profiles','where role','client','order by created_at','desc'],
+   explain:"SELECT name, phone\nFROM profiles\nWHERE role = 'client'\nORDER BY created_at DESC\n\nDESC = новые клиенты первыми. Без DESC — старые."},
+  {id:'s2',lvl:'A1',title:'Статистика бронирований',
+   ctx:'Таблица bookings:\n  id, client_id, service, status, amount\nСтатусы: pending | confirmed | cancelled',
+   q:'Подсчитай количество бронирований по каждому статусу.',
+   hint:'SELECT status, COUNT(*)\nFROM bookings\nGROUP BY ...;',
+   keys:['select','status','count','from bookings','group by'],
+   explain:"SELECT status, COUNT(*) as total\nFROM bookings\nGROUP BY status\n\nCOUNT(*) считает строки в каждой группе. GROUP BY разбивает по уникальным значениям."},
+  {id:'s3',lvl:'A2',title:'Джойн: клиент + брони',
+   ctx:'profiles(id, name, phone)\nbookings(id, client_id, service, date)\n\nclient_id → profiles.id',
+   q:'Покажи имя клиента и сервис для всех бронирований сегодня.',
+   hint:'SELECT p.name, b.service\nFROM bookings b\nJOIN profiles p ON ...\nWHERE b.date = ...;',
+   keys:['join','profiles','bookings','on','client_id','name','service','current_date'],
+   explain:"SELECT p.name, b.service\nFROM bookings b\nJOIN profiles p ON b.client_id = p.id\nWHERE b.date = CURRENT_DATE\n\nАлиасы b и p сокращают запись. JOIN соединяет по ключу."},
+  {id:'s4',lvl:'A2',title:'RLS политика Supabase',
+   ctx:'Таблица messages(id, user_id, text, created_at)\n\nНужно: пользователь видит ТОЛЬКО свои сообщения.\nauth.uid() возвращает ID текущего пользователя.',
+   q:'Напиши SQL для создания RLS политики SELECT на таблицу messages.',
+   hint:'CREATE POLICY "..." ON messages\nFOR SELECT USING (...);',
+   keys:['create policy','on messages','for select','using','auth.uid'],
+   explain:"CREATE POLICY \"own_messages\" ON messages\nFOR SELECT USING (user_id = auth.uid())\n\nRLS фильтрует строки на уровне БД — даже зная anon key, чужие данные недоступны."},
+  {id:'s5',lvl:'B1',title:'Топ-5 клиентов по выручке',
+   ctx:'Таблица bookings(id, client_id, amount, status)\n\nНужны топ-5 клиентов по сумме confirmed бронирований.',
+   q:'Напиши запрос: client_id, суммарный amount, только confirmed, топ-5 по убыванию суммы.',
+   hint:'SELECT client_id, SUM(amount) as total\nFROM bookings\nWHERE ...\nGROUP BY ...\nORDER BY total DESC\nLIMIT ...;',
+   keys:['select','client_id','sum','amount','from bookings','where','confirmed','group by client_id','order by','desc','limit 5'],
+   explain:"SELECT client_id, SUM(amount) as total\nFROM bookings\nWHERE status = 'confirmed'\nGROUP BY client_id\nORDER BY total DESC\nLIMIT 5\n\nПорядок: WHERE → GROUP BY → ORDER BY → LIMIT"}
+];
+
+let sqlIdx=0;
+
+function renderSQL(){
+  const task=SQL_TASKS.find(t=>!S.sqlDone.includes(t.id)) || SQL_TASKS[sqlIdx%SQL_TASKS.length];
+  document.getElementById('screen').innerHTML=`<div class="screen-in">
+    <div class="prac-header">
+      <div class="back-btn" onclick="navigate('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15,18 9,12 15,6"/></svg></div>
+      <div class="prac-title-block">
+        <div class="module-tag tag-tech">SQL</div>
+        <div class="prac-title">SQL-квесты</div>
+        <div class="prac-subtitle">${S.sqlDone.length}/${SQL_TASKS.length} выполнено</div>
+      </div>
+    </div>
+    <div class="level-row">
+      ${SQL_TASKS.map(t=>`<div class="level-pill ${S.sqlDone.includes(t.id)?'done':''} ${t.id===task.id?'active':''}" onclick="sqlJump('${t.id}')">${t.lvl}: ${t.title}</div>`).join('')}
+    </div>
+    <div class="sql-task" id="sql-body">
+      ${sqlBody(task)}
+    </div>
+    ${isRest ? `
+    <div class="section-title" style="color:#166534">🌙 Неделя закрепления</div>
+    <div class="modules-grid">
+      <div class="module-card" onclick="navigate('negot')" style="border-color:#bbf7d0;background:#f0fdf4">
+        <div class="module-tag" style="background:#dcfce7;color:#166534">повторение</div>
+        <div class="module-icon">🎭</div>
+        <div class="module-name">Финальные переговоры</div>
+        <div class="module-desc">Самый сложный клиент — всё что знаешь</div>
+      </div>
+      <div class="module-card" onclick="navigate('review')" style="border-color:#bbf7d0;background:#f0fdf4">
+        <div class="module-tag" style="background:#dcfce7;color:#166534">повторение</div>
+        <div class="module-icon">🔍</div>
+        <div class="module-name">Код-ревью микс</div>
+        <div class="module-desc">Все типы задач вперемешку</div>
+      </div>
+      <div class="module-card" onclick="navigate('sql')" style="border-color:#bbf7d0;background:#f0fdf4">
+        <div class="module-tag" style="background:#dcfce7;color:#166534">повторение</div>
+        <div class="module-icon">🗄️</div>
+        <div class="module-name">SQL марафон</div>
+        <div class="module-desc">Прогони все задачи заново</div>
+      </div>
+      <div class="module-card" onclick="navigate('arch')" style="border-color:#bbf7d0;background:#f0fdf4">
+        <div class="module-tag" style="background:#dcfce7;color:#166534">повторение</div>
+        <div class="module-icon">🏗️</div>
+        <div class="module-name">Архитектурный финал</div>
+        <div class="module-desc">Все дилеммы по кругу</div>
+      </div>
+    </div>` : ''}
+    <div style="height:20px"></div>
+  </div>`;
+}
+
+function sqlBody(task){
+  return `<div class="sql-label">Задача — ${task.title} <span style="color:var(--blue)">[${task.lvl}]</span></div>
+  <div class="sql-context">${task.ctx}</div>
+  <div class="task-label" style="padding:0 0 6px;font-size:10px">Задание</div>
+  <div style="font-size:13px;color:var(--tx);margin-bottom:12px;line-height:1.6">${task.q}</div>
+  <div class="task-label" style="padding:0 0 5px;font-size:10px">Подсказка</div>
+  <div class="sql-code">${task.hint}</div>
+  <textarea class="sql-editor" id="sql-inp" placeholder="Напиши SQL запрос здесь..."></textarea>
+  <div class="btn-row">
+    <button class="btn-primary" onclick="checkSQL('${task.id}')">Проверить</button>
+    <button class="btn-secondary" id="hint-btn" onclick="toggleSQLHint('${task.id}')">Ответ</button>
+  </div>
+  <div id="sql-result"></div>
+  <div id="sql-hint" class="sql-code" style="display:none;margin-top:10px"></div>`;
+}
+
+function sqlJump(id){
+  const task=SQL_TASKS.find(t=>t.id===id);
+  if(task) document.getElementById('sql-body').innerHTML=sqlBody(task);
+}
+
+function toggleSQLHint(id){
+  const task=SQL_TASKS.find(t=>t.id===id);
+  const el=document.getElementById('sql-hint');
+  el.style.display=el.style.display==='none'?'block':'none';
+  if(el.style.display==='block') el.textContent=task.explain;
+}
+
+function checkSQL(id){
+  const task=SQL_TASKS.find(t=>t.id===id);
+  const ans=(document.getElementById('sql-inp').value||'').toLowerCase().trim();
+  if(!ans){ toast('Напиши запрос'); return; }
+  const hits=task.keys.filter(k=>ans.includes(k.toLowerCase()));
+  const score=hits.length/task.keys.length;
+  const res=document.getElementById('sql-result');
+  if(score>=0.75){
+    res.className='result-block result-ok';
+    res.innerHTML='✅ Верно! Все ключевые элементы на месте.';
+    if(!S.sqlDone.includes(id)){ S.sqlDone.push(id); save(); addXP(25); }
+    setTimeout(()=>{
+      const next=SQL_TASKS.find(t=>!S.sqlDone.includes(t.id));
+      if(next){ document.getElementById('sql-body').innerHTML=sqlBody(next); toast('Следующая задача!'); }
+      else toast('Все задачи пройдены! 🎉');
+    },1400);
+  } else {
+    const missed=task.keys.filter(k=>!ans.includes(k.toLowerCase())).slice(0,3);
+    res.className='result-block result-err';
+    res.innerHTML='❌ Не хватает: '+missed.map(k=>`<code style="background:var(--bg4);padding:1px 5px;border-radius:3px;font-size:11px">${k}</code>`).join(' ');
+  }
+}
+
+// ─── КОД-РЕВЬЮ ────────────────────────────────────────────
+const REVIEW_TASKS=[
+  {
+    title:'Уязвимость: пользователь сам ставит роль',
+    code:`async function saveUser(phone, name) {
+  const { data, error } = await supabase
+    .from('users')
+    .insert({
+      phone,
+      name,
+      role: 'admin',   // ← клиент передаёт роль сам
+      created_at: new Date()
+    });
+  return data;
+}`,
+    opts:[
+      {t:'role: admin передаётся с клиента — любой может стать админом',c:true,
+       e:'✅ Критично. Роль должна назначаться триггером на сервере или через проверку в Edge Function. С клиента принимай только name и phone.'},
+      {t:'created_at не нужен — Supabase ставит сам через DEFAULT now()',c:true,
+       e:'✅ Верно. Лишнее поле в insert ведёт к путанице. Убери created_at из запроса — Supabase справится сам.'},
+      {t:'Нет обработки ошибок — error не проверяется',c:true,
+       e:'✅ Важно. Если вставка упадёт — функция вернёт undefined без предупреждения. Добавь: if(error) throw error;'},
+      {t:'Нужно использовать async/await по-другому',c:false,
+       e:'❌ Нет, синтаксис async/await здесь правильный. Это не проблема.'}
+    ]
+  },
+  {
+    title:'Service Worker: кеш никогда не обновляется',
+    code:`const CACHE = 'app-v1'; // никогда не меняется
+
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open(CACHE).then(c =>
+      c.addAll(['/', '/index.html', '/app.js'])
+    )
+  );
+  // нет skipWaiting()
+});
+
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    caches.match(e.request)
+      .then(r => r || fetch(e.request))
+  );
+});`,
+    opts:[
+      {t:"CACHE = 'app-v1' — версия не меняется, пользователи видят старую версию",c:true,
+       e:'✅ Главная проблема. При каждом деплое меняй: app-v2, app-v3. Иначе браузер отдаёт кеш даже после обновления.'},
+      {t:'Cache-first: index.html берётся из кеша, свежая версия не приходит',c:true,
+       e:'✅ Верно. Для index.html нужна network-first стратегия: сначала сеть, при ошибке — кеш.'},
+      {t:'Нет события activate — старые кеши копятся и занимают место',c:true,
+       e:'✅ Важно. В activate нужно удалять старые ключи кроме текущей версии.'},
+      {t:'addAll принимает только абсолютные пути — / и /index.html одно и то же',c:false,
+       e:'❌ Нет, это не проблема. addAll корректно обрабатывает оба пути.'}
+    ]
+  },
+  {
+    title:'Утечка данных через Supabase без RLS',
+    code:`// Запрос без RLS — любой видит всё
+const { data } = await supabase
+  .from('orders')
+  .select('*');
+
+// Фильтрация на клиенте
+const myOrders = data.filter(
+  o => o.user_id === currentUser.id
+);`,
+    opts:[
+      {t:'Без RLS select(*) возвращает ВСЕ заказы всех пользователей',c:true,
+       e:'✅ Критичная утечка. Даже если на клиенте фильтруем — сервер уже отдал чужие данные. Включи RLS и добавь политику: USING (user_id = auth.uid())'},
+      {t:'filter на клиенте — лишняя нагрузка на браузер и сеть',c:true,
+       e:'✅ Верно. Фильтрация должна быть в запросе: .eq("user_id", user.id). Тогда БД отдаёт только нужные строки.'},
+      {t:'select(*) медленнее чем выбирать конкретные поля',c:false,
+       e:'❌ Это вопрос оптимизации, не безопасности. Для небольших таблиц несущественно.'},
+      {t:'currentUser.id может быть undefined если пользователь не залогинен',c:true,
+       e:'✅ Важно. Если currentUser null — filter ничего не вернёт но данные всё равно скачаны. Проверяй авторизацию до запроса.'}
+    ]
+  }
+];
+
+let reviewTask=null, reviewSel={}, reviewChecked=false;
+
+function renderReview(){
+  reviewTask=REVIEW_TASKS[S.reviewDone%REVIEW_TASKS.length];
+  reviewSel={}; reviewChecked=false;
+  const t=reviewTask;
+  document.getElementById('screen').innerHTML=`<div class="screen-in">
+    <div class="prac-header">
+      <div class="back-btn" onclick="navigate('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15,18 9,12 15,6"/></svg></div>
+      <div class="prac-title-block">
+        <div class="module-tag tag-tech">код-ревью</div>
+        <div class="prac-title">Найди проблемы</div>
+        <div class="prac-subtitle">${t.title}</div>
+      </div>
+    </div>
+    <pre class="code-snippet">${t.code}</pre>
+    <div style="padding:0 16px 8px;font-size:13px;color:var(--tx2)">Отметь все проблемы которые видишь:</div>
+    <div class="bug-hunt" id="bug-hunt">
+      ${t.opts.map((o,i)=>`
+        <div class="bug-item" id="bug-${i}" onclick="toggleBug(${i})">
+          <div class="bug-q">${o.t}</div>
+          <div class="bug-exp" id="bugexp-${i}">${o.e}</div>
+        </div>`).join('')}
+    </div>
+    <div style="padding:0 16px 20px">
+      <button class="btn-primary" onclick="checkReview()">Проверить</button>
+      <div id="rev-result" style="margin-top:12px"></div>
+    </div>
+  </div>`;
+}
+
+function toggleBug(i){
+  if(reviewChecked) return;
+  reviewSel[i]=!reviewSel[i];
+  const el=document.getElementById('bug-'+i);
+  el.className='bug-item'+(reviewSel[i]?' sel':'');
+}
+
+function checkReview(){
+  if(reviewChecked) return;
+  reviewChecked=true;
+  const t=reviewTask;
+  let correct=0, total=t.opts.filter(o=>o.c).length;
+  t.opts.forEach((o,i)=>{
+    const el=document.getElementById('bug-'+i);
+    const exp=document.getElementById('bugexp-'+i);
+    exp.style.display='block';
+    if(o.c && reviewSel[i]){ el.className='bug-item correct'; correct++; }
+    else if(!o.c && reviewSel[i]){ el.className='bug-item wrong'; }
+    else if(o.c && !reviewSel[i]){ el.className='bug-item missed'; }
+  });
+  const xp=correct*10;
+  addXP(xp); S.reviewDone++; save();
+  const res=document.getElementById('rev-result');
+  res.innerHTML=`<div class="${correct===total?'result-block result-ok':'result-block result-err'}">
+    ${correct===total?'✅':'⚠️'} Найдено ${correct}/${total} проблем (+${xp} XP)
+  </div>
+  <button class="btn-primary" style="margin-top:10px" onclick="navigate('review')">Следующая задача</button>`;
+}
+
+// ─── ЮНИТ ЭКОНОМИКА ───────────────────────────────────────
+function renderEcon(){
+  document.getElementById('screen').innerHTML=`<div class="screen-in">
+    <div class="prac-header">
+      <div class="back-btn" onclick="navigate('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15,18 9,12 15,6"/></svg></div>
+      <div class="prac-title-block">
+        <div class="module-tag tag-biz">экономика</div>
+        <div class="prac-title">Юнит-экономика</div>
+        <div class="prac-subtitle">Считай реальные проекты</div>
+      </div>
+    </div>
+    <div style="padding:0 16px 20px">
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <button class="btn-secondary" style="font-size:12px" onclick="fillEcon('raketa')">🎡 Ракета</button>
+        <button class="btn-secondary" style="font-size:12px" onclick="fillEcon('postroy')">🏗️ ПостройДом</button>
+        <button class="btn-secondary" style="font-size:12px" onclick="fillEcon('lesso')">📚 Lesso</button>
+      </div>
+      ${econField('mrr','Подписка в месяц (₽)','4000')}
+      ${econField('cac','Стоимость привлечения клиента (₽ / CAC)','0')}
+      ${econField('lt','Среднее время жизни клиента (месяцев)','12')}
+      ${econField('hrs','Часов поддержки в месяц','3')}
+      ${econField('rate','Стоимость твоего часа (₽)','1000')}
+      <button class="btn-primary" style="margin-top:14px" onclick="calcEcon()">Рассчитать</button>
+      <div id="econ-res" style="margin-top:16px"></div>
+    </div>
+  </div>`;
+}
+
+function econField(id,label,ph){
+  return `<div style="margin-bottom:12px">
+    <div class="task-label" style="padding:0 0 5px">${label}</div>
+    <input id="${id}" type="number" placeholder="${ph}" class="econ-input">
+  </div>`;
+}
+
+function fillEcon(type){
+  const data={raketa:{mrr:4000,cac:0,lt:18,hrs:3,rate:1000},postroy:{mrr:3000,cac:0,lt:12,hrs:2,rate:1000},lesso:{mrr:1500,cac:0,lt:9,hrs:1,rate:1000}};
+  const d=data[type];
+  Object.keys(d).forEach(k=>{ const el=document.getElementById(k); if(el) el.value=d[k]; });
+}
+
+function calcEcon(){
+  const v=k=>parseFloat(document.getElementById(k).value)||0;
+  const mrr=v('mrr'),cac=v('cac'),lt=v('lt')||12,hrs=v('hrs'),rate=v('rate')||1000;
+  const ltv=Math.round(mrr*lt);
+  const cost=Math.round(hrs*rate);
+  const margin=mrr-cost;
+  const marginPct=mrr>0?Math.round(margin/mrr*100):0;
+  const ltvCac=cac>0?(ltv/cac).toFixed(1):'∞';
+  const payback=cac>0&&margin>0?Math.ceil(cac/margin):0;
+  addXP(5);
+  document.getElementById('econ-res').innerHTML=`
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-val">${ltv.toLocaleString()}₽</div><div class="stat-label">LTV</div></div>
+      <div class="stat-card"><div class="stat-val">${ltvCac}x</div><div class="stat-label">LTV/CAC (норма ≥3)</div></div>
+      <div class="stat-card"><div class="stat-val">${margin.toLocaleString()}₽</div><div class="stat-label">Маржа/мес</div></div>
+      <div class="stat-card"><div class="stat-val">${marginPct}%</div><div class="stat-label">% маржи (норма 60%+)</div></div>
+    </div>
+    ${payback>0?`<div style="font-size:13px;color:var(--tx2);margin-top:10px">Окупаемость CAC: <strong style="color:var(--acc)">${payback} мес.</strong></div>`:''}
+    <div style="margin-top:10px;font-size:13px;line-height:1.6;color:var(--tx2)">
+      ${margin<0?'<span style="color:var(--red)">⚠️ Поддержка дороже подписки — убыточный клиент!</span>':marginPct<50?'<span style="color:var(--amber)">💡 Маржа ниже 60% — рассмотри повышение цены</span>':'<span style="color:var(--green)">✅ Хорошая маржинальность</span>'}
+    </div>`;
+}
+
+// ─── КОПИРАЙТИНГ ──────────────────────────────────────────
+const COPY_LIST=[
+  {client:'Директор кафе, 40 мест',pain:'Официанты путают заказы, гости ждут счёт по 20 минут',product:'PWA QR-меню с онлайн-заказом',sec:180},
+  {client:'Владелец парка аттракционов',pain:'Очереди на кассе, нет программы лояльности',product:'Система лояльности + онлайн-запись',sec:180},
+  {client:'Управляющая ветклиникой, 3 врача',pain:'Бумажный журнал записи, звонят по любому поводу',product:'PWA-запись и карта питомца',sec:180}
+];
+
+let copyTimer=null, copyTimeLeft=0, copyTask=null, copyDone=false;
+
+function renderCopy(){
+  if(!hasAPI()){ showNoAPI(); navigate('home',false); return; }
+  copyTask=COPY_LIST[Math.floor(Math.random()*COPY_LIST.length)];
+  copyTimeLeft=copyTask.sec; copyDone=false;
+  clearInterval(copyTimer);
+  const t=copyTask;
+  document.getElementById('screen').innerHTML=`<div class="screen-in">
+    <div class="prac-header">
+      <div class="back-btn" onclick="clearInterval(copyTimer);navigate('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15,18 9,12 15,6"/></svg></div>
+      <div class="prac-title-block">
+        <div class="module-tag tag-biz">копирайтинг</div>
+        <div class="prac-title">Питч за 3 минуты</div>
+        <div class="prac-subtitle" id="timer-disp">3:00</div>
+      </div>
+    </div>
+    <div class="task-card">
+      <div class="task-label">Клиент</div><div class="task-text" style="margin-bottom:8px">${t.client}</div>
+      <div class="task-label">Его боль</div><div class="task-text" style="margin-bottom:8px">${t.pain}</div>
+      <div class="task-label">Твой продукт</div><div class="task-text">${t.product}</div>
+      <div class="task-chips"><div class="chip">боль → усиление → решение → результат</div></div>
+    </div>
+    <div style="padding:0 16px 20px">
+      <textarea id="copy-inp" style="width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r);padding:14px;color:var(--tx);font-family:var(--font);font-size:14px;line-height:1.6;min-height:160px;resize:vertical" placeholder="Напиши питч здесь..."></textarea>
+      <button class="btn-primary" style="margin-top:10px" id="copy-btn" onclick="submitCopy()">Отправить на оценку</button>
+      <div id="copy-res" style="margin-top:14px"></div>
+    </div>
+  </div>`;
+  copyTimer=setInterval(()=>{
+    copyTimeLeft--;
+    const m=Math.floor(copyTimeLeft/60), s=copyTimeLeft%60;
+    const el=document.getElementById('timer-disp');
+    if(el) el.textContent=m+':'+(s<10?'0':'')+s;
+    if(copyTimeLeft<=0){ clearInterval(copyTimer); if(!copyDone) submitCopy(); }
+  },1000);
+}
+
+async function submitCopy(){
+  if(copyDone) return;
+  copyDone=true; clearInterval(copyTimer);
+  const text=(document.getElementById('copy-inp')?.value||'').trim();
+  const btn=document.getElementById('copy-btn');
+  if(btn) btn.disabled=true;
+  if(!text){ toast('Напиши хотя бы что-нибудь'); return; }
+  const res=document.getElementById('copy-res');
+  res.innerHTML='<div style="color:var(--tx3);font-size:13px">Анализирую...</div>';
+  try{
+    const eval_=await aiChat(
+      'Эксперт по B2B продажам в России. Оцени питч фаундера кратко:\n1. Оценка 1-10\n2. Что сработало ✅ (1-2 пункта)\n3. Что упустил ❌ (1-2 пункта)\n4. Переписанная версия (3-5 предложений, по формуле боль→усиление→решение→результат)\nКратко. По-русски.',
+      [{role:'user',content:'Клиент: '+copyTask.client+'\nБоль: '+copyTask.pain+'\nПродукт: '+copyTask.product+'\n\nПитч:\n'+text}]
+    );
+    res.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:15px;font-size:13px;color:var(--tx);line-height:1.7">${eval_.replace(/\n/g,'<br>')}</div>
+    <button class="btn-primary" style="margin-top:10px" onclick="navigate('copy')">Ещё задание</button>`;
+    addXP(20);
+  }catch(e){ res.innerHTML='<div class="result-block result-err">Ошибка API. Проверь ключ.</div>'; }
+}
+
+// ─── АРХИТЕКТУРА ──────────────────────────────────────────
+const ARCH_LIST=[
+  {q:'PWA для кафе. Меню меняется раз в неделю менеджером. Где хранить данные меню?',
+   opts:['localStorage в браузере клиента','Supabase таблица menu','JSON файл на Vercel','IndexedDB'],
+   c:2, exp:'JSON файл на Vercel — оптимально для статичных данных. Меняешь файл → редеплой → все получают свежее меню автоматически. Supabase избыточен для данных которые меняются раз в неделю. localStorage не обновится у других пользователей.'},
+  {q:'Клиент боится что конкурент увидит его данные. У тебя Supabase с anon key в коде. Что делаешь?',
+   opts:['Скрываю ключ через Vercel env переменную','Настраиваю RLS политики в Supabase','Перехожу на платный план Supabase','Добавляю пароль на страницу (htaccess)'],
+   c:1, exp:'RLS (Row Level Security) — правильный ответ. Даже зная anon key, без нужных политик пользователь не увидит чужие данные. Env переменные для anon key не нужны — он и так должен быть публичным (это его суть).'},
+  {q:'Нужно хранить черновик формы пока пользователь заполняет (пропал интернет — данные не потерялись). Куда сохранять?',
+   opts:['Supabase — надёжно','localStorage — работает офлайн','sessionStorage — до закрытия вкладки','IndexedDB — для больших данных'],
+   c:1, exp:'localStorage — правильно. Работает офлайн, данные не теряются при перезагрузке, простой API. sessionStorage сотрётся при закрытии вкладки. Supabase требует сети. IndexedDB избыточен для простого черновика формы.'},
+  {q:'PWA стал тормозить — каждый клик перерисовывает всю страницу через innerHTML. Как правильнее?',
+   opts:['Перейти на React','Обновлять только нужные DOM-элементы через getElementById','Добавить requestAnimationFrame','Уменьшить CSS'],
+   c:1, exp:'Точечное обновление нужных элементов через getElementById/querySelector — правильный подход. innerHTML всей страницы сбрасывает состояние и медленнее. React решит проблему но добавит сложность — для PWA на чистом JS это оверкилл.'}
+];
+
+let archIdx=0;
+
+function renderArch(){
+  const task=ARCH_LIST[archIdx%ARCH_LIST.length];
+  document.getElementById('screen').innerHTML=`<div class="screen-in">
+    <div class="prac-header">
+      <div class="back-btn" onclick="navigate('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15,18 9,12 15,6"/></svg></div>
+      <div class="prac-title-block">
+        <div class="module-tag tag-tech">архитектура</div>
+        <div class="prac-title">Архитектурные дилеммы</div>
+        <div class="prac-subtitle">${archIdx+1}/${ARCH_LIST.length}</div>
+      </div>
+    </div>
+    <div class="review-context">${task.q}</div>
+    <div class="review-options" id="arch-opts">
+      ${task.opts.map((o,i)=>`<div class="review-opt" id="aopt-${i}" onclick="checkArch(${i},${task.c},'${task.exp.replace(/'/g,"&#39;")}')">${o}</div>`).join('')}
+    </div>
+    <div id="arch-exp" style="display:none" class="review-explain">${task.exp}</div>
+  </div>`;
+}
+
+function checkArch(i,correct,exp){
+  document.querySelectorAll('.review-opt').forEach((el,idx)=>{
+    el.onclick=null;
+    if(idx===correct) el.className='review-opt correct';
+    else if(idx===i) el.className='review-opt wrong';
+  });
+  const expEl=document.getElementById('arch-exp');
+  expEl.style.display='block'; expEl.textContent=exp;
+  if(i===correct){ addXP(15); }
+  archIdx++;
+  setTimeout(renderArch, 2500);
+}
+
+// ─── GIT ──────────────────────────────────────────────────
+const GIT_LIST=[
+  {title:'Сломал прод — откатись',
+   ctx:'Ты запушил изменения и сайт упал. Пользователи видят ошибку. Расставь шаги в правильном порядке:',
+   steps:['git log --oneline','Найти хеш последнего рабочего коммита','git revert <hash>','git push origin main']},
+  {title:'Фича без риска для прода',
+   ctx:'Нужно добавить систему лояльности не ломая рабочую версию. Правильный порядок:',
+   steps:['git checkout -b feature/loyalty','Разработка и коммиты изменений','git checkout main','git merge feature/loyalty']},
+  {title:'Срочный hotfix в прод',
+   ctx:'На main есть незавершённая фича. Нужно срочно исправить баг в проде. Порядок действий:',
+   steps:['git stash','git checkout main','Исправить баг и сделать коммит','git push origin main','git stash pop']}
+];
+
+let gitTask=null, gitSelected=[], gitDone=false;
+
+function renderGit(){
+  gitTask=GIT_LIST[Math.floor(Math.random()*GIT_LIST.length)];
+  gitSelected=[]; gitDone=false;
+  const shuffled=[...gitTask.steps].sort(()=>Math.random()-0.5);
+  gitTask._shuffled=shuffled;
+  document.getElementById('screen').innerHTML=`<div class="screen-in">
+    <div class="prac-header">
+      <div class="back-btn" onclick="navigate('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15,18 9,12 15,6"/></svg></div>
+      <div class="prac-title-block">
+        <div class="module-tag tag-tech">git</div>
+        <div class="prac-title">${gitTask.title}</div>
+      </div>
+    </div>
+    <div class="review-context">${gitTask.ctx}</div>
+    <div style="padding:0 16px 12px;font-size:12px;color:var(--tx3)">Нажимай шаги в правильном порядке:</div>
+    <div style="padding:0 16px" id="git-steps">
+      ${shuffled.map((s,i)=>`<div class="git-step" id="gs-${i}" onclick="selectGit(${i})">${s}</div>`).join('')}
+    </div>
+    <div style="padding:0 16px 20px" id="git-result"></div>
+  </div>`;
+}
+
+function selectGit(i){
+  if(gitDone) return;
+  if(gitSelected.includes(i)) return;
+  gitSelected.push(i);
+  const el=document.getElementById('gs-'+i);
+  el.className='git-step sel';
+  el.innerHTML=`<span style="color:var(--tx3);font-size:10px">#${gitSelected.length} </span>${gitTask._shuffled[i]}`;
+
+  if(gitSelected.length===gitTask.steps.length){
+    gitDone=true;
+    const correct=gitSelected.every((val,idx)=>gitTask._shuffled[val]===gitTask.steps[idx]);
+    gitSelected.forEach((val,idx)=>{
+      const el=document.getElementById('gs-'+val);
+      el.className='git-step '+(gitTask._shuffled[val]===gitTask.steps[idx]?'correct':'wrong');
+    });
+    const res=document.getElementById('git-result');
+    if(correct){
+      res.innerHTML='<div class="result-block result-ok">✅ Верно! +15 XP</div>';
+      addXP(15);
+    } else {
+      res.innerHTML=`<div class="result-block result-err">❌ Не совсем. Правильный порядок:<br>${gitTask.steps.map((s,i)=>`${i+1}. <code style="font-size:11px">${s}</code>`).join('<br>')}</div>`;
+    }
+    res.innerHTML+=`<button class="btn-primary" style="margin-top:10px" onclick="navigate('git')">Ещё сценарий</button>`;
+  }
+}
+
+// ─── STATS ────────────────────────────────────────────────
+function renderStats(){
+  const ci = getCycleInfo();
+  document.getElementById('screen').innerHTML=`<div class="stats-screen screen-in">
+    <div class="stats-title">Мой прогресс</div>
+    <div style="background:${ci.phase==='rest'?'#f0fdf4':'#eff6ff'};border:1px solid ${ci.phase==='rest'?'#bbf7d0':'#bfdbfe'};border-radius:var(--r);padding:14px 16px;margin-bottom:16px">
+      <div style="font-size:12px;font-weight:600;color:${ci.phase==='rest'?'#166534':'#1e40af'}">
+        ${ci.phase==='rest'?'🌙 Неделя закрепления':'📚 Активный цикл'} ${ci.cycleNum}
+      </div>
+      <div style="font-size:12px;color:var(--tx2);margin-top:4px">День ${ci.dayInCycle}/28 • Всего дней обучения: ${ci.dayTotal}</div>
+      <div style="font-size:12px;color:var(--tx2);margin-top:2px">Пройдено тестов: ${S.testDone.length}</div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-val">${S.xp}</div><div class="stat-label">Всего XP</div></div>
+      <div class="stat-card"><div class="stat-val">${S.streak}🔥</div><div class="stat-label">Дней подряд</div></div>
+      <div class="stat-card"><div class="stat-val">${S.sqlDone.length}/5</div><div class="stat-label">SQL задач</div></div>
+      <div class="stat-card"><div class="stat-val">${S.reviewDone}</div><div class="stat-label">Код-ревью</div></div>
+      <div class="stat-card"><div class="stat-val">${S.negotN}</div><div class="stat-label">Переговоры</div></div>
+      <div class="stat-card"><div class="stat-val">${S.cdevN}</div><div class="stat-label">CustDev</div></div>
+    </div>
+    <div class="section-title">Как получать XP</div>
+    ${[['SQL задача','25'],['Код-ревью','10–30'],['Переговоры','20'],['Разбор переговоров','10'],
+       ['CustDev интервью','20'],['Питч за 3 мин','20'],['Арх. дилемма','15'],['Git сценарий','15'],
+       ['Юнит-экономика','5']].map(([n,x])=>`
+      <div class="history-item">
+        <div class="hist-name">${n}</div>
+        <div class="hist-score">+${x} XP</div>
+      </div>`).join('')}
+    ${isRest ? `
+    <div class="section-title" style="color:#166534">🌙 Неделя закрепления</div>
+    <div class="modules-grid">
+      <div class="module-card" onclick="navigate('negot')" style="border-color:#bbf7d0;background:#f0fdf4">
+        <div class="module-tag" style="background:#dcfce7;color:#166534">повторение</div>
+        <div class="module-icon">🎭</div>
+        <div class="module-name">Финальные переговоры</div>
+        <div class="module-desc">Самый сложный клиент — всё что знаешь</div>
+      </div>
+      <div class="module-card" onclick="navigate('review')" style="border-color:#bbf7d0;background:#f0fdf4">
+        <div class="module-tag" style="background:#dcfce7;color:#166534">повторение</div>
+        <div class="module-icon">🔍</div>
+        <div class="module-name">Код-ревью микс</div>
+        <div class="module-desc">Все типы задач вперемешку</div>
+      </div>
+      <div class="module-card" onclick="navigate('sql')" style="border-color:#bbf7d0;background:#f0fdf4">
+        <div class="module-tag" style="background:#dcfce7;color:#166534">повторение</div>
+        <div class="module-icon">🗄️</div>
+        <div class="module-name">SQL марафон</div>
+        <div class="module-desc">Прогони все задачи заново</div>
+      </div>
+      <div class="module-card" onclick="navigate('arch')" style="border-color:#bbf7d0;background:#f0fdf4">
+        <div class="module-tag" style="background:#dcfce7;color:#166534">повторение</div>
+        <div class="module-icon">🏗️</div>
+        <div class="module-name">Архитектурный финал</div>
+        <div class="module-desc">Все дилеммы по кругу</div>
+      </div>
+    </div>` : ''}
+    <div style="height:20px"></div>
+  </div>`;
+}
+
+// ─── CHAT KEY ─────────────────────────────────────────────
+function chatKey(e,type){
+  if(e.key==='Enter'&&!e.shiftKey){
+    e.preventDefault();
+    if(type==='negot') sendNegot();
+    else if(type==='cdev') sendCdev();
+  }
+  autoResize(e.target);
+}
+
+// ─── SW ───────────────────────────────────────────────────
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').then(reg=>{
+    reg.update();
+    reg.addEventListener('updatefound',()=>{
+      const w=reg.installing;
+      w.addEventListener('statechange',()=>{
+        if(w.state==='installed'&&navigator.serviceWorker.controller)
+          document.getElementById('update-banner').style.display='block';
       });
     });
-    navigator.serviceWorker.addEventListener('controllerchange',()=>window.location.reload());
-  }
-
-  history.pushState(null,'',location.href);
-  window.addEventListener('popstate',()=>{
-    if(document.getElementById('scr-breath').classList.contains('on')){closeBreath();}
-    else if(document.getElementById('day-detail-ov').classList.contains('on')){closeDayDetail();}
-    else if(document.getElementById('scr-workout').classList.contains('on')){closeWorkout();}
-    else{goNav('home');}
-    history.pushState(null,'',location.href);
   });
+  navigator.serviceWorker.addEventListener('controllerchange',()=>location.reload());
 }
-init();
+
+// ─── START ────────────────────────────────────────────────
+navigate('home', false);
 </script>
 </body>
 </html>
