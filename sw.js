@@ -1,4 +1,4 @@
-const CACHE = 'dikcia-v13';
+const CACHE = 'dikcia-v12';
 const ASSETS = ['/', '/index.html', '/manifest.json'];
 
 // Установка — кешируем файлы и сразу активируемся
