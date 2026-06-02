@@ -42,9 +42,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 #scr-home{background:var(--bg)}
 
 .home-top{
-  padding:56px 24px 20px;
+  padding:56px 24px 16px;
   background:var(--bg);
   flex-shrink:0;
+  position:sticky;top:0;z-index:10;
+  border-bottom:1px solid var(--border);
 }
 .home-greeting{font-size:13px;color:var(--muted);font-weight:500;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px}
 .home-title{font-size:28px;font-weight:800;color:var(--text);line-height:1.15}
@@ -111,7 +113,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 }
 .hdc-start-btn:active{transform:scale(.97);opacity:.9}
 
-.home-sections{padding:20px 24px 100px;display:flex;flex-direction:column;gap:10px}
+.home-sections{padding:16px 24px 100px;display:flex;flex-direction:column;gap:10px}
 .hs-row{
   display:grid;grid-template-columns:1fr 1fr;gap:10px;
 }
@@ -338,7 +340,7 @@ nav button.on{color:var(--accent)}
     <div class="hdc-focus" id="hdc-focus">Загрузка...</div>
     <div class="hdc-task" id="hdc-task"></div>
     <div class="hdc-steps" id="hdc-steps"></div>
-    <div id="hdc-awareness" style="display:none;margin:0 16px 0;background:#fef3c7;border-left:3px solid #d97706;border-radius:0 8px 8px 0;padding:10px 12px;font-size:13px;color:#92400e;line-height:1.5">
+    <div id="hdc-awareness" style="display:none;margin:0 16px 8px;background:#fef3c7;border-left:3px solid #d97706;border-radius:0 8px 8px 0;padding:10px 12px;font-size:13px;color:#92400e;line-height:1.5">
       🎯 <strong>Задание дня:</strong> <span id="awareness-text"></span>
     </div>
     <button class="hdc-start-btn" id="hdc-start" onclick="startWorkout()">
